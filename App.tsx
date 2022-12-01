@@ -7,6 +7,8 @@ import { AddDepense } from './src/screen/AddDepense';
 import { Icon } from '@rneui/base';
 import * as SQLite from 'expo-sqlite';
 import DatabaseManager from './src/utils/DataBase';
+import { Provider } from 'react-redux';
+import store from './src/redux/Appstore';
 const db = SQLite.openDatabase("database.db");
 
 
@@ -19,9 +21,11 @@ export default function App() {
   });
 
   return (
-    <NavigationContainer>
-      <TabButton />
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <TabButton />
+      </NavigationContainer>
+    </Provider>
   );
 }
 
