@@ -6,7 +6,7 @@ import { Buget } from './src/screen/Buget';
 import { AddDepense } from './src/screen/AddDepense';
 import { Icon } from '@rneui/base';
 import * as SQLite from 'expo-sqlite';
-import DatabaseManager from './src/utils/openDataBase';
+import DatabaseManager from './src/utils/DataBase';
 const db = SQLite.openDatabase("database.db");
 
 
@@ -14,7 +14,7 @@ export default function App() {
 
   DatabaseManager.initializeDatabase();
 
-  DatabaseManager.getCategories().then((result) => {
+  DatabaseManager.getCategory().then((result) => {
     /* TODO:implementation de redux */
   });
 
