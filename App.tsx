@@ -1,14 +1,68 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Buget } from './src/screen/Buget';
+import { AddDepense } from './src/screen/AddDepense';
+import { Icon } from '@rneui/base';
+import * as SQLite from 'expo-sqlite';
+import DatabaseManager from './src/utils/openDataBase';
+const db = SQLite.openDatabase("database.db");
+
 
 export default function App() {
+
+  DatabaseManager.initializeDatabase();
+
+  DatabaseManager.getCategories().then((result) => {
+    /* TODO:implementation de redux */
+  });
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <TabButton />
+    </NavigationContainer>
   );
 }
+
+const Tab = createBottomTabNavigator();
+
+
+export const TabButton = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#e91e63',
+        tabBarStyle: { backgroundColor: '#fff' },
+      }}
+    >
+      <Tab.Screen name="Buget"
+        options={
+          {
+            tabBarLabel: 'Buget',
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="dollar" type='font-awesome' color={color} size={size} />
+            ),
+          }
+        }
+        component={Buget} />
+      <Tab.Screen name="AddDepense"
+        options={
+          {
+            tabBarLabel: 'Buget',
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="money" type='font-awesome' color={color} size={size} />
+            ),
+          }
+        }
+        component={AddDepense} />
+    </Tab.Navigator>
+  );
+}
+
+
+
 
 const styles = StyleSheet.create({
   container: {
