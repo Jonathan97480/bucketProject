@@ -3,12 +3,12 @@ import { View, Text, StyleSheet } from "react-native";
 
 
 
-export const Buget = () => {
+export const Budget = () => {
 
 
     return (
         <View>
-            <Text>Buget</Text>
+            <Text>Budget</Text>
         </View>
     );
 

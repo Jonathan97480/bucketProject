@@ -3,12 +3,12 @@ import { View, Text, StyleSheet } from "react-native";
 
 
 
-export const AddDepense = () => {
+export const AddExpend = () => {
 
 
     return (
         <View>
-            <Text>Dépenses</Text>
+            <Text>AddExpend</Text>
         </View>
     );
 

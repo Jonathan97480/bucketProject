@@ -2,13 +2,13 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Buget } from './src/screen/Buget';
-import { AddDepense } from './src/screen/AddDepense';
+import { Budget } from './src/screen/Budget';
+import { AddExpend } from './src/screen/AddExpend';
 import { Icon } from '@rneui/base';
 import * as SQLite from 'expo-sqlite';
 import DatabaseManager from './src/utils/DataBase';
 import { Provider } from 'react-redux';
-import store from './src/redux/Appstore';
+import store from './src/redux/AppStore';
 const db = SQLite.openDatabase("database.db");
 
 
@@ -41,26 +41,26 @@ export const TabButton = () => {
         tabBarStyle: { backgroundColor: '#fff' },
       }}
     >
-      <Tab.Screen name="Buget"
+      <Tab.Screen name="Budget"
         options={
           {
-            tabBarLabel: 'Buget',
+            tabBarLabel: 'Budget',
             tabBarIcon: ({ color, size }) => (
               <Icon name="dollar" type='font-awesome' color={color} size={size} />
             ),
           }
         }
-        component={Buget} />
-      <Tab.Screen name="AddDepense"
+        component={Budget} />
+      <Tab.Screen name="addExpend"
         options={
           {
-            tabBarLabel: 'Buget',
+            tabBarLabel: 'addExpend',
             tabBarIcon: ({ color, size }) => (
               <Icon name="money" type='font-awesome' color={color} size={size} />
             ),
           }
         }
-        component={AddDepense} />
+        component={AddExpend} />
     </Tab.Navigator>
   );
 }
