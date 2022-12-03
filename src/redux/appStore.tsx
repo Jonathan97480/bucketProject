@@ -4,7 +4,7 @@ import categoryReducer from './categorySlice'
 import expendReducer from './expendSlice'
 
 
-export default configureStore({
+export const store = configureStore({
     reducer: {
         budget: budgetReducer,
         category: categoryReducer,

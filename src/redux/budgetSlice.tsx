@@ -3,12 +3,18 @@
 
 import { createSlice } from '@reduxjs/toolkit'
 
+export interface budgetInterface {
+
+    id: number,
+    name: string,
+    montant: number,
+    start_montant: number,
+    date: string,
+
+}
+
 export interface budgetState {
-    budget: {
-        id: number,
-        name: string,
-        montant: number,
-    }[],
+    budget: budgetInterface[],
     status: 'idle' | 'loading' | 'failed',
     error: string | null,
 }
@@ -24,7 +30,7 @@ export const budgetSlice = createSlice({
     initialState: initialState,
     reducers: {
         addBudget: (state, action) => {
-            state.budget.push(action.payload)
+            state.budget = (action.payload)
             state.status = 'loading'
         },
         setError: (state, action) => {
