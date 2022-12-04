@@ -4,21 +4,28 @@ import { textSizeFixe } from "../utils/TextManipulation";
 import { Image } from "@rneui/themed/";
 import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../utils/IconCustom";
 import { ExpendInfo } from "./ExpendInfo";
+import { ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
+import { useSelector, useDispatch } from 'react-redux';
+import { addExpend, PoleExpend } from "../redux/expendSlice";
+
+
+
 
 interface ItemBudgetProps {
     title: string,
     montant: number,
     id_expend: number,
     name_category: string,
-    ItemDeleteExpendSlice: any,
     indexBudget: number,
     type: string
 }
 
 
-export const ItemBudget = ({ title, montant, id_expend, name_category, ItemDeleteExpendSlice, indexBudget, type }: ItemBudgetProps) => {
+export const ItemBudget = ({ title, montant, id_expend, name_category, indexBudget, type }: ItemBudgetProps) => {
 
     const [modalVisible, setModalVisible] = useState(false);
+    const dispatch = useDispatch();
+    const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
 
     return (
         <TouchableOpacity style={{ marginBottom: 20 }}
@@ -37,7 +44,15 @@ export const ItemBudget = ({ title, montant, id_expend, name_category, ItemDelet
                             text: "OK", onPress: () => {
                                 DatabaseManager.deleteExpend(id_expend).then(() => {
 
-                                    ItemDeleteExpendSlice(indexBudget, id_expend);
+                                    ItemDeleteExpendSlice(indexBudget, id_expend, budget).then((newBudget: PoleExpend[]) => {
+
+                                        dispatch(addExpend(newBudget));
+
+                                    }).catch((error) => {
+
+                                        console.log(error);
+
+                                    });
                                 });
                             }
                         }
@@ -83,8 +98,6 @@ export const ItemBudget = ({ title, montant, id_expend, name_category, ItemDelet
                     isModalVisible={modalVisible} setIsModalVisible={setModalVisible}
                     index_budget={indexBudget}
                     id_expend={id_expend}
-                    ItemDeleteExpendSlice={ItemDeleteExpendSlice}
-
                 />
             </View>
         </TouchableOpacity>

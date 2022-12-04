@@ -1,8 +1,7 @@
 import { Icon } from "@rneui/base";
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { listeExpendInterface } from "../redux/expendSlice";
-import { getColorBudget } from "../screen/Budget";
+import { getColorBudget } from "../utils/ColorCollection";
 import { textSizeFixe } from "../utils/TextManipulation";
 import { ModalAddExpend } from "./ModalAddExpend";
 
@@ -12,12 +11,12 @@ interface SectionTitleProps {
     remaining_budget: number,
     id_budget: number,
     budget_start: number,
-    ItemAddExpendSlice: (value: listeExpendInterface, indexBudget: number) => void,
+
     indexBudget: number
 }
 
 
-export const SectionTitle = ({ title, remaining_budget, budget_start, id_budget, ItemAddExpendSlice, indexBudget }: SectionTitleProps) => {
+export const SectionTitle = ({ title, remaining_budget, budget_start, id_budget, indexBudget }: SectionTitleProps) => {
 
     const [modalVisible, setModalVisible] = useState(false);
     return (
@@ -52,7 +51,7 @@ export const SectionTitle = ({ title, remaining_budget, budget_start, id_budget,
                 id_budget={id_budget}
                 isVisible={modalVisible}
                 setIsVisible={setModalVisible}
-                ItemAddExpendSlice={ItemAddExpendSlice}
+
                 indexBudget={indexBudget}
             />
         </View>

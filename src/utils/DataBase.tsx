@@ -393,5 +393,23 @@ export default class DatabaseManager {
         });
     }
 
+    static updateBudget(id: number, montant: number, name: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "UPDATE budget SET start_montant = ?, name = ? WHERE id = ?;",
+                    [montant, name, id]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + UPDATE BUDGET")
+                    resolve();
 
+                }
+            );
+        });
+    }
 }

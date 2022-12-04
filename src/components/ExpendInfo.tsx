@@ -2,8 +2,27 @@ import React from "react";
 import { View, Text, ImageBackground, Alert, Modal } from "react-native";
 import { Icon, Image } from "@rneui/themed/";
 import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../utils/IconCustom";
+import { useSelector, useDispatch } from 'react-redux';
+import { addExpend, PoleExpend } from "../redux/expendSlice";
+import { ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
 
-export function ExpendInfo({ name_category, montant, title, type, date, index_budget, id_expend, ItemDeleteExpendSlice, isModalVisible, setIsModalVisible }: { date: string, name_category: string, montant: number, title: string, type: string, index_budget: number, id_expend: number, ItemDeleteExpendSlice: any, isModalVisible: boolean, setIsModalVisible: any }) {
+interface ItemBudgetProps {
+    date: string,
+    name_category: string,
+    montant: number,
+    title: string,
+    type: string,
+    index_budget: number,
+    id_expend: number,
+    isModalVisible: boolean,
+    setIsModalVisible: (value: boolean) => void
+}
+
+export function ExpendInfo({ name_category, montant, title, type, date, index_budget, id_expend, isModalVisible, setIsModalVisible }: ItemBudgetProps) {
+
+    const dispatch = useDispatch();
+    const budget = useSelector((state: any) => state.expend.expends);
+
     return (
         <Modal
 
@@ -150,7 +169,10 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
                                         },
                                         {
                                             text: "Oui", onPress: () => {
-                                                ItemDeleteExpendSlice(index_budget, id_expend);
+                                                ItemDeleteExpendSlice(index_budget, id_expend, budget).then((_data: PoleExpend[]) => {
+                                                    setIsModalVisible(false);
+                                                    dispatch(addExpend(_data));
+                                                });
                                                 setIsModalVisible(false);
 
                                             }

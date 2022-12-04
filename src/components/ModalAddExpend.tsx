@@ -3,12 +3,25 @@ import { View, Text, StyleSheet, Modal } from "react-native";
 import { Input, Button } from "@rneui/themed/";
 import { Picker } from '@react-native-picker/picker';
 import DatabaseManager from "../utils/DataBase";
-import { listeExpendInterface } from "../redux/expendSlice";
+import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
+import { ItemAddExpendSlice } from "../utils/ExpendManipulation";
+import { useSelector, useDispatch } from 'react-redux';
 
-export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, ItemAddExpendSlice, indexBudget }: { isVisible: boolean, id_budget: number, setIsVisible: (value: boolean) => void, ItemAddExpendSlice: (value: listeExpendInterface, indexBudget: number) => void, indexBudget: number }) => {
+
+
+interface ModalAddExpendProps {
+    isVisible: boolean,
+    id_budget: number,
+    setIsVisible: (value: boolean) => void,
+
+    indexBudget: number
+}
+
+export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget }: ModalAddExpendProps) => {
     const [actionType, setActionType] = useState("add");
     const [isDisabledBtnForm, setIsDisabledBtnForm] = useState(true);
-
+    const dispatch = useDispatch();
+    const budget = useSelector((state: any) => state.expend.expends);
     const [formExpend, setFormExpend] = useState({
         title: "",
         errorTitle: "",
@@ -129,8 +142,12 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, ItemAddExpe
                                     description: "",
                                 });
 
-                                ItemAddExpendSlice(_expend, indexBudget);
-                                console.info("EXPEND REGISTER", _expend);
+                                ItemAddExpendSlice(_expend, indexBudget, budget).then((_data: PoleExpend[]) => {
+                                    dispatch(addExpend(_data));
+                                }).catch((err) => {
+                                    console.error("EXPEND REGISTER", err);
+                                });
+
                                 setIsVisible(false);
 
                             }).catch((error) => {
