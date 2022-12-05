@@ -2,7 +2,7 @@
 import { Button, ListItem } from "@rneui/base";
 import { Icon } from "@rneui/themed";
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, Text, StyleSheet, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from 'react-redux';
 import { EmptyBudget } from "../components/EmptyBudget";
@@ -60,6 +60,7 @@ export const Budget = () => {
         <SafeAreaView
             style={styles.safeAreaView}
         >
+            <StatusBar barStyle="default" />
             <View style={styles.container}>
 
                 {

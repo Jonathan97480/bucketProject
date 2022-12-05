@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
 import { Input, Button } from "@rneui/themed/";
 import { Picker } from '@react-native-picker/picker';
 import DatabaseManager from "../utils/DataBase";
 import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
-import { ItemAddExpendSlice } from "../utils/ExpendManipulation";
+import { fixedFloatNumber, ItemAddExpendSlice, ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
 import { useSelector, useDispatch } from 'react-redux';
 
 
@@ -13,26 +13,41 @@ interface ModalAddExpendProps {
     isVisible: boolean,
     id_budget: number,
     setIsVisible: (value: boolean) => void,
+    expend?: listeExpendInterface,
 
     indexBudget: number
 }
 
-export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget }: ModalAddExpendProps) => {
+interface FormAddExpendInterface {
+    title: string,
+    errorTitle: string,
+    montant: string,
+    errorMontant: string,
+    category: string,
+    errorCategory: string,
+    type: string,
+    description: string,
+    quantity: string,
+    errorQuantity: string,
+
+}
+
+export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget, expend }: ModalAddExpendProps) => {
+
+
     const [actionType, setActionType] = useState("add");
     const [isDisabledBtnForm, setIsDisabledBtnForm] = useState(true);
+
     const dispatch = useDispatch();
     const budget = useSelector((state: any) => state.expend.expends);
-    const [formExpend, setFormExpend] = useState({
-        title: "",
-        errorTitle: "",
-        montant: "",
-        errorMontant: "",
-        category: "",
-        errorCategory: "",
-        type: "add",
-        description: "",
 
-    });
+    const [formExpend, setFormExpend] = useState<FormAddExpendInterface>(returnDefaultValueForm(expend));
+
+    useEffect(() => {
+        if (formExpend.type !== actionType) {
+            setActionType(formExpend.type);
+        }
+    }, []);
 
 
     return (
@@ -53,12 +68,14 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
                     <View style={Styles.TitleBlock}>
                         <Text style={actionType === "add" ? Styles.title : Styles.titleActive}
                             onPress={() => {
-                                setActionType("withdrawal");
+                                setActionTypeForm("withdrawal");
+
                             }}
                         >Retrait</Text>
                         <Text style={actionType === "withdrawal" ? Styles.title : Styles.titleActive}
                             onPress={() => {
-                                setActionType("add");
+                                setActionTypeForm("add");
+
                             }}
                         >Dépôt</Text>
 
@@ -72,6 +89,7 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
                                 title: value,
                                 montant: formExpend.montant,
                                 category: formExpend.category,
+                                quantity: formExpend.quantity,
                             });
 
                         }}
@@ -86,12 +104,25 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
                                 title: formExpend.title,
                                 montant: value,
                                 category: formExpend.category,
+                                quantity: formExpend.quantity
                             });
                         }}
                         errorMessage={formExpend.errorMontant}
                     />
-
-                    <View>
+                    <Input
+                        keyboardType="numeric"
+                        placeholder={"Quantité"}
+                        value={formExpend.quantity}
+                        onChangeText={(value) => {
+                            checkForm({
+                                title: formExpend.title,
+                                montant: formExpend.montant,
+                                category: formExpend.category,
+                                quantity: value,
+                            });
+                        }}
+                    />
+                    < View >
                         <Text>{formExpend.errorCategory}</Text>
                         <Picker
                             selectedValue={formExpend.category}
@@ -104,6 +135,8 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
                                     title: formExpend.title,
                                     montant: formExpend.montant,
                                     category: itemValue,
+                                    quantity: formExpend.quantity,
+
                                 });
                             }}
                         >
@@ -122,40 +155,14 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
                         title="ENREGISTRÉE"
                         onPress={() => {
                             setIsDisabledBtnForm(true);
-                            DatabaseManager.createExpenses({
-                                name: formExpend.title,
-                                montant: parseFloat(formExpend.montant),
-                                category: formExpend.category,
-                                type: formExpend.type,
-                                description: formExpend.description,
-                                budget_id: id_budget
-                            }).then((_expend: listeExpendInterface) => {
 
-                                setFormExpend({
-                                    title: "",
-                                    errorTitle: "",
-                                    montant: "",
-                                    errorMontant: "",
-                                    category: "",
-                                    errorCategory: "",
-                                    type: "expend",
-                                    description: "",
-                                });
-
-                                ItemAddExpendSlice(_expend, indexBudget, budget).then((_data: PoleExpend[]) => {
-                                    dispatch(addExpend(_data));
-                                }).catch((err) => {
-                                    console.error("EXPEND REGISTER", err);
-                                });
-
-                                setIsVisible(false);
-
-                            }).catch((error) => {
-                                console.error(error);
-                            });
+                            if (expend) {
+                                updateExpend();
+                            } else {
+                                saveExpend();
+                            }
 
 
-                            setIsVisible(false);
 
 
                         }}
@@ -165,12 +172,13 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
         </Modal >
     )
 
-    function checkForm(form: { title: string, montant: string, category: string }) {
+    function checkForm(form: { title: string, montant: string, category: string, quantity: string, }) {
         const newForm = {
             ...formExpend,
             title: form.title,
             montant: form.montant,
             category: form.category,
+            quantity: form.quantity,
         };
 
         if (form.title === "") {
@@ -196,10 +204,168 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
             setIsDisabledBtnForm(true);
         }
 
+        newForm.quantity = form.quantity;
+        newForm.type = actionType;
 
         setFormExpend(newForm);
 
     }
+
+    function fixedQuantity(quantity: string): string {
+        if (quantity === "") {
+            return "1";
+        } else {
+            return quantity;
+        }
+    }
+    function resetForm() {
+        setFormExpend({
+            title: "",
+            errorTitle: "",
+            montant: "",
+            errorMontant: "",
+            category: "",
+            errorCategory: "",
+            type: "withdrawal",
+            description: "",
+            quantity: "",
+            errorQuantity: "",
+        });
+    }
+
+    function calculateTotalExpend(montant: number, quantity: number): number {
+        let total = 0;
+        total = montant * quantity;
+        return fixedFloatNumber(total);
+
+    }
+
+    function returnDefaultValueForm(expend?: listeExpendInterface): FormAddExpendInterface {
+        let value: FormAddExpendInterface = {
+            title: "",
+            errorTitle: "",
+            montant: "",
+            errorMontant: "",
+            category: "",
+            errorCategory: "",
+            type: "add",
+            description: "",
+            quantity: "",
+            errorQuantity: "",
+
+        }
+
+        if (expend) {
+            value = {
+                title: expend.name,
+                errorTitle: "",
+                montant: expend.montant.toString(),
+                errorMontant: "",
+                category: expend.category,
+                errorCategory: "",
+                type: expend.type,
+                description: expend.description,
+                quantity: expend.quantity.toString(),
+                errorQuantity: "",
+            };
+        }
+
+        return value;
+    }
+
+    function saveExpend() {
+        DatabaseManager.createExpenses({
+            name: formExpend.title,
+            montant: parseFloat(formExpend.montant),
+            montant_total: calculateTotalExpend(
+                parseFloat(formExpend.montant),
+                parseInt(fixedQuantity(formExpend.quantity))
+            ),
+            category: formExpend.category,
+            type: formExpend.type,
+            description: formExpend.description,
+            budget_id: id_budget,
+            quantity: parseInt(fixedQuantity(formExpend.quantity)),
+        }).then((_expend: listeExpendInterface) => {
+
+
+
+            ItemAddExpendSlice(_expend, indexBudget, budget).then((_data: PoleExpend[]) => {
+                resetForm();
+                dispatch(addExpend(_data));
+            }).catch((err) => {
+                console.error("EXPEND REGISTER", err);
+            });
+
+            setIsVisible(false);
+
+        }).catch((error) => {
+            console.error(error);
+        });
+    }
+
+
+    function updateExpend() {
+
+        if (expend) {
+
+
+            DatabaseManager.updateExpend(
+                expend.id,
+                parseFloat(formExpend.montant),
+                formExpend.title,
+                calculateTotalExpend(
+                    parseFloat(formExpend.montant),
+                    parseInt(fixedQuantity(formExpend.quantity))
+                ),
+                parseInt(formExpend.quantity),
+                actionType,
+                formExpend.category,
+
+            ).then(() => {
+                ItemDeleteExpendSlice(indexBudget, expend.id, budget).then((_data: PoleExpend[]) => {
+
+                    ItemAddExpendSlice({
+                        ...expend,
+                        montant: parseFloat(formExpend.montant),
+                        montant_total: calculateTotalExpend(
+                            parseFloat(formExpend.montant),
+                            parseInt(fixedQuantity(formExpend.quantity))
+                        ),
+                        name: formExpend.title,
+                        quantity: parseInt(fixedQuantity(formExpend.quantity)),
+                        type: actionType,
+                        category: formExpend.category,
+
+                    }, indexBudget, _data).then((_data2: PoleExpend[]) => {
+                        resetForm();
+                        dispatch(addExpend(_data2));
+                        setIsVisible(false);
+
+                    }).catch((err) => {
+
+                        console.error("EXPEND REGISTER NEW VALUE ERROR", err);
+                    });
+
+                    setIsVisible(false);
+
+                }).catch((err) => {
+
+                    console.error("Update Expend fixe budget 1 ERROR", err);
+                });
+
+            }).catch((error) => {
+
+                console.error(error);
+            });
+        }
+    }
+
+    function setActionTypeForm(type: string) {
+        setActionType(type);
+        checkForm(formExpend);
+    }
+
 }
 
 

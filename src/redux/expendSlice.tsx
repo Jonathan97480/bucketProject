@@ -7,11 +7,13 @@ export interface listeExpendInterface {
     id: number,
     name: string,
     montant: number,
+    montant_total: number,
     date: string,
     category: string,
     description: string,
     recurrence: number,
     type: string,
+    quantity: number,
 
 
 }

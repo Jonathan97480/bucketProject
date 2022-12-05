@@ -1,30 +1,39 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, ImageBackground, Alert, Modal } from "react-native";
 import { Icon, Image } from "@rneui/themed/";
 import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../utils/IconCustom";
 import { useSelector, useDispatch } from 'react-redux';
-import { addExpend, PoleExpend } from "../redux/expendSlice";
+import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
 import { ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
+import { ModalAddExpend } from "./ModalAddExpend";
 
 interface ItemBudgetProps {
-    date: string,
-    name_category: string,
-    montant: number,
-    title: string,
-    type: string,
+
     index_budget: number,
-    id_expend: number,
     isModalVisible: boolean,
     setIsModalVisible: (value: boolean) => void
+    expend: listeExpendInterface
+    id_budget: number
+
 }
 
-export function ExpendInfo({ name_category, montant, title, type, date, index_budget, id_expend, isModalVisible, setIsModalVisible }: ItemBudgetProps) {
+export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, expend, id_budget }: ItemBudgetProps) {
+
+    const [modalEditExpendVisible, setModalEditExpendVisible] = React.useState(false);
 
     const dispatch = useDispatch();
     const budget = useSelector((state: any) => state.expend.expends);
 
+    function setAllModal(value: boolean) {
+        setIsModalVisible(value);
+        setModalEditExpendVisible(value);
+    }
+
+
+
     return (
         <Modal
+
 
             animationType="slide"
             transparent={true}
@@ -34,6 +43,14 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
             }}
 
         >
+            <ModalAddExpend
+                isVisible={modalEditExpendVisible}
+                id_budget={id_budget}
+                setIsVisible={setAllModal}
+                expend={expend}
+                indexBudget={index_budget}
+
+            />
             <View
                 style={{
 
@@ -66,7 +83,7 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
                             marginTop: 20,
                         }}
 
-                    >{title}</Text>
+                    >{expend.name}</Text>
 
                     <Image
                         resizeMode="contain"
@@ -80,16 +97,16 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
                             marginLeft: "35%",
                         }}
                         source={
-                            name_category === "Alimentation" ? IconAlimentation :
-                                name_category === "Loisirs" ? IconLoisir :
-                                    name_category === "Santé" ? IconSanté :
-                                        name_category === "Vêtements" ? IconVetement :
-                                            name_category === "Logement" ? IconLogement :
+                            expend.category === "Alimentation" ? IconAlimentation :
+                                expend.category === "Loisirs" ? IconLoisir :
+                                    expend.category === "Santé" ? IconSanté :
+                                        expend.category === "Vêtements" ? IconVetement :
+                                            expend.category === "Logement" ? IconLogement :
                                                 IconAutres
                         }
                     />
                     <View style={{
-                        backgroundColor: type === "add" ? "#203EAA" : "#E1424B",
+                        backgroundColor: expend.type === "add" ? "#203EAA" : "#E1424B",
 
                         paddingHorizontal: 12,
                         borderRadius: 5,
@@ -101,19 +118,9 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
 
 
                     }}>
-                        <Text style={{ color: "#fff" }} >{type === "add" ? "Depot" : "Retrait"}</Text>
+                        <Text style={{ color: "#fff" }} >{expend.type === "add" ? "Depot" : "Retrait"}</Text>
                     </View>
-                    <Text
 
-                        style={{
-                            fontSize: 40,
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            marginTop: 0,
-                        }}
-
-                    >{montant}€
-                    </Text>
                     <View
                         style={{
 
@@ -125,7 +132,7 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
                                 fontSize: 20,
                                 fontWeight: "bold",
                                 textAlign: "center",
-                                marginTop: 20,
+                                marginTop: 10,
                             }}
 
                         >Le</Text>
@@ -137,8 +144,40 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
 
                             }}
                         >
-                            {date}
+                            {expend.date}
                         </Text>
+                        <Text
+
+                            style={{
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                marginTop: 10,
+                            }}
+
+                        >Prix unitaire : {expend.montant}€
+                        </Text>
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                marginTop: 10,
+                            }}
+                        >
+                            Quantité : {expend.quantity}
+                        </Text>
+                        <Text
+                            style={{
+                                fontSize: 20,
+                                fontWeight: "bold",
+                                textAlign: "center",
+                                marginTop: 10,
+                            }}
+                        >
+                            TOTAL : {expend.montant_total}€
+                        </Text>
+
                     </View>
 
                     <View
@@ -149,45 +188,78 @@ export function ExpendInfo({ name_category, montant, title, type, date, index_bu
                             marginTop: "10%",
                         }}
                     >
-                        <Icon
-                            name="delete"
-                            type="material-community"
-                            size={50}
+                        <View
                             style={{
-                                elevation: 5,
+                                width: "50%",
+                                alignItems: "center",
+                                flexDirection: "row",
+                                justifyContent: "center",
                             }}
-                            color={"#E1424B"}
-                            onPress={() => {
-                                Alert.alert(
-                                    "Suppression",
-                                    `Voulez-vous vraiment supprimer ${type === "add" ? "ce dépôt" : "cette dépense"} ?`,
-                                    [
-                                        {
-                                            text: "Annuler",
-                                            onPress: () => { },
-                                            style: "cancel"
-                                        },
-                                        {
-                                            text: "Oui", onPress: () => {
-                                                ItemDeleteExpendSlice(index_budget, id_expend, budget).then((_data: PoleExpend[]) => {
+                        >
+                            <Icon
+                                name="delete"
+                                type="material-community"
+                                size={50}
+                                style={{
+                                    elevation: 2,
+                                    marginRight: 40,
+                                    backgroundColor: "#E1424B",
+                                    borderRadius: 50,
+                                    padding: 5,
+                                }}
+                                color={"#fff"}
+                                onPress={() => {
+                                    Alert.alert(
+                                        "Suppression",
+                                        `Voulez-vous vraiment supprimer ${expend.type === "add" ? "ce dépôt" : "cette dépense"} ?`,
+                                        [
+                                            {
+                                                text: "Annuler",
+                                                onPress: () => { },
+                                                style: "cancel"
+                                            },
+                                            {
+                                                text: "Oui", onPress: () => {
+                                                    ItemDeleteExpendSlice(index_budget, expend.id, budget).then((_data: PoleExpend[]) => {
+                                                        setIsModalVisible(false);
+                                                        dispatch(addExpend(_data));
+                                                    });
                                                     setIsModalVisible(false);
-                                                    dispatch(addExpend(_data));
-                                                });
-                                                setIsModalVisible(false);
 
+                                                }
                                             }
-                                        }
-                                    ]
-                                );
-                            }}
+                                        ]
+                                    );
+                                }}
 
-                        />
+                            />
+                            <Icon
+                                name="pencil"
+                                type="material-community"
+                                size={50}
+                                style={{
+                                    elevation: 2,
+                                    backgroundColor: "#203EAA",
+                                    borderRadius: 50,
+                                    padding: 5,
+                                }}
+                                color={"#fff"}
+                                onPress={() => {
+
+                                    setModalEditExpendVisible(true);
+                                }}
+
+                            />
+                        </View>
                     </View>
+
+
 
                 </ImageBackground>
 
 
             </View >
+
         </Modal >
 
     )

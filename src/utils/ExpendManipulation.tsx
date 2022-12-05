@@ -10,17 +10,32 @@ export async function ItemAddExpendSlice(Expend: listeExpendInterface, indexBudg
 
         let newBudgets = [...AllBudget];
         let budgetCurent = { ...newBudgets[indexBudget] };
-        budgetCurent.listeExpend = [...budgetCurent.listeExpend, Expend];
+
+        /* get id is present */
+        const id = Expend.id;
+        if (budgetCurent.listeExpend.find((item) => item.id === id) !== undefined) {
+
+            const index = budgetCurent.listeExpend.findIndex((item) => item.id === id);
+            const listExpend = [...budgetCurent.listeExpend];
+            listExpend[index] = Expend;
+
+            budgetCurent.listeExpend = [...listExpend];
+
+        } else {
+            budgetCurent.listeExpend = [...budgetCurent.listeExpend, Expend];
+
+        }
 
         newBudgets[indexBudget] = budgetCurent;
 
 
-        const newBudgetMontant = Expend.type === "add" ? budgetCurent.montant + Expend.montant : budgetCurent.montant - Expend.montant;
+        const newBudgetMontant = CalculateNewBudgetMontant(newBudgets, indexBudget, Expend.montant, Expend.type);
+
 
         DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetMontant).then(() => {
 
             newBudgets[indexBudget].montant = newBudgetMontant;
-
+            console.info("MAN ADD EXPEND COMPLETED", newBudgets[indexBudget].montant);
             resolve(newBudgets);
 
         }).catch((error) => {
@@ -39,7 +54,7 @@ export function ItemDeleteExpendSlice(indexBudget: number, idExpend: number, All
 
     return new Promise((resolve, reject) => {
 
-
+        console.log("CHECK PARAMETER ENTER", indexBudget, idExpend, AllBudget);
 
         let newBudgets = [...AllBudget];
         let budgetCurent = { ...newBudgets[indexBudget] };
@@ -51,13 +66,14 @@ export function ItemDeleteExpendSlice(indexBudget: number, idExpend: number, All
 
         if (curentExpends !== undefined) {
 
-            const newBudgetMontant = curentExpends.type === "add" ? budgetCurent.montant - curentExpends.montant : budgetCurent.montant + curentExpends.montant;
+            const newBudgetMontant = CalculateNewBudgetMontant(newBudgets, indexBudget, curentExpends.montant_total, curentExpends.type, true);
 
             newBudgets[indexBudget] = budgetCurent;
 
             DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetMontant).then(() => {
 
                 newBudgets[indexBudget].montant = newBudgetMontant;
+                console.info("MAN DELETE EXPEND COMPLETED", newBudgets[indexBudget].montant);
 
                 resolve(newBudgets);
             }).catch((error) => {
@@ -73,4 +89,27 @@ export function ItemDeleteExpendSlice(indexBudget: number, idExpend: number, All
         }
 
     });
+}
+
+
+
+export function fixedFloatNumber(number: number): number {
+    return parseFloat(number.toFixed(2));
+}
+
+function CalculateNewBudgetMontant(newBudgets: PoleExpend[], indexBudget: number, montant: number, typeOperation: string, inverseCalcul?: boolean): number {
+
+    let newBudgetMontant = newBudgets[indexBudget].montant;
+
+    if (inverseCalcul && inverseCalcul === true) {
+        typeOperation = typeOperation === "add" ? "withdrawal" : "add";
+    }
+
+    if (typeOperation === "add") {
+        newBudgetMontant = newBudgetMontant + montant;
+    } else {
+        newBudgetMontant = newBudgetMontant - montant;
+    }
+
+    return fixedFloatNumber(newBudgetMontant);
 }

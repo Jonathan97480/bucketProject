@@ -13,7 +13,7 @@ interface InfoModalProps {
 
 
 export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget }: InfoModalProps) => {
-    console.log("BUGET GET TEXT", budget);
+
 
     return (
         <Modal
@@ -63,12 +63,9 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
                             return (
                                 <ItemBudget
                                     key={item.id + index}
-                                    title={item.name}
-                                    montant={item.montant}
-                                    id_expend={item.id} name_category={item.category}
-                                    ItemDeleteExpendSlice={undefined}
                                     indexBudget={indexBudget}
-                                    type={item.type}
+                                    expend={item}
+                                    idBudget={budget.id}
                                 />
                             )
                         })

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, ScrollView, ActivityIndicator, StyleSheet, StatusBar } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { addExpend, listeExpendInterface, PoleExpend } from '../redux/expendSlice';
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -35,8 +35,10 @@ export const AddExpend = () => {
 
 
     return (
+
         <SafeAreaView>
 
+            <StatusBar barStyle="default" />
             <ScrollView contentContainerStyle={styles.scrollView}>
 
                 <View style={styles.container} >
@@ -44,7 +46,7 @@ export const AddExpend = () => {
                         return (
                             <SectionCustom key={`${pole.id}-${index}`}>
                                 <SectionTitle title={pole.nom} id_budget={pole.id} remaining_budget={pole.montant} budget_start={pole.montantStart} indexBudget={index} />
-                                <GenerateListeComponentsItemExpend listeExpend={pole.listeExpend} indexBudget={index} />
+                                <GenerateListeComponentsItemExpend listeExpend={pole.listeExpend} indexBudget={index} idBudget={pole.id} />
                             </SectionCustom>
                         )
                     })
@@ -58,6 +60,7 @@ export const AddExpend = () => {
             </ScrollView>
 
         </SafeAreaView>
+
     );
 
 }
@@ -88,10 +91,11 @@ interface GenerateListeComponentsItemExpendProps {
     listeExpend: listeExpendInterface[],
 
     indexBudget: number
+    idBudget: number
 }
 
 
-export function GenerateListeComponentsItemExpend({ listeExpend, indexBudget }: GenerateListeComponentsItemExpendProps) {
+export function GenerateListeComponentsItemExpend({ listeExpend, indexBudget, idBudget }: GenerateListeComponentsItemExpendProps) {
 
     return (
         <>
@@ -99,7 +103,13 @@ export function GenerateListeComponentsItemExpend({ listeExpend, indexBudget }: 
                 listeExpend.length > 0 ?
                     listeExpend.map((item, index) => {
                         return (
-                            <ItemBudget key={index} title={item.name} montant={item.montant} id_expend={item.id} name_category={item.category} indexBudget={indexBudget} type={item.type} />
+                            <ItemBudget
+                                key={item.id + index}
+                                indexBudget={indexBudget}
+                                expend={item}
+                                idBudget={idBudget}
+                            />
+
                         )
                     })
                     : <Text style={{ textAlign: "center" }}>Vous n'avez pas encore d'éléments dans ce budget</Text>

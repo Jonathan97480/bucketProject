@@ -6,22 +6,20 @@ import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, Ico
 import { ExpendInfo } from "./ExpendInfo";
 import { ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
 import { useSelector, useDispatch } from 'react-redux';
-import { addExpend, PoleExpend } from "../redux/expendSlice";
+import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
 
 
 
 
 interface ItemBudgetProps {
-    title: string,
-    montant: number,
-    id_expend: number,
-    name_category: string,
+
     indexBudget: number,
-    type: string
+    expend: listeExpendInterface
+    idBudget: number
 }
 
 
-export const ItemBudget = ({ title, montant, id_expend, name_category, indexBudget, type }: ItemBudgetProps) => {
+export const ItemBudget = ({ indexBudget, expend, idBudget }: ItemBudgetProps) => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const dispatch = useDispatch();
@@ -42,9 +40,9 @@ export const ItemBudget = ({ title, montant, id_expend, name_category, indexBudg
                         },
                         {
                             text: "OK", onPress: () => {
-                                DatabaseManager.deleteExpend(id_expend).then(() => {
+                                DatabaseManager.deleteExpend(expend.id).then(() => {
 
-                                    ItemDeleteExpendSlice(indexBudget, id_expend, budget).then((newBudget: PoleExpend[]) => {
+                                    ItemDeleteExpendSlice(indexBudget, expend.id, budget).then((newBudget: PoleExpend[]) => {
 
                                         dispatch(addExpend(newBudget));
 
@@ -59,9 +57,6 @@ export const ItemBudget = ({ title, montant, id_expend, name_category, indexBudg
                     ],
                     { cancelable: false }
                 );
-
-
-
             }}
             onPress={() => {
                 setModalVisible(true);
@@ -72,10 +67,10 @@ export const ItemBudget = ({ title, montant, id_expend, name_category, indexBudg
                         width: "45%",
                     }}
 
-                >{textSizeFixe(title, 17)}</Text>
-                <Text>{montant}€</Text>
-                <View style={[{ backgroundColor: type === "add" ? "#203EAA" : "#E1424B", }, styles.pastille]}>
-                    <Text style={{ color: "#fff" }} >{type === "add" ? "Depot" : "Retrait"}</Text>
+                >{textSizeFixe(expend.name, 17)}</Text>
+                <Text>{expend.montant_total}€</Text>
+                <View style={[{ backgroundColor: expend.type === "add" ? "#203EAA" : "#E1424B", }, styles.pastille]}>
+                    <Text style={{ color: "#fff" }} >{expend.type === "add" ? "Depot" : "Retrait"}</Text>
                 </View>
                 <Image
                     resizeMode="cover"
@@ -86,18 +81,21 @@ export const ItemBudget = ({ title, montant, id_expend, name_category, indexBudg
                         marginLeft: 10
                     }}
                     source={
-                        name_category === "Alimentation" ? IconAlimentation :
-                            name_category === "Loisirs" ? IconLoisir :
-                                name_category === "Santé" ? IconSanté :
-                                    name_category === "Vêtements" ? IconVetement :
-                                        name_category === "Logement" ? IconLogement :
+                        expend.category === "Alimentation" ? IconAlimentation :
+                            expend.category === "Loisirs" ? IconLoisir :
+                                expend.category === "Santé" ? IconSanté :
+                                    expend.category === "Vêtements" ? IconVetement :
+                                        expend.category === "Logement" ? IconLogement :
                                             IconAutres
                     }
                 />
-                <ExpendInfo date={"12/20/2022"} name_category={name_category} montant={montant} title={title} type={type}
-                    isModalVisible={modalVisible} setIsModalVisible={setModalVisible}
+                <ExpendInfo
+                    isModalVisible={modalVisible}
+                    setIsModalVisible={setModalVisible}
+                    expend={expend}
                     index_budget={indexBudget}
-                    id_expend={id_expend}
+                    id_budget={idBudget}
+
                 />
             </View>
         </TouchableOpacity>

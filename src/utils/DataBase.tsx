@@ -10,7 +10,7 @@ export default class DatabaseManager {
     static initializeDatabase(): void {
         db.transaction(tx => {
             tx.executeSql(
-                "CREATE TABLE IF NOT EXISTS expenses (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, date TEXT, category TEXT, description TEXT,recurrence INTEGER,type TEXT);",
+                "CREATE TABLE IF NOT EXISTS expenses (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, montant_total REAL, date TEXT, category TEXT, description TEXT,recurrence INTEGER,type TEXT, quantity INTEGER);",
 
             );
             tx.executeSql(
@@ -25,7 +25,7 @@ export default class DatabaseManager {
             );
             tx.executeSql(
 
-                "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT , montant REAL, start_montant REAL);",
+                "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, start_montant REAL, date TEXT);",
 
             );
             tx.executeSql(
@@ -163,11 +163,13 @@ export default class DatabaseManager {
 
     static createBudget(name: string, montant: number, start_montant: number): Promise<any> {
 
+        const date = this.CreateDateCurentString();
+
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "INSERT INTO budget (name, montant,start_montant) VALUES (?, ?, ?);",
-                    [name, montant, start_montant]
+                    "INSERT INTO budget (name, montant,start_montant, date) VALUES (?, ?, ?, ?);",
+                    [name, montant, start_montant, date]
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -183,19 +185,24 @@ export default class DatabaseManager {
         });
     }
 
-    static createExpenses({ montant, category, description, budget_id, name, type }: {
+    static createExpenses({ montant, category, montant_total, description, budget_id, name, type, quantity }: {
         montant: number,
         category: string,
         description: string,
         budget_id: number,
-        name: string
-        type: string
+        name: string,
+        type: string,
+        quantity: number,
+        montant_total: number
     }): Promise<any> {
+
+        const date_string = this.CreateDateCurentString()
+
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "INSERT INTO expenses (montant, name, category, description,type) VALUES (?, ?, ?, ?,?);",
-                    [montant, name, category, description, type]
+                    "INSERT INTO expenses (montant, montant_total,name, category, description, type, quantity, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
+                    [montant, montant_total, name, category, description, type, quantity, date_string]
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -406,6 +413,32 @@ export default class DatabaseManager {
             },
                 () => {
                     console.info("OK + UPDATE BUDGET")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static CreateDateCurentString(): string {
+        const date = new Date();
+        const date_string = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+        return date_string;
+    }
+
+    static updateExpend(id: number, montant: number, name: string, montant_total: number, quantity: number, type: string, category: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "UPDATE expenses SET montant = ?, name = ?,  montant_total = ?, quantity = ?, type=?, category=? WHERE id = ?;",
+                    [montant, name, montant_total, quantity, type, category, id]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + UPDATE EXPEND")
                     resolve();
 
                 }

@@ -51,7 +51,6 @@ export const SectionTitle = ({ title, remaining_budget, budget_start, id_budget,
                 id_budget={id_budget}
                 isVisible={modalVisible}
                 setIsVisible={setModalVisible}
-
                 indexBudget={indexBudget}
             />
         </View>
