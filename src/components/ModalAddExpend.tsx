@@ -44,9 +44,14 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
     const [formExpend, setFormExpend] = useState<FormAddExpendInterface>(returnDefaultValueForm(expend));
 
     useEffect(() => {
-        if (formExpend.type !== actionType) {
-            setActionType(formExpend.type);
+        if (!expend) {
+            if (formExpend.type !== actionType) {
+                setActionType(formExpend.type);
+            }
+        } else {
+            setActionType(expend.type);
         }
+
     }, []);
 
 
@@ -309,35 +314,24 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
 
         if (expend) {
 
+            const oldExpend = { ...expend };
+            const newExpend = CreateNewExpendForUpdate(expend);
 
-            DatabaseManager.updateExpend(
-                expend.id,
-                parseFloat(formExpend.montant),
-                formExpend.title,
-                calculateTotalExpend(
-                    parseFloat(formExpend.montant),
-                    parseInt(fixedQuantity(formExpend.quantity))
-                ),
-                parseInt(formExpend.quantity),
-                actionType,
-                formExpend.category,
+            DatabaseManager.updateExpend({
+                id: newExpend.id,
+                name: newExpend.name,
+                montant: newExpend.montant,
+                montant_total: newExpend.montant_total,
+                category: newExpend.category,
+                type: newExpend.type,
+                quantity: newExpend.quantity,
 
-            ).then(() => {
-                ItemDeleteExpendSlice(indexBudget, expend.id, budget).then((_data: PoleExpend[]) => {
+            }).then(() => {
 
-                    ItemAddExpendSlice({
-                        ...expend,
-                        montant: parseFloat(formExpend.montant),
-                        montant_total: calculateTotalExpend(
-                            parseFloat(formExpend.montant),
-                            parseInt(fixedQuantity(formExpend.quantity))
-                        ),
-                        name: formExpend.title,
-                        quantity: parseInt(fixedQuantity(formExpend.quantity)),
-                        type: actionType,
-                        category: formExpend.category,
+                ItemDeleteExpendSlice(indexBudget, oldExpend.id, budget).then((_data: PoleExpend[]) => {
 
-                    }, indexBudget, _data).then((_data2: PoleExpend[]) => {
+                    ItemAddExpendSlice(newExpend, indexBudget, _data).then((_data2: PoleExpend[]) => {
+
                         resetForm();
                         dispatch(addExpend(_data2));
                         setIsVisible(false);
@@ -364,6 +358,22 @@ export const ModalAddExpend = ({ isVisible, id_budget, setIsVisible, indexBudget
     function setActionTypeForm(type: string) {
         setActionType(type);
         checkForm(formExpend);
+    }
+
+    function CreateNewExpendForUpdate(expend: listeExpendInterface): listeExpendInterface {
+        return {
+            ...expend,
+            montant: parseFloat(formExpend.montant),
+            montant_total: calculateTotalExpend(
+                parseFloat(formExpend.montant),
+                parseInt(fixedQuantity(formExpend.quantity))
+            ),
+            name: formExpend.title,
+            quantity: parseInt(fixedQuantity(formExpend.quantity)),
+            type: actionType,
+            category: formExpend.category,
+
+        }
     }
 
 }

@@ -426,7 +426,19 @@ export default class DatabaseManager {
         return date_string;
     }
 
-    static updateExpend(id: number, montant: number, name: string, montant_total: number, quantity: number, type: string, category: string): Promise<void> {
+    static updateExpend({ id, montant, name, montant_total, quantity, type, category }:
+        {
+            id: number,
+            montant: number,
+            name: string,
+            montant_total:
+            number,
+            quantity: number,
+            type: string,
+            category: string
+        }
+
+    ): Promise<void> {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(

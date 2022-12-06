@@ -1,14 +1,16 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, StackNavigationState } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Budget } from './src/screen/Budget';
-import { AddExpend } from './src/screen/AddExpend';
+import { Budget } from './src/screen/budget/Budget';
+import { AllExpend } from './src/screen/AllExpend';
 import { Icon } from '@rneui/base';
 
 import DatabaseManager from './src/utils/DataBase';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/appStore';
+import { AddExpendBudget } from './src/screen/budget/AddExpendBudget';
 
 
 
@@ -41,35 +43,44 @@ export const TabButton = () => {
       <Tab.Screen name="Budget"
         options={
           {
-            tabBarLabel: 'Budget',
+            tabBarLabel: 'Tous les budgets',
             tabBarIcon: ({ color, size }) => (
               <Icon name="dollar" type='font-awesome' color={color} size={size} />
             ),
           }
         }
-        component={Budget} />
+        component={StackBudget} />
       <Tab.Screen name="addExpend"
         options={
           {
-            tabBarLabel: 'Ajoute une dépense',
+            tabBarLabel: 'Toutes les dépenses',
             tabBarIcon: ({ color, size }) => (
               <Icon name="money" type='font-awesome' color={color} size={size} />
             ),
           }
         }
-        component={AddExpend} />
+        component={AllExpend} />
     </Tab.Navigator>
+  );
+}
+
+
+const stackBudget = createStackNavigator();
+
+export const StackBudget = () => {
+  return (
+    <stackBudget.Navigator
+      screenOptions={{
+        headerShown: false,
+
+      }}
+    >
+      <stackBudget.Screen name="Budget2" component={Budget} />
+      <stackBudget.Screen name="AddExpendBudget" component={AddExpendBudget} />
+    </stackBudget.Navigator>
   );
 }
 
 
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

@@ -13,7 +13,7 @@ import { getAllExpend } from "../utils/GetBudgetAndExpend";
 
 
 
-export const AddExpend = () => {
+export const AllExpend = () => {
 
     const dispatch = useDispatch();
     const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
@@ -44,7 +44,7 @@ export const AddExpend = () => {
                 <View style={styles.container} >
                     {budget.length !== 0 ? budget.map((pole, index) => {
                         return (
-                            <SectionCustom key={`${pole.id}-${index}`}>
+                            <SectionCustom >
                                 <SectionTitle title={pole.nom} id_budget={pole.id} remaining_budget={pole.montant} budget_start={pole.montantStart} indexBudget={index} />
                                 <GenerateListeComponentsItemExpend listeExpend={pole.listeExpend} indexBudget={index} idBudget={pole.id} />
                             </SectionCustom>
@@ -104,7 +104,7 @@ export function GenerateListeComponentsItemExpend({ listeExpend, indexBudget, id
                     listeExpend.map((item, index) => {
                         return (
                             <ItemBudget
-                                key={item.id + index}
+                                key={item.id + index + "listeExpend"}
                                 indexBudget={indexBudget}
                                 expend={item}
                                 idBudget={idBudget}

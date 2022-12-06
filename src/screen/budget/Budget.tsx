@@ -5,14 +5,14 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, ScrollView, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from 'react-redux';
-import { EmptyBudget } from "../components/EmptyBudget";
-import { InfoModal } from "../components/InfoBudget";
-import { ModalAddBudget } from "../components/ModalAddBudget";
-import { addExpend, PoleExpend } from "../redux/expendSlice";
-import { colorList, getColorBudget } from "../utils/ColorCollection";
-import DatabaseManager from "../utils/DataBase";
-import { getAllExpend } from "../utils/GetBudgetAndExpend";
-
+import { EmptyBudget } from "../../components/EmptyBudget";
+import { InfoModal } from "../../components/InfoBudget";
+import { ModalAddBudget } from "../../components/ModalAddBudget";
+import { addExpend, PoleExpend } from "../../redux/expendSlice";
+import { colorList, getColorBudget } from "../../utils/ColorCollection";
+import DatabaseManager from "../../utils/DataBase";
+import { getAllExpend } from "../../utils/GetBudgetAndExpend";
+import { useNavigation } from '@react-navigation/native';
 
 
 interface curentBudgetInterface {
@@ -23,7 +23,10 @@ interface curentBudgetInterface {
 
 export const Budget = () => {
 
+    const navigation = useNavigation();
+
     const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
+
     const [curentBudget, setCurentBudget] = React.useState<curentBudgetInterface>({
         budget: {
             id: 0,
@@ -90,6 +93,7 @@ export const Budget = () => {
                                                     indexBudget={indexBudget}
                                                     setCurentBudget={setCurentBudget}
                                                     setIsViewModalInfo={setIsViewModalInfo}
+                                                    navigation={navigation}
                                                 />
                                             </View>
 
@@ -174,6 +178,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#596cab',
     }
 
+
+
 });
 
 
@@ -184,10 +190,11 @@ interface BudgetSwipeableElementProps {
     indexBudget: number;
     setCurentBudget: (value: curentBudgetInterface) => void;
     setIsViewModalInfo: (value: boolean) => void;
+    navigation: any;
 }
 
 
-function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsViewModalInfo }: BudgetSwipeableElementProps) {
+function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsViewModalInfo, navigation }: BudgetSwipeableElementProps) {
 
     const dispatch = useDispatch();
 
@@ -195,6 +202,10 @@ function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsVie
         <ListItem.Swipeable
 
             containerStyle={[{ backgroundColor: getColorBudget(budget.montant, budget.montantStart), borderRadius: 20, }]}
+            onPress={() => {
+                navigation.navigate('AddExpendBudget', { curentBudget: budget, indexBudget: indexBudget });
+            }}
+
 
             leftContent={(reset) => (
                 <Button
