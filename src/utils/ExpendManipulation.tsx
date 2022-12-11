@@ -35,7 +35,7 @@ export async function ItemAddExpendSlice(Expend: listeExpendInterface, indexBudg
         DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetMontant).then(() => {
 
             newBudgets[indexBudget].montant = newBudgetMontant;
-            console.info("MAN ADD EXPEND COMPLETED", newBudgets[indexBudget].montant);
+
             resolve(newBudgets);
 
         }).catch((error) => {
@@ -54,7 +54,7 @@ export function ItemDeleteExpendSlice(indexBudget: number, idExpend: number, All
 
     return new Promise((resolve, reject) => {
 
-        console.log("CHECK PARAMETER ENTER", indexBudget, idExpend, AllBudget);
+
 
         let newBudgets = [...AllBudget];
         let budgetCurent = { ...newBudgets[indexBudget] };
@@ -73,7 +73,7 @@ export function ItemDeleteExpendSlice(indexBudget: number, idExpend: number, All
             DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetMontant).then(() => {
 
                 newBudgets[indexBudget].montant = newBudgetMontant;
-                console.info("MAN DELETE EXPEND COMPLETED", newBudgets[indexBudget].montant);
+
 
                 resolve(newBudgets);
             }).catch((error) => {

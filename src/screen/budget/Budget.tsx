@@ -1,10 +1,10 @@
 
-import { Button, ListItem } from "@rneui/base";
-import { Icon } from "@rneui/themed";
+import { Button, ListItem, Icon } from "@rneui/base";
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, StatusBar } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, StyleSheet, ScrollView, StatusBar, SafeAreaView } from "react-native";
+import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
+
 import { EmptyBudget } from "../../components/EmptyBudget";
 import { InfoModal } from "../../components/InfoBudget";
 import { ModalAddBudget } from "../../components/ModalAddBudget";
@@ -12,7 +12,6 @@ import { addExpend, PoleExpend } from "../../redux/expendSlice";
 import { colorList, getColorBudget } from "../../utils/ColorCollection";
 import DatabaseManager from "../../utils/DataBase";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
-import { useNavigation } from '@react-navigation/native';
 
 
 interface curentBudgetInterface {
@@ -35,6 +34,7 @@ export const Budget = () => {
             nom: "",
             date: "",
             montantStart: 0,
+            isList: false,
         }, indexBudget: 0
     });
 
@@ -176,6 +176,7 @@ const styles = StyleSheet.create({
         flex: 1,
         borderRadius: 50,
         backgroundColor: '#596cab',
+
     }
 
 
@@ -260,8 +261,14 @@ function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsVie
 
             >
                 <ListItem.Title
-                    style={{ color: colorList.primary }}
+                    style={{ color: colorList.primary, fontWeight: 'bold' }}
                 >{budget.nom}</ListItem.Title>
+                <ListItem.Subtitle
+                    style={{ color: colorList.primary, fontSize: 12 }}
+                >Montant de départ : {budget.montant}€</ListItem.Subtitle>
+                <ListItem.Subtitle
+                    style={{ color: colorList.primary, fontSize: 12 }}
+                >Budget restant : {budget.montantStart}€</ListItem.Subtitle>
             </ListItem.Content>
             <ListItem.Chevron />
         </ListItem.Swipeable>

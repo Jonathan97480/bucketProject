@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import { View, Text, ScrollView, ActivityIndicator, StyleSheet, StatusBar } from "react-native";
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
+import { Icon, Input } from "@rneui/base";
 import { addExpend, listeExpendInterface, PoleExpend } from '../../redux/expendSlice';
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from '@react-navigation/native';
 import { SectionCustom } from "../../components/SectionCustom";
 import { SectionTitle } from "../../components/SectionTitle";
 import { ItemBudget } from "../../components/ItemBudget";
-import { Icon, Image, Input } from "@rneui/base";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
 import { ExpendArrayAlphabetizeOrder } from "../../utils/TextManipulation";
 

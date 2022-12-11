@@ -1,10 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { NavigationContainer, StackNavigationState } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Budget } from './src/screen/budget/Budget';
-import { AllExpend } from './src/screen/AllExpend';
+import { AllList } from './src/screen/AllList';
 import { Icon } from '@rneui/base';
 
 import DatabaseManager from './src/utils/DataBase';
@@ -12,7 +11,8 @@ import { Provider } from 'react-redux';
 import { store } from './src/redux/appStore';
 import { AddExpendBudget } from './src/screen/budget/AddExpendBudget';
 
-
+const Tab = createBottomTabNavigator();
+const stackBudget = createNativeStackNavigator();
 
 export default function App() {
 
@@ -22,25 +22,36 @@ export default function App() {
   return (
     <Provider store={store}>
       <NavigationContainer>
-        <TabButton />
+        <stackBudget.Navigator
+          initialRouteName='Tab'
+          screenOptions={{
+            headerShown: false,
+
+          }}
+        >
+          <stackBudget.Screen name="Tab" component={TabButton} />
+          <stackBudget.Screen name="AddExpendBudget" component={AddExpendBudget} />
+        </stackBudget.Navigator>
       </NavigationContainer>
     </Provider>
   );
 }
 
-const Tab = createBottomTabNavigator();
 
 
 export const TabButton = () => {
   return (
     <Tab.Navigator
+      initialRouteName='Budget'
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#e91e63',
         tabBarStyle: { backgroundColor: '#fff' },
+
       }}
     >
       <Tab.Screen name="Budget"
+
         options={
           {
             tabBarLabel: 'Tous les budgets',
@@ -49,37 +60,26 @@ export const TabButton = () => {
             ),
           }
         }
-        component={StackBudget} />
-      <Tab.Screen name="addExpend"
+        component={Budget} />
+      <Tab.Screen name="AllList"
+
         options={
           {
-            tabBarLabel: 'Toutes les dépenses',
+            tabBarLabel: 'Mes listes',
             tabBarIcon: ({ color, size }) => (
               <Icon name="money" type='font-awesome' color={color} size={size} />
             ),
           }
         }
-        component={AllExpend} />
+        component={AllList} />
     </Tab.Navigator>
   );
 }
 
 
-const stackBudget = createStackNavigator();
 
-export const StackBudget = () => {
-  return (
-    <stackBudget.Navigator
-      screenOptions={{
-        headerShown: false,
 
-      }}
-    >
-      <stackBudget.Screen name="Budget2" component={Budget} />
-      <stackBudget.Screen name="AddExpendBudget" component={AddExpendBudget} />
-    </stackBudget.Navigator>
-  );
-}
+
 
 
 

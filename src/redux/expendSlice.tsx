@@ -24,6 +24,7 @@ export interface PoleExpend {
     montant: number,
     date: string,
     montantStart: number,
+    isList: boolean,
     listeExpend: listeExpendInterface[]
 
 }

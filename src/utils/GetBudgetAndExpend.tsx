@@ -1,4 +1,4 @@
-import { budgetInterface } from "../redux/budgetSlice";
+
 import { PoleExpend } from "../redux/expendSlice";
 import DatabaseManager from "./DataBase";
 
@@ -7,7 +7,7 @@ export function getAllExpend(): Promise<PoleExpend[]> {
 
     return new Promise((resolve, reject) => {
 
-        DatabaseManager.getBudget().then((data: budgetInterface[]) => {
+        DatabaseManager.getBudget().then((data: any) => {
             const newPoleExpends: PoleExpend[] = [];
 
             for (let index = 0; index < data.length; index++) {
@@ -18,6 +18,7 @@ export function getAllExpend(): Promise<PoleExpend[]> {
                     montant: pole.montant,
                     date: pole.date,
                     montantStart: pole.start_montant,
+                    isList: pole.is_list == 1 ? true : false,
                     listeExpend: []
                 });
 

@@ -20,3 +20,9 @@ export function ExpendArrayAlphabetizeOrder(a: listeExpendInterface[]) {
 
 
 }
+
+export function CreateDateCurentString(): string {
+    const date = new Date();
+    const date_string = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    return date_string;
+}

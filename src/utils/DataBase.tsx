@@ -1,5 +1,7 @@
 
 import * as SQLite from 'expo-sqlite';
+import { PoleExpend } from '../redux/expendSlice';
+import { listInterface } from '../redux/listSlice';
 
 const db = SQLite.openDatabase("database.db");
 
@@ -25,12 +27,21 @@ export default class DatabaseManager {
             );
             tx.executeSql(
 
-                "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, start_montant REAL, date TEXT);",
+                "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, start_montant REAL, date TEXT, is_list INTEGER);",
 
             );
             tx.executeSql(
 
                 "CREATE TABLE IF NOT EXISTS budget_expenses (id INTEGER PRIMARY KEY AUTOINCREMENT, budget_id INTEGER, expenses_id INTEGER);",
+            );
+
+            tx.executeSql(
+
+                "CREATE TABLE IF NOT EXISTS list (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, items TEXT, validate INTEGER, date TEXT, task INTEGER, task_terminer INTEGER);",
+            );
+            tx.executeSql(
+
+                "CREATE TABLE IF NOT EXISTS list_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, id_list INTEGER, id_budget INTEGER );",
             );
 
         }, (e) => { console.log("ERREUR + " + e) },
@@ -168,8 +179,8 @@ export default class DatabaseManager {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "INSERT INTO budget (name, montant,start_montant, date) VALUES (?, ?, ?, ?);",
-                    [name, montant, start_montant, date]
+                    "INSERT INTO budget (name, montant,start_montant, date, is_list) VALUES (?, ?, ?, ?, ?);",
+                    [name, montant, start_montant, date, 0]
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -400,12 +411,12 @@ export default class DatabaseManager {
         });
     }
 
-    static updateBudget(id: number, montant: number, name: string): Promise<void> {
+    static updateBudget(id: number, montant: number, name: string, is_list: boolean): Promise<void> {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "UPDATE budget SET start_montant = ?, name = ? WHERE id = ?;",
-                    [montant, name, id]
+                    "UPDATE budget SET start_montant = ?, name = ?, is_list = ? WHERE id = ?;",
+                    [montant, name, id, is_list ? 1 : 0]
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -456,5 +467,366 @@ export default class DatabaseManager {
                 }
             );
         });
+    }
+
+
+    static getAllList(): Promise<listInterface[]> {
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM list",
+                    [],
+                    (_, { rows: { _array } }) => {
+
+                        const list: listInterface[] = _array.map((item: any) => {
+                            return {
+                                id: item.id,
+                                name: item.name,
+                                montant: item.montant,
+                                date: item.date,
+                                items: JSON.parse(item.items),
+                                validate: item.validate,
+                                task: item.task,
+                                taskTerminer: item.task_terminer
+                            }
+
+                        });
+
+                        resolve(list);
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET LIST")
+                }
+            );
+        });
+    }
+
+    static getListByIdBudget(id_budget: number): Promise<listInterface> {
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM list_budget WHERE id_budget = ?",
+                    [id_budget],
+                    (_, { rows: { _array } }) => {
+
+
+                        this.getListById(_array[0].id_list).then((list) => {
+                            resolve(list);
+                        });
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET LIST BY ID BUDGET")
+                }
+            );
+        });
+
+    }
+
+
+    static getListById(id: number): Promise<listInterface> {
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM list WHERE id = ?",
+                    [id],
+                    (_, { rows: { _array } }) => {
+
+
+                        const list: listInterface = {
+                            id: _array[0].id,
+                            name: _array[0].name,
+                            montant: _array[0].montant,
+                            date: _array[0].date,
+                            items: JSON.parse(_array[0].items),
+                            validate: _array[0].validate,
+                            task: _array[0].task,
+                            taskTerminer: _array[0].task_terminer
+
+                        }
+                        resolve(list);
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET LIST BY ID")
+                }
+            );
+        });
+
+    }
+
+    static createListByBudget(budget: PoleExpend): Promise<listInterface> {
+        const task = budget.listeExpend.length;
+        return new Promise((resolve, reject) => {
+            const list: listInterface = {
+                id: 0,
+                name: budget.nom,
+                montant: budget.montant,
+                date: this.CreateDateCurentString(),
+                items: [],
+                validate: false,
+                task: task,
+                taskTerminer: 0
+            }
+
+            const items = budget.listeExpend.map((item) => {
+                return {
+                    id: item.id,
+                    name: item.name,
+                    date: item.date,
+                    montant: item.montant,
+                    quantity: item.quantity,
+                    type: item.type,
+                    category: item.category,
+                    isChecked: false
+                }
+            })
+
+            list.items = items;
+
+            db.transaction(tx => {
+
+                tx.executeSql(
+                    "INSERT INTO list (name, montant, date, items, validate, task, task_terminer) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                    [list.name, list.montant, list.date, JSON.stringify(list.items), list.validate ? 1 : 0, list.task, list.taskTerminer],
+                    (_, { insertId }) => {
+
+                        if (insertId) {
+
+                            this.LinkListToBudget(insertId, budget.id).then(() => {
+
+                                this.getListById(insertId).then((list) => {
+
+                                    this.updateBudget(budget.id, budget.montant, budget.nom, true).then(() => {
+                                        resolve(list);
+                                    });
+
+
+                                });
+
+                            });
+
+                        } else {
+                            console.error("ERREUR + INSERT LIST")
+                        }
+                    }
+
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            }, () => {
+                console.info("OK + CREATE LIST")
+            });
+        });
+
+    }
+
+
+    static updateList({ id, name, montant, date, items, validate, task }: {
+        id: number,
+        name: string,
+        montant: number,
+        date: string,
+        task: number
+        items: {
+            id: number,
+            name: string,
+            montant: number,
+            date: string,
+            category: string,
+            quantity: number,
+            type: string,
+            isChecked: boolean,
+        }[],
+        validate: boolean
+    }): Promise<void> {
+
+        const listItemValidate = items.filter((item) => {
+            return item.isChecked;
+        })
+        console.log("listItemValidate", listItemValidate.length)
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "UPDATE list SET name = ?, montant = ?, date = ?, items = ?, validate = ?, task_terminer = ?, task = ? WHERE id = ?;",
+                    [name, montant, date, JSON.stringify(items), validate ? 1 : 0, listItemValidate.length, task, id]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + UPDATE LIST")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static deleteList(id: number, id_budget: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "DELETE FROM list WHERE id = ?;",
+                    [id]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + DELETE LIST")
+
+                    this.getBudgetById(id_budget).then((budget) => {
+
+                        this.updateBudget(budget.id, budget.montant, budget.nom, false).then(() => {
+                            this.deleteListByIdBudget(id_budget).then(() => {
+                                resolve();
+                            });
+                        });
+                    });
+
+
+
+
+                }
+            );
+        });
+
+    }
+
+    static deleteListByIdBudget(id_budget: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "DELETE FROM list_budget WHERE id_budget = ?;",
+                    [id_budget]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + DELETE LIST BY ID BUDGET")
+
+
+                    resolve();
+
+                }
+            );
+        });
+
+    }
+
+    static LinkListToBudget(id_budget: number, id_list: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "INSERT INTO list_budget (id_budget, id_list) VALUES (?, ?);",
+                    [id_budget, id_list]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + LINK LIST TO BUDGET")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static getIdBudgetByListId(id_list: number): Promise<number> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM list_budget WHERE id_list = ?",
+                    [id_list],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            resolve(_array[0].id_budget);
+
+                        } else {
+                            resolve(0);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET BUDGET BY LIST")
+                }
+            );
+        });
+    }
+
+    static getBudgetById(id: number): Promise<PoleExpend> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM budget WHERE id = ?",
+                    [id],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            const budget = _array[0];
+
+                            const poleExpend: PoleExpend = {
+                                id: budget.id,
+                                nom: budget.nom,
+                                montant: budget.montant,
+                                listeExpend: [],
+                                date: budget.date,
+                                isList: budget.is_list ? true : false,
+                                montantStart: budget.montant_start,
+                            }
+
+                            resolve(poleExpend);
+
+                        } else {
+                            resolve({} as PoleExpend);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET BUDGET BY ID")
+                }
+            );
+        });
+
     }
 }

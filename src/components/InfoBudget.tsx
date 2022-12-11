@@ -1,7 +1,11 @@
+import { Button } from "@rneui/base";
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
 import { PoleExpend } from "../redux/expendSlice";
+import { addList, addListArray, listInterface } from "../redux/listSlice";
+import DatabaseManager from "../utils/DataBase";
 import { ItemBudget } from "./ItemBudget";
+import { useDispatch, useSelector } from 'react-redux';
 
 
 interface InfoModalProps {
@@ -14,7 +18,8 @@ interface InfoModalProps {
 
 export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget }: InfoModalProps) => {
 
-
+    const dispatch = useDispatch();
+    const AllList: listInterface[] = useSelector((state: any) => state.list.list);
     return (
         <Modal
             animationType="slide"
@@ -86,6 +91,21 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
                         style={styles.textInfo}
                     >{budget.montant}€</Text>
                 </View>
+
+                <Button
+                    title="Créer une liste"
+                    onPress={() => {
+
+                        DatabaseManager.createListByBudget(budget).then((data: listInterface) => {
+
+
+                            dispatch(addListArray(data));
+
+                        });
+
+                        setIsViewModalInfo(false);
+                    }}
+                />
 
 
             </View>
