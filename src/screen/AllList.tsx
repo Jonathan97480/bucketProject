@@ -1,13 +1,13 @@
 import { Button, CheckBox } from "@rneui/base";
 import { Input } from "@rneui/themed";
 import React, { useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Alert, NativeSyntheticEvent } from "react-native";
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Alert } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
-import { addList, listInterface } from "../redux/listSlice";
-import { colorList } from "../utils/ColorCollection";
+import { StepTask } from "../components/stepStack";
+import { Task } from "../components/Task";
+import { addList, addListArray, listInterface } from "../redux/listSlice";
 import DatabaseManager from "../utils/DataBase";
-import { fixedFloatNumber } from "../utils/ExpendManipulation";
-import { CreateDateCurentString, textSizeFixe } from "../utils/TextManipulation";
+import { CreateDateCurentString } from "../utils/TextManipulation";
 
 
 
@@ -18,6 +18,7 @@ export const AllList = () => {
     const list: listInterface[] = useSelector((state: any) => state.list.list);
     const [modalIsVisible, setModalIsVisible] = React.useState(false);
     const [currentIndexList, setCurrentIndexList] = React.useState<number>();
+    const [newList, setNewList] = React.useState<string>("");
 
 
     function resetModal() {
@@ -42,128 +43,77 @@ export const AllList = () => {
         <SafeAreaView>
 
             <StatusBar barStyle="default" />
-            <ScrollView contentContainerStyle={{
-                padding: 10,
+            <View style={{
+
+                maxHeight: "100%",
+                minHeight: "100%",
+
             }}>
+                <ScrollView contentContainerStyle={{
+                    padding: 10,
+                }}>
+
+                    {
+                        list.length > 0 ?
+                            list.map((item: listInterface, index: number) => {
+                                return (
+                                    <Task
+                                        key={index + "-list"}
+                                        index={index}
+                                        task={item}
+                                        setCurrentIndexList={setCurrentIndexList}
+                                        setModalIsVisible={setModalIsVisible}
+                                    />
+                                )
+                            })
+                            :
+                            <View >
+                                <Text>Aucune list</Text>
+                            </View>
+                    }
+
+                </ScrollView>
 
                 {
-                    list.length > 0 ?
-                        list.map((item: listInterface, index: number) => {
-                            return (
-                                <TouchableOpacity key={index + "-list"}
-                                    style={{
-                                        marginVertical: 5,
-                                    }}
-                                    onPress={() => {
+                    list.length > 0 && currentIndexList != undefined ?
+                        <ModalListTask
+                            isVisible={modalIsVisible}
+                            index_list={currentIndexList}
+                            setModalIsVisible={resetModal}
 
-                                        setCurrentIndexList(index);
-                                        setModalIsVisible(true);
-                                    }}
-                                    onLongPress={() => {
-
-                                        Alert.alert(
-                                            "Supprimer",
-                                            "Voulez vous supprimer cette liste ?",
-                                            [
-                                                {
-                                                    text: "Annuler",
-                                                    onPress: () => console.log("Cancel Pressed"),
-                                                    style: "cancel"
-                                                },
-                                                { text: "OK", onPress: () => DeleteListe(item.id) }
-                                            ],)
-
-                                    }}
-                                >
-                                    <View
-                                        style={{
-
-                                            backgroundColor: "#373737",
-                                            flexDirection: "row",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            borderRadius: 50,
-
-
-                                        }}
-                                    >
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                alignItems: "center",
-                                                justifyContent: "flex-start",
-                                            }}
-                                        >
-                                            <CheckBox
-                                                containerStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-                                                checkedIcon="dot-circle-o"
-                                                uncheckedIcon="circle-o"
-                                                checked={item.taskTerminer === item.task}
-
-                                            />
-                                            <Text
-                                                style={
-                                                    {
-                                                        color: "white",
-                                                        textDecorationLine: item.taskTerminer === item.task ? "line-through" : "none",
-                                                    }
-                                                }
-                                            >{textSizeFixe(item.name, 20)}</Text>
-                                        </View>
-
-                                        <Text style={{
-                                            fontSize: 12,
-                                            textAlign: "center",
-                                            marginBottom: 5,
-                                            marginRight: 10,
-                                            color: "white",
-                                            textDecorationLine: item.taskTerminer === item.task ? "line-through" : "none",
-
-                                        }}
-                                        >Tache terminer : {item.taskTerminer} / {item.task}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            )
-                        })
-                        :
-                        <View >
-                            <Text>Aucune list</Text>
-                        </View>
+                        />
+                        : null
                 }
-
-            </ScrollView>
-
-            {
-                list.length > 0 && currentIndexList != undefined ?
-                    <ModalListTask
-                        isVisible={modalIsVisible}
-                        index_list={currentIndexList}
-                        setModalIsVisible={resetModal}
+                <View>
+                    <Input
+                        placeholder="nom de la nouvelle liste"
+                        value={newList}
+                        onChangeText={(text) => {
+                            setNewList(text);
+                        }}
 
                     />
-                    : null
-            }
+                    <Button
+                        title={"Ajouter une liste"}
+                        onPress={() => {
+                            if (newList.length === 0) {
+                                Alert.alert("Erreur", "Veuillez entrer un nom pour la liste");
+                                return;
+                            }
+
+                            DatabaseManager.createList(newList).then((data: listInterface) => {
+                                dispatch(addListArray(data));
+                                setNewList("");
+                            });
+                        }}
+                    />
+                </View>
+            </View>
         </SafeAreaView>
 
     );
 
-    function DeleteListe(id_list: number) {
 
-        DatabaseManager.getIdBudgetByListId(id_list).then((id_budget: any) => {
-            DatabaseManager.deleteList(id_list, id_budget).then(() => {
-                DatabaseManager.getAllList().then((data: any) => {
-                    if (data.length > 0)
-
-                        dispatch(addList(data));
-                    else
-                        dispatch(addList([]));
-
-                });
-
-            });
-        });
-
-    }
 }
 
 
@@ -197,7 +147,7 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
 
 
         >
-            <View style={{ flex: 1, justifyContent: "space-between", paddingTop: 20, maxHeight: "100%" }}>
+            <View style={{ flex: 1, justifyContent: "space-between", padding: 15, paddingTop: 20, maxHeight: "100%", }}>
 
                 <Text
                     style={{
@@ -213,69 +163,15 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
                     {
 
 
-                        list.items.map((item, index) => {
+                        list.steps.map((item, index) => {
                             return (
-                                <TouchableOpacity
-                                    key={index + "-item"}
-                                    onLongPress={() => {
-                                        Alert.alert(
-                                            "Supprimer",
-                                            "Voulez vous supprimer cette tache ?",
-                                            [
-                                                {
-                                                    text: "Annuler",
-                                                    onPress: () => console.log("Cancel Pressed"),
-                                                    style: "cancel"
-                                                },
-                                                { text: "OK", onPress: () => deleteTask(index) }
-                                            ],)
-
-                                    }}
-                                    onPress={() => {
-
-                                        UpdateList(!item.isChecked, index);
-                                    }}
-
-
-
-                                >
-                                    <View
-                                        style={{
-                                            flexDirection: "row",
-                                            justifyContent: "flex-start",
-                                            alignItems: "center",
-                                            backgroundColor: item.isChecked ? "green" : "white",
-                                            padding: 10,
-                                            borderBottomWidth: 1,
-                                            borderBottomColor: "grey",
-
-                                        }}
-                                    >
-                                        <CheckBox
-                                            containerStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
-                                            center
-
-                                            checkedIcon="dot-circle-o"
-                                            uncheckedIcon="circle-o"
-                                            checked={item.isChecked}
-
-                                        />
-                                        <View
-                                            style={{
-                                                flexDirection: "row",
-                                                justifyContent: "space-between",
-                                                alignItems: "center",
-                                                flex: 1,
-                                            }}
-                                        >
-                                            <Text>{item.name}</Text>
-                                            <Text>{item.quantity > 0 ? `quantité :${item.quantity}` : ""}</Text>
-                                        </View>
-
-                                    </View>
-
-
-                                </TouchableOpacity>
+                                <StepTask
+                                    key={index + "-step"}
+                                    index={index}
+                                    step={item}
+                                    UpdateList={UpdateList}
+                                    task={list}
+                                />
                             )
                         })
 
@@ -284,7 +180,7 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
                 <View>
                     <Text>Ajouter une tache</Text>
                     <Input
-                        placeholder="Nom de la tache"
+                        placeholder="Nom de la nouvelle tache"
                         keyboardType="default"
                         value={newItem}
                         onChange={(e) => {
@@ -315,7 +211,7 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
 
     function UpdateList(isChecked: boolean, index: number, ItemArray?: any) {
 
-        let newItemArray = ItemArray ? [...ItemArray] : [...list.items];
+        let newItemArray = ItemArray ? [...ItemArray] : [...list.steps];
         newItemArray[index] = {
             ...newItemArray[index],
             isChecked: isChecked
@@ -327,7 +223,7 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
             name: list.name,
             montant: list.montant,
             date: list.date,
-            items: newItemArray,
+            steps: newItemArray,
             validate: list.validate,
             task: newItemArray.length,
 
@@ -348,7 +244,7 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
 
     function addTask(value: string) {
 
-        let newItemArray = [...list.items];
+        let newItemArray = [...list.steps];
         newItemArray.push({
             id: 0,
             name: value,
@@ -364,13 +260,6 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
 
     }
 
-    function deleteTask(index: number) {
 
-        let newItemArray = [...list.items];
-        newItemArray.splice(index, 1);
-
-        UpdateList(false, newItemArray.length - 1, newItemArray);
-
-    }
 
 }

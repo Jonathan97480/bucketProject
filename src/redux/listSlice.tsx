@@ -3,22 +3,26 @@
 
 import { createSlice } from '@reduxjs/toolkit'
 
+
+
+export interface stepInterface {
+    id: number,
+    name: string,
+    montant: number,
+    date: string,
+    category: string,
+    quantity: number,
+    type: string,
+    isChecked: boolean,
+}
+
 export interface listInterface {
 
     id: number,
     name: string,
     montant: number,
     date: string,
-    items: {
-        id: number,
-        name: string,
-        montant: number,
-        date: string,
-        category: string,
-        quantity: number,
-        type: string,
-        isChecked: boolean,
-    }[],
+    steps: stepInterface[],
     validate: boolean,
     task: number,
     taskTerminer: number,

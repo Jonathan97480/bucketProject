@@ -1,7 +1,7 @@
 
 import * as SQLite from 'expo-sqlite';
 import { PoleExpend } from '../redux/expendSlice';
-import { listInterface } from '../redux/listSlice';
+import { listInterface, stepInterface } from '../redux/listSlice';
 
 const db = SQLite.openDatabase("database.db");
 
@@ -484,7 +484,7 @@ export default class DatabaseManager {
                                 name: item.name,
                                 montant: item.montant,
                                 date: item.date,
-                                items: JSON.parse(item.items),
+                                steps: JSON.parse(item.items),
                                 validate: item.validate,
                                 task: item.task,
                                 taskTerminer: item.task_terminer
@@ -548,7 +548,7 @@ export default class DatabaseManager {
                             name: _array[0].name,
                             montant: _array[0].montant,
                             date: _array[0].date,
-                            items: JSON.parse(_array[0].items),
+                            steps: JSON.parse(_array[0].items),
                             validate: _array[0].validate,
                             task: _array[0].task,
                             taskTerminer: _array[0].task_terminer
@@ -577,13 +577,13 @@ export default class DatabaseManager {
                 name: budget.nom,
                 montant: budget.montant,
                 date: this.CreateDateCurentString(),
-                items: [],
+                steps: [],
                 validate: false,
                 task: task,
                 taskTerminer: 0
             }
 
-            const items = budget.listeExpend.map((item) => {
+            const steps = budget.listeExpend.map((item) => {
                 return {
                     id: item.id,
                     name: item.name,
@@ -596,13 +596,13 @@ export default class DatabaseManager {
                 }
             })
 
-            list.items = items;
+            list.steps = steps;
 
             db.transaction(tx => {
 
                 tx.executeSql(
                     "INSERT INTO list (name, montant, date, items, validate, task, task_terminer) VALUES (?, ?, ?, ?, ?, ?, ?);",
-                    [list.name, list.montant, list.date, JSON.stringify(list.items), list.validate ? 1 : 0, list.task, list.taskTerminer],
+                    [list.name, list.montant, list.date, JSON.stringify(list.steps), list.validate ? 1 : 0, list.task, list.taskTerminer],
                     (_, { insertId }) => {
 
                         if (insertId) {
@@ -637,34 +637,67 @@ export default class DatabaseManager {
     }
 
 
-    static updateList({ id, name, montant, date, items, validate, task }: {
+    static createList(name: string): Promise<listInterface> {
+
+        const list: listInterface = {
+            id: 0,
+            name: name,
+            montant: 0,
+            date: this.CreateDateCurentString(),
+            steps: [],
+            validate: false,
+            task: 0,
+            taskTerminer: 0
+        }
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+
+                tx.executeSql(
+                    "INSERT INTO list (name, montant, date, items, validate, task, task_terminer) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                    [list.name, list.montant, list.date, JSON.stringify(list.steps), list.validate ? 1 : 0, list.task, list.taskTerminer],
+                    (_, { insertId }) => {
+
+                        if (insertId) {
+                            this.getListById(insertId).then((list) => {
+                                resolve(list);
+                            });
+                        } else {
+                            console.error("ERREUR + INSERT LIST")
+                        }
+                    }
+
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            }, () => {
+                console.info("OK + CREATE LIST")
+            });
+        });
+
+    }
+
+
+    static updateList({ id, name, montant, date, steps, validate, task }: {
         id: number,
         name: string,
         montant: number,
         date: string,
         task: number
-        items: {
-            id: number,
-            name: string,
-            montant: number,
-            date: string,
-            category: string,
-            quantity: number,
-            type: string,
-            isChecked: boolean,
-        }[],
+        steps: stepInterface[],
         validate: boolean
     }): Promise<void> {
 
-        const listItemValidate = items.filter((item) => {
-            return item.isChecked;
+        const listStepValidate = steps.filter((step: stepInterface) => {
+            return step.isChecked;
         })
-        console.log("listItemValidate", listItemValidate.length)
+
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
                     "UPDATE list SET name = ?, montant = ?, date = ?, items = ?, validate = ?, task_terminer = ?, task = ? WHERE id = ?;",
-                    [name, montant, date, JSON.stringify(items), validate ? 1 : 0, listItemValidate.length, task, id]
+                    [name, montant, date, JSON.stringify(steps), validate ? 1 : 0, listStepValidate.length, task, id]
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
