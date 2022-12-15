@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"; import DatabaseManager from "../utils/DataBase";
-import { textSizeFixe } from "../utils/TextManipulation";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"; import DatabaseManager from "../../utils/DataBase";
+import { textSizeFixe } from "../../utils/TextManipulation";
 import { Image } from "@rneui/themed/";
-import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../utils/IconCustom";
-import { ExpendInfo } from "./ExpendInfo";
-import { ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
+import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../../utils/IconCustom";
+import { ExpendInfo } from "../ExpendInfo/ExpendInfo";
+import { ItemDeleteExpendSlice } from "../../utils/ExpendManipulation";
 import { useSelector, useDispatch } from 'react-redux';
-import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
+import { addExpend, listeExpendInterface, PoleExpend } from "../../redux/expendSlice";
 
 
 

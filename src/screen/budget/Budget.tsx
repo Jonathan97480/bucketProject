@@ -5,13 +5,14 @@ import { View, Text, StyleSheet, ScrollView, StatusBar, SafeAreaView } from "rea
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { EmptyBudget } from "../../components/EmptyBudget";
-import { InfoModal } from "../../components/InfoBudget";
-import { ModalAddBudget } from "../../components/ModalAddBudget";
+import { EmptyBudget } from "../../components/EmptyBudget/EmptyBudget";
+import { InfoModal } from "../../components/InfoBudget/InfoBudget";
+import { ModalAddBudget } from "../../components/ModalAddBudget/ModalAddBudget";
 import { addExpend, PoleExpend } from "../../redux/expendSlice";
 import { colorList, getColorBudget } from "../../utils/ColorCollection";
 import DatabaseManager from "../../utils/DataBase";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
+import { addComptes } from "../../redux/comptesSlice";
 
 
 interface curentBudgetInterface {
@@ -122,8 +123,7 @@ export const Budget = () => {
                 }
 
 
-                <ModalAddBudget isViewModalAddBudget={isViewModalAddBudget} setIsViewModalAddBudget={setIsViewModalAddBudget}
-                />
+                <ModalAddBudget isViewModalAddBudget={isViewModalAddBudget} setIsViewModalAddBudget={setIsViewModalAddBudget} />
             </View>
 
 
@@ -230,15 +230,22 @@ function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsVie
                         DatabaseManager.deleteAllExpendByBudget(budget.id).then(() => {
 
                             DatabaseManager.deleteBudget(budget.id).then(() => {
+                                DatabaseManager.deleteLinkBudgetByIdBudget(budget.id).then(() => {
 
-                                getAllExpend().then((_data) => {
-                                    console.log("DATA TEST12 ", _data);
-                                    if (_data.length > 0) {
-                                        dispatch(addExpend(_data));
-                                    } else {
-                                        dispatch(addExpend([]));
-                                    }
+                                    getAllExpend().then((_data) => {
+
+                                        if (_data.length > 0) {
+                                            dispatch(addExpend(_data));
+                                        } else {
+                                            dispatch(addExpend([]));
+                                        }
+                                    });
+
+
+
+
                                 });
+
 
 
                             });
@@ -265,10 +272,10 @@ function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsVie
                 >{budget.nom}</ListItem.Title>
                 <ListItem.Subtitle
                     style={{ color: colorList.primary, fontSize: 12 }}
-                >Montant de départ : {budget.montant}€</ListItem.Subtitle>
+                >Montant de départ : {budget.montantStart}€</ListItem.Subtitle>
                 <ListItem.Subtitle
                     style={{ color: colorList.primary, fontSize: 12 }}
-                >Budget restant : {budget.montantStart}€</ListItem.Subtitle>
+                >Budget restant : {budget.montant}€</ListItem.Subtitle>
             </ListItem.Content>
             <ListItem.Chevron />
         </ListItem.Swipeable>

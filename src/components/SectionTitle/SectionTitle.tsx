@@ -1,9 +1,9 @@
 import { Icon } from "@rneui/base";
 import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { getColorBudget } from "../utils/ColorCollection";
-import { textSizeFixe } from "../utils/TextManipulation";
-import { ModalAddExpend } from "./ModalAddExpend";
+import { getColorBudget } from "../../utils/ColorCollection";
+import { textSizeFixe } from "../../utils/TextManipulation";
+import { ModalAddExpend } from "../ModalAddExpend/ModalAddExpend";
 
 
 interface SectionTitleProps {

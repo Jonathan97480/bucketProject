@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Image, Button } from "@rneui/base";
-import { IconBudgetAdd } from "../utils/IconCustom";
+import { IconBudgetAdd } from "../../utils/IconCustom";
 
 
 interface EmptyBudgetProps {

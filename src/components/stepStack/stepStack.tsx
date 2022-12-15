@@ -1,7 +1,7 @@
 import { CheckBox } from "@rneui/base";
 import React from "react";
 import { Alert, TouchableOpacity, View, Text } from "react-native";
-import { listInterface, stepInterface } from "../redux/listSlice";
+import { listInterface, stepInterface } from "../../redux/listSlice";
 
 
 
@@ -73,13 +73,13 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
                 >
                     <Text
                         style={{
-                            color: "black",
+                            color: "#fff",
                             textDecorationLine: step.isChecked ? "line-through" : "none",
                         }}
                     >{step.name}</Text>
                     <Text
                         style={{
-                            color: "black",
+                            color: "#fff",
                             textDecorationLine: step.isChecked ? "line-through" : "none",
                         }}
                     >{step.quantity > 0 ? `quantité :${step.quantity}` : ""}</Text>

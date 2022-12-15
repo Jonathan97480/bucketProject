@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Modal } from "react-native";
 import { Input, Button } from "@rneui/themed/";
 import { Picker } from '@react-native-picker/picker';
-import DatabaseManager from "../utils/DataBase";
-import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
-import { fixedFloatNumber, ItemAddExpendSlice, ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
+import DatabaseManager from "../../utils/DataBase";
+import { addExpend, listeExpendInterface, PoleExpend } from "../../redux/expendSlice";
+import { fixedFloatNumber, ItemAddExpendSlice, ItemDeleteExpendSlice } from "../../utils/ExpendManipulation";
 import { useSelector, useDispatch } from 'react-redux';
 
 

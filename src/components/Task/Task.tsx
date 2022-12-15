@@ -1,10 +1,10 @@
-import { CheckBox } from "@rneui/base";
+import { CheckBox } from "@rneui/themed";
 import React from "react";
 import { Alert, TouchableOpacity, View, Text } from "react-native";
 import { useDispatch } from "react-redux";
-import { addList, listInterface } from "../redux/listSlice";
-import DatabaseManager from "../utils/DataBase";
-import { textSizeFixe } from "../utils/TextManipulation";
+import { addList, listInterface } from "../../redux/listSlice";
+import DatabaseManager from "../../utils/DataBase";
+import { textSizeFixe } from "../../utils/TextManipulation";
 
 
 

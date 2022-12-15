@@ -4,9 +4,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Icon, Input } from "@rneui/base";
 import { addExpend, listeExpendInterface, PoleExpend } from '../../redux/expendSlice';
 import { useRoute } from '@react-navigation/native';
-import { SectionCustom } from "../../components/SectionCustom";
-import { SectionTitle } from "../../components/SectionTitle";
-import { ItemBudget } from "../../components/ItemBudget";
+import { SectionCustom } from "../../components/SectionCustom/SectionCustom";
+import { SectionTitle } from "../../components/SectionTitle/SectionTitle";
+import { ItemBudget } from "../../components/ItemBudget/ItemBudget";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
 import { ExpendArrayAlphabetizeOrder } from "../../utils/TextManipulation";
 

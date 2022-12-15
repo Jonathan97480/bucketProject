@@ -10,6 +10,7 @@ import DatabaseManager from './src/utils/DataBase';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/appStore';
 import { AddExpendBudget } from './src/screen/budget/AddExpendBudget';
+import AllComptes from './src/screen/AllComptes';
 
 const Tab = createBottomTabNavigator();
 const stackBudget = createNativeStackNavigator();
@@ -42,7 +43,7 @@ export default function App() {
 export const TabButton = () => {
   return (
     <Tab.Navigator
-      initialRouteName='Budget'
+      initialRouteName='comptes'
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#e91e63',
@@ -50,6 +51,18 @@ export const TabButton = () => {
 
       }}
     >
+
+      <Tab.Screen name="comptes"
+
+        options={
+          {
+            tabBarLabel: 'Tous vos comptes',
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="dollar" type='font-awesome' color={color} size={size} />
+            ),
+          }
+        }
+        component={AllComptes} />
       <Tab.Screen name="Budget"
 
         options={

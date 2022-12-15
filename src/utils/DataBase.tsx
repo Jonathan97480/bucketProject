@@ -1,5 +1,6 @@
 
 import * as SQLite from 'expo-sqlite';
+import { CompteInterface } from '../redux/comptesSlice';
 import { PoleExpend } from '../redux/expendSlice';
 import { listInterface, stepInterface } from '../redux/listSlice';
 
@@ -42,6 +43,15 @@ export default class DatabaseManager {
             tx.executeSql(
 
                 "CREATE TABLE IF NOT EXISTS list_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, id_list INTEGER, id_budget INTEGER );",
+            );
+
+            tx.executeSql(
+
+                "CREATE TABLE IF NOT EXISTS compte (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL , category TEXT, date TEXT );",
+            );
+            tx.executeSql(
+
+                "CREATE TABLE IF NOT EXISTS compte_budget (id INTEGER PRIMARY KEY AUTOINCREMENT, id_compte INTEGER, id_budget INTEGER );",
             );
 
         }, (e) => { console.log("ERREUR + " + e) },
@@ -172,7 +182,7 @@ export default class DatabaseManager {
         });
     }
 
-    static createBudget(name: string, montant: number, start_montant: number): Promise<any> {
+    static createBudget(name: string, montant: number, start_montant: number): Promise<number> {
 
         const date = this.CreateDateCurentString();
 
@@ -180,7 +190,10 @@ export default class DatabaseManager {
             db.transaction(tx => {
                 tx.executeSql(
                     "INSERT INTO budget (name, montant,start_montant, date, is_list) VALUES (?, ?, ?, ?, ?);",
-                    [name, montant, start_montant, date, 0]
+                    [name, montant, start_montant, date, 0],
+                    (_, { insertId }) => {
+                        resolve(insertId ? insertId : 0);
+                    },
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -189,7 +202,7 @@ export default class DatabaseManager {
 
                 () => {
                     console.log("OK + CREATE BUDGET")
-                    resolve(true);
+
 
                 }
             );
@@ -862,4 +875,425 @@ export default class DatabaseManager {
         });
 
     }
+
+    static createCompte({ name, montant }: {
+        name: string,
+        montant: number
+    }): Promise<CompteInterface> {
+
+        const date = this.CreateDateCurentString();
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "INSERT INTO compte (name, montant, date) VALUES (?, ?, ?);",
+                    [name, montant, date],
+                    (_, { insertId }) => {
+
+                        if (insertId) {
+                            this.getCompteById(insertId).then((compte) => {
+                                resolve(compte);
+                            });
+                        } else {
+                            console.error("ERREUR + INSERT COMPTE")
+                        }
+                    }
+
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            }, () => {
+                console.info("OK + CREATE COMPTE")
+            });
+        });
+
+
+
+    }
+
+    static getCompteById(id: number): Promise<CompteInterface> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM compte WHERE id = ?",
+                    [id],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            const compte = _array[0];
+
+                            const compteInterface: CompteInterface = {
+                                id: compte.id,
+                                name: compte.name,
+                                montant: compte.montant,
+                                date: compte.date,
+                            }
+
+                            resolve(compteInterface);
+
+                        } else {
+                            resolve({} as CompteInterface);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET COMPTE BY ID")
+                }
+            );
+        });
+
+    }
+
+    static getAllCompte(): Promise<CompteInterface[]> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM compte",
+                    [],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            const compteInterface: CompteInterface[] = [];
+
+                            _array.forEach((compte) => {
+                                compteInterface.push({
+                                    id: compte.id,
+                                    name: compte.name,
+                                    montant: compte.montant,
+                                    date: compte.date,
+                                })
+                            });
+
+                            resolve(compteInterface);
+
+                        } else {
+                            resolve([]);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET ALL COMPTE")
+                }
+            );
+        });
+
+    }
+
+    static linkCompteToBudget(id_budget: number, id_compte: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "INSERT INTO compte_budget (id_budget, id_compte) VALUES (?, ?);",
+                    [id_budget, id_compte]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + LINK COMPTE TO BUDGET")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static getCompteIdByBudgetId(id_budget: number): Promise<number> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT id_compte FROM compte_budget WHERE id_budget = ?",
+                    [id_budget],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            const compteId: number = _array[0].id_compte;
+
+                            resolve(compteId);
+
+                        } else {
+                            resolve(0);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET COMPTE ID BY BUDGET ID")
+                }
+            );
+        });
+    }
+
+    static deleteLInkBudgetByIdCompte(id_compte: number, id_budget: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "DELETE FROM compte_budget WHERE id_compte = ? AND id_budget = ?",
+                    [id_compte, id_budget]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + DELETE LINK BUDGET BY ID COMPTE")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static deleteLinkCompteToBudget(id_compte: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "DELETE FROM compte_budget WHERE id_compte = ?",
+                    [id_compte]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + DELETE LINK COMPTE TO BUDGET")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static getAllBudgetIdByCompteId(id_compte: number): Promise<number[]> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM compte_budget WHERE id_compte = ?",
+                    [id_compte],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            const idBudget: number[] = [];
+
+                            _array.forEach((compte) => {
+                                idBudget.push(compte.id_budget);
+                            });
+
+                            resolve(idBudget);
+
+                        } else {
+                            resolve([]);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET ALL BUDGET ID BY COMPTE ID")
+                }
+            );
+        });
+
+    }
+
+    static getAllBudgetByCompteId(id_compte: number): Promise<PoleExpend[]> {
+
+        return new Promise((resolve, reject) => {
+            this.getAllBudgetIdByCompteId(id_compte).then((idBudget) => {
+
+                const budgetList: PoleExpend[] = [];
+
+                idBudget.forEach((id) => {
+                    this.getBudgetById(id).then((budget) => {
+                        budgetList.push(budget);
+                    });
+                });
+
+                resolve(budgetList);
+
+            }).catch((e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            });
+        });
+
+    }
+
+    static deleteCompteById(id: number, isDeleteBudget?: boolean): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "DELETE FROM compte WHERE id = ?",
+                    [id]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + DELETE COMPTE BY ID")
+                    if (isDeleteBudget) {
+                        this.getAllBudgetIdByCompteId(id).then((idBudget) => {
+
+                            idBudget.forEach((id) => {
+                                this.deleteBudget(id).then(() => {
+                                    this.deleteLinkCompteToBudget(id).then(() => {
+                                        resolve();
+                                    });
+                                });
+                            });
+
+                            resolve();
+
+                        }).catch((e) => {
+                            console.error("ERREUR + " + e)
+                            reject(e);
+                        });
+
+                    } else {
+                        this.deleteLinkCompteToBudget(id).then(() => {
+                            resolve();
+                        });
+
+                    }
+
+                }
+            );
+        });
+
+    }
+
+    static getIdBudgetByCompteId(id_compte: number): Promise<number[]> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT id_budget FROM compte_budget WHERE id_compte = ?",
+                    [id_compte],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+
+                            const idBudget: number[] = [];
+
+                            _array.forEach((compte) => {
+                                idBudget.push(compte.id_budget);
+                            });
+
+                            resolve(idBudget);
+
+                        } else {
+                            resolve([]);
+                        }
+
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET ID BUDGET BY COMPTE ID")
+                }
+            );
+        });
+
+    }
+
+    static deleteLinkBudgetByIdBudget(id_budget: number): Promise<void> {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "DELETE FROM compte_budget WHERE id_budget = ?",
+                    [id_budget]
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + DELETE LINK BUDGET BY ID BUDGET")
+                    resolve();
+
+                }
+            );
+        });
+    }
+
+    static getBudgetByCompteId(id_compte: number): Promise<PoleExpend[]> {
+
+        return new Promise((resolve, reject) => {
+            this.getIdBudgetByCompteId(id_compte).then((idBudget) => {
+
+
+                let budgetList: PoleExpend[] = [];
+                db.transaction(tx => {
+
+                    tx.executeSql(
+                        `SELECT * FROM budget WHERE id IN (${idBudget.toString()})`,
+                        [],
+                        (_, { rows: { _array } }) => {
+
+                            console.log("idBudget : ", _array);
+                            _array.forEach((budget) => {
+                                budgetList.push(
+                                    {
+                                        id: budget.id,
+                                        nom: budget.name,
+                                        montant: budget.montant,
+                                        date: budget.date,
+                                        montantStart: budget.start_montant,
+                                        isList: budget.is_list,
+                                        listeExpend: []
+
+                                    }
+                                )
+
+                            });
+
+                            resolve(budgetList);
+                        }
+                    );
+
+                });
+
+            }).catch((e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            });
+        });
+
+    }
+
 }

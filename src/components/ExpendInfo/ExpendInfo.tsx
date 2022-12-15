@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
 import { View, Text, ImageBackground, Alert, Modal } from "react-native";
 import { Icon, Image } from "@rneui/themed/";
-import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../utils/IconCustom";
+import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../../utils/IconCustom";
 import { useSelector, useDispatch } from 'react-redux';
-import { addExpend, listeExpendInterface, PoleExpend } from "../redux/expendSlice";
-import { ItemDeleteExpendSlice } from "../utils/ExpendManipulation";
-import { ModalAddExpend } from "./ModalAddExpend";
+import { addExpend, listeExpendInterface, PoleExpend } from "../../redux/expendSlice";
+import { ItemDeleteExpendSlice } from "../../utils/ExpendManipulation";
+import { ModalAddExpend } from "../ModalAddExpend/ModalAddExpend";
 
 interface ItemBudgetProps {
 
@@ -64,7 +64,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                 }}
             >
                 <ImageBackground
-                    source={require("../screen/images/Background_recipe.png")}
+                    source={require("../../screen/images/Background_recipe.png")}
                     resizeMode="contain"
                     style={{
                         height: "80%",

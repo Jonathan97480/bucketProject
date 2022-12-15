@@ -3,11 +3,13 @@
 import React from 'react'
 import { Modal, View, StyleSheet, Text } from 'react-native'
 import { Input, Icon, Button } from '@rneui/base';
-import DatabaseManager from '../utils/DataBase'
-import { useDispatch } from 'react-redux';
-import { getAllExpend } from '../utils/GetBudgetAndExpend';
-import { addExpend, PoleExpend } from '../redux/expendSlice';
-import { colorList } from '../utils/ColorCollection';
+import DatabaseManager from '../../utils/DataBase'
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllExpend } from '../../utils/GetBudgetAndExpend';
+import { addExpend, PoleExpend } from '../../redux/expendSlice';
+import { colorList } from '../../utils/ColorCollection';
+import { addComptes, CompteInterface } from '../../redux/comptesSlice';
+import { Picker } from '@react-native-picker/picker';
 
 
 interface ModalAddBudgetProps {
@@ -20,6 +22,7 @@ interface ModalAddBudgetProps {
 export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, budget }: ModalAddBudgetProps) => {
 
     const dispatch = useDispatch();
+    const comptes: CompteInterface[] = useSelector((state: any) => state.compte.comptes);
 
     const [formAddBudget, setFormAddBudget] = React.useState(getValueDefaultForm(budget));
 
@@ -60,6 +63,25 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                             }}
                         />
                     </View>
+                    <View>
+                        <Text style={styles.modalInputLabel}>vous pouvez lier votre budget a un compte :</Text>
+                        <Picker
+                            accessibilityLabel='compte'
+                            selectedValue={formAddBudget.id_compte}
+                            onValueChange={(itemValue, itemIndex) => {
+
+                                setFormAddBudget({ ...formAddBudget, id_compte: itemValue });
+                            }}
+                        >
+                            <Picker.Item label="Aucun" value={0} />
+
+                            {comptes.map((compte, index) => {
+                                return (
+                                    <Picker.Item key={index + "-compte-picker"} label={compte.name} value={compte.id} />
+                                )
+                            })}
+                        </Picker>
+                    </View>
 
                     <Button
                         title={'Ajouter'}
@@ -98,22 +120,73 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
             DatabaseManager.createBudget(
                 formAddBudget.name,
                 parseFloat(formAddBudget.montant),
-                parseFloat(formAddBudget.montant)).then(() => {
+                parseFloat(formAddBudget.montant)).then((_id_budget) => {
                     getAllExpend().then((_data) => {
+                        if (formAddBudget.id_compte && formAddBudget.id_compte > 0) {
+                            DatabaseManager.linkCompteToBudget(_id_budget, formAddBudget.id_compte).then(() => {
+                                ResetForm()
+                                setIsViewModalAddBudget(false);
 
-                        ResetForm()
-                        setIsViewModalAddBudget(false);
-                        dispatch(addExpend(_data));
+                                dispatch(addExpend(_data));
+
+
+
+                            });
+                        }
+                        else {
+                            ResetForm()
+                            setIsViewModalAddBudget(false);
+                            dispatch(addExpend(_data));
+                        }
+
 
                     });
                 });
         } else {
-            DatabaseManager.updateBudget(id, parseFloat(formAddBudget.montant), formAddBudget.name).then(() => {
-                getAllExpend().then((_data) => {
 
-                    ResetForm()
-                    setIsViewModalAddBudget(false);
-                    dispatch(addExpend(_data));
+            if (!budget) return;
+
+            DatabaseManager.updateBudget(id, parseFloat(formAddBudget.montant), formAddBudget.name, budget.isList).then(() => {
+                getAllExpend().then((_data) => {
+                    if (formAddBudget.id_compte && formAddBudget.id_compte > 0) {
+                        DatabaseManager.getCompteIdByBudgetId(id).then((id_compte) => {
+
+                            switch (id_compte) {
+                                case 0:
+                                    DatabaseManager.linkCompteToBudget(id, formAddBudget.id_compte).then(() => {
+
+                                        ResetForm()
+                                        setIsViewModalAddBudget(false);
+                                        dispatch(addExpend(_data));
+
+                                    });
+                                    break;
+                                case formAddBudget.id_compte:
+                                    ResetForm()
+                                    setIsViewModalAddBudget(false);
+                                    dispatch(addExpend(_data));
+                                    break;
+                                default:
+                                    DatabaseManager.deleteLInkBudgetByIdCompte(id_compte, id).then(() => {
+                                        DatabaseManager.linkCompteToBudget(id, formAddBudget.id_compte).then(() => {
+
+                                            ResetForm()
+                                            setIsViewModalAddBudget(false);
+                                            dispatch(addExpend(_data));
+
+                                        });
+                                    });
+                                    break;
+                            }
+
+                        });
+                    } else {
+                        ResetForm()
+                        setIsViewModalAddBudget(false);
+                        dispatch(addExpend(_data));
+                    }
+
+
 
                 });
             });
@@ -142,7 +215,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
     function getValueDefaultForm(budget: PoleExpend | undefined) {
         if (!budget) {
-            return { name: '', montant: '', errorMontant: '', errorName: '', id: 0 };
+            return { name: '', montant: '', errorMontant: '', errorName: '', id: 0, id_compte: 0 };
         }
         return { name: budget.nom, montant: budget.montantStart.toString(), errorMontant: '', errorName: '', id: budget.id };
     }
@@ -150,6 +223,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
 
 }
+
+
 
 
 

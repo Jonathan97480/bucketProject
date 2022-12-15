@@ -1,10 +1,10 @@
 import { Button } from "@rneui/base";
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
-import { PoleExpend } from "../redux/expendSlice";
-import { addList, addListArray, listInterface } from "../redux/listSlice";
-import DatabaseManager from "../utils/DataBase";
-import { ItemBudget } from "./ItemBudget";
+import { PoleExpend } from "../../redux/expendSlice";
+import { addList, addListArray, listInterface } from "../../redux/listSlice";
+import DatabaseManager from "../../utils/DataBase";
+import { ItemBudget } from "../ItemBudget/ItemBudget";
 import { useDispatch, useSelector } from 'react-redux';
 
 
