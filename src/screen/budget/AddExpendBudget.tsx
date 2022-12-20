@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView } from "react-native";
+import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, addons } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { Icon, Input } from "@rneui/base";
 import { addExpend, listeExpendInterface, PoleExpend } from '../../redux/expendSlice';
@@ -9,8 +9,6 @@ import { SectionTitle } from "../../components/SectionTitle/SectionTitle";
 import { ItemBudget } from "../../components/ItemBudget/ItemBudget";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
 import { ExpendArrayAlphabetizeOrder } from "../../utils/TextManipulation";
-
-
 
 
 

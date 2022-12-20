@@ -1,6 +1,6 @@
 
 
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Modal, View, StyleSheet, Text } from 'react-native'
 import { Input, Icon, Button } from '@rneui/base';
 import DatabaseManager from '../../utils/DataBase'
@@ -17,15 +17,50 @@ interface ModalAddBudgetProps {
     setIsViewModalAddBudget: (value: boolean) => void,
     budget?: PoleExpend
 }
-
+interface FormAddBudget {
+    name: string,
+    montant: string,
+    errorMontant: string,
+    errorName: string,
+    id: number,
+    id_compte: number
+}
 
 export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, budget }: ModalAddBudgetProps) => {
 
     const dispatch = useDispatch();
     const comptes: CompteInterface[] = useSelector((state: any) => state.compte.comptes);
 
-    const [formAddBudget, setFormAddBudget] = React.useState(getValueDefaultForm(budget));
 
+
+    const [formAddBudget, setFormAddBudget] = useState<FormAddBudget>(getValueDefaultForm());
+
+    useEffect(() => {
+
+        if (budget?.id !== undefined) {
+            DatabaseManager.getCompteIdByBudgetId(budget.id).then((_data) => {
+                if (_data !== undefined && _data !== null && _data !== 0) {
+                    setFormAddBudget({
+                        ...formAddBudget,
+
+                        id_compte: _data,
+                        name: budget.nom,
+                        montant: budget.montant.toString(),
+                        id: budget.id,
+                    })
+                } else {
+                    setFormAddBudget({
+                        ...formAddBudget,
+
+
+                        name: budget.nom,
+                        montant: budget.montant.toString(),
+                        id: budget.id,
+                    })
+                }
+            });
+        }
+    }, [budget])
 
     return (
         <Modal
@@ -84,13 +119,12 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                     </View>
 
                     <Button
-                        title={'Ajouter'}
+                        title={budget ? "Enregistrée" : 'Ajouter'}
                         onPress={() => {
 
-                            if (ValidateForm()) {
-                                AddAndUpdateBudget(formAddBudget.id);
-                            }
-                        }}
+                            AddAndUpdateBudget(formAddBudget.id);
+                        }
+                        }
                         icon={
                             <Icon
                                 name="check"
@@ -146,7 +180,15 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
             if (!budget) return;
 
-            DatabaseManager.updateBudget(id, parseFloat(formAddBudget.montant), formAddBudget.name, budget.isList).then(() => {
+            console.log("budgetUPdate", budget);
+
+            const diffMontant = parseFloat(formAddBudget.montant) - budget.montantStart;
+            const newCurentMontant = parseFloat(formAddBudget.montant) > budget.montantStart ?
+                budget.montant + diffMontant :
+                budget.montant - diffMontant;
+
+
+            DatabaseManager.updateBudget(id, parseFloat(formAddBudget.montant), newCurentMontant, formAddBudget.name, budget.isList).then(() => {
                 getAllExpend().then((_data) => {
                     if (formAddBudget.id_compte && formAddBudget.id_compte > 0) {
                         DatabaseManager.getCompteIdByBudgetId(id).then((id_compte) => {
@@ -210,14 +252,15 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
 
     function ResetForm() {
-        setFormAddBudget({ name: '', montant: '', errorMontant: '', errorName: '', id: 0 });
+        setFormAddBudget({ name: '', montant: '', errorMontant: '', errorName: '', id: 0, id_compte: 0 });
     }
 
-    function getValueDefaultForm(budget: PoleExpend | undefined) {
-        if (!budget) {
-            return { name: '', montant: '', errorMontant: '', errorName: '', id: 0, id_compte: 0 };
-        }
-        return { name: budget.nom, montant: budget.montantStart.toString(), errorMontant: '', errorName: '', id: budget.id };
+
+
+    function getValueDefaultForm(): FormAddBudget {
+
+
+        return { name: '', montant: '', errorMontant: '', errorName: '', id: 0, id_compte: 0 };
     }
 
 

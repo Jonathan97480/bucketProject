@@ -27,17 +27,7 @@ export const Budget = () => {
 
     const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
 
-    const [curentBudget, setCurentBudget] = React.useState<curentBudgetInterface>({
-        budget: {
-            id: 0,
-            montant: 0,
-            listeExpend: [],
-            nom: "",
-            date: "",
-            montantStart: 0,
-            isList: false,
-        }, indexBudget: 0
-    });
+    const [curentBudget, setCurentBudget] = React.useState<curentBudgetInterface | undefined>(undefined);
 
     const dispatch = useDispatch();
 
@@ -58,7 +48,10 @@ export const Budget = () => {
     }, [budget]);
 
 
+    function editBudget() {
+        setIsViewModalAddBudget(true);
 
+    }
 
     return (
         <SafeAreaView
@@ -123,16 +116,20 @@ export const Budget = () => {
                 }
 
 
-                <ModalAddBudget isViewModalAddBudget={isViewModalAddBudget} setIsViewModalAddBudget={setIsViewModalAddBudget} />
+                <ModalAddBudget isViewModalAddBudget={isViewModalAddBudget} setIsViewModalAddBudget={setIsViewModalAddBudget} budget={curentBudget?.budget} />
             </View>
 
+            {
+                curentBudget !== undefined ?
 
-            <InfoModal
-                IsViewModalInfo={isViewModalInfo}
-                setIsViewModalInfo={setIsViewModalInfo}
-                budget={curentBudget.budget}
-                indexBudget={curentBudget.indexBudget}
-            />
+                    <InfoModal
+                        IsViewModalInfo={isViewModalInfo}
+                        setIsViewModalInfo={setIsViewModalInfo}
+                        budget={curentBudget.budget}
+                        indexBudget={curentBudget.indexBudget}
+                        editBudget={editBudget}
+                    /> : null
+            }
         </SafeAreaView>
     );
 

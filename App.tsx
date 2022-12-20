@@ -58,7 +58,7 @@ export const TabButton = () => {
           {
             tabBarLabel: 'Tous vos comptes',
             tabBarIcon: ({ color, size }) => (
-              <Icon name="dollar" type='font-awesome' color={color} size={size} />
+              <Icon name="account-balance-wallet" color={color} size={size} />
             ),
           }
         }
@@ -80,7 +80,7 @@ export const TabButton = () => {
           {
             tabBarLabel: 'Mes listes',
             tabBarIcon: ({ color, size }) => (
-              <Icon name="money" type='font-awesome' color={color} size={size} />
+              <Icon name="list" type='font-awesome' color={color} size={size} />
             ),
           }
         }

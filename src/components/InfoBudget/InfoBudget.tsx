@@ -1,4 +1,4 @@
-import { Button } from "@rneui/base";
+import { Button, Icon } from "@rneui/base";
 import React from "react";
 import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
 import { PoleExpend } from "../../redux/expendSlice";
@@ -10,16 +10,17 @@ import { useDispatch, useSelector } from 'react-redux';
 
 interface InfoModalProps {
     setIsViewModalInfo: (value: boolean) => void,
+    editBudget: () => void,
     IsViewModalInfo: boolean,
     budget: PoleExpend,
     indexBudget: number,
 }
 
 
-export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget }: InfoModalProps) => {
+export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget, editBudget }: InfoModalProps) => {
 
     const dispatch = useDispatch();
-    const AllList: listInterface[] = useSelector((state: any) => state.list.list);
+
     return (
         <Modal
             animationType="slide"
@@ -42,57 +43,33 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
                 >
                     <Text
                         style={styles.textInfo}
-                    >MONTANT DU BUDGET</Text>
+                    >MONTANT DEPART DU BUDGET</Text>
                     <Text
                         style={styles.textInfo}
                     >{budget.montantStart}€</Text>
-                </View>
 
-
-                <View
-                    style={styles.containInfo2}
-                >
                     <Text
                         style={styles.textInfo}
-                    >DÉPENSE DU BUDGET</Text>
-                </View>
-
-                <ScrollView
-                    style={{
-                        width: "100%",
-                        maxHeight: "100%",
-                    }}
-                >
-                    {
-                        budget.listeExpend.map((item, index) => {
-                            return (
-                                <ItemBudget
-                                    key={item.id + index}
-                                    indexBudget={indexBudget}
-                                    expend={item}
-                                    idBudget={budget.id}
-                                />
-                            )
-                        })
-                    }
-
-
-
-                </ScrollView>
-
-
-                <View
-                    style={styles.blockRest}
-                >
-                    <Text
-                        style={styles.textInfo}
-                    >Reste du budget</Text>
+                    >MONTANT RESTANT DU BUDGET</Text>
                     <Text
                         style={styles.textInfo}
                     >{budget.montant}€</Text>
+
                 </View>
 
+
+
                 <Button
+                    disabled={budget.listeExpend.length <= 0}
+                    containerStyle={{ width: "80%", marginBottom: 20, borderRadius: 10 }}
+                    icon={
+                        <Icon
+                            containerStyle={{ marginRight: 10 }}
+                            name="list"
+                            size={20}
+                            color="white"
+                        />
+                    }
                     title="Créer une liste"
                     onPress={() => {
 
@@ -106,7 +83,25 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
                         setIsViewModalInfo(false);
                     }}
                 />
+                <Button
+                    containerStyle={{ width: "80%", marginBottom: 20, borderRadius: 10 }}
 
+                    icon={
+                        <Icon
+                            containerStyle={{ marginRight: 10 }}
+                            name="edit"
+                            size={20}
+                            color="white"
+
+
+                        />
+                    }
+                    title="Éditer le budget"
+                    onPress={() => {
+                        setIsViewModalInfo(false);
+                        editBudget();
+                    }}
+                />
 
             </View>
         </Modal >

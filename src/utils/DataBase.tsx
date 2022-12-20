@@ -424,12 +424,12 @@ export default class DatabaseManager {
         });
     }
 
-    static updateBudget(id: number, montant: number, name: string, is_list: boolean): Promise<void> {
+    static updateBudget(id: number, montant_start: number, curentMontant: number, name: string, is_list: boolean): Promise<void> {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "UPDATE budget SET start_montant = ?, name = ?, is_list = ? WHERE id = ?;",
-                    [montant, name, id, is_list ? 1 : 0]
+                    "UPDATE budget SET start_montant = ?, montant = ?, name = ?, is_list = ? WHERE id = ?;",
+                    [montant_start, curentMontant, name, is_list ? 1 : 0, id]
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -624,7 +624,7 @@ export default class DatabaseManager {
 
                                 this.getListById(insertId).then((list) => {
 
-                                    this.updateBudget(budget.id, budget.montant, budget.nom, true).then(() => {
+                                    this.updateBudget(budget.id, budget.montantStart, budget.montant, budget.nom, true).then(() => {
                                         resolve(list);
                                     });
 
@@ -742,7 +742,7 @@ export default class DatabaseManager {
 
                     this.getBudgetById(id_budget).then((budget) => {
 
-                        this.updateBudget(budget.id, budget.montant, budget.nom, false).then(() => {
+                        this.updateBudget(budget.id, budget.montantStart, budget.montant, budget.nom, false).then(() => {
                             this.deleteListByIdBudget(id_budget).then(() => {
                                 resolve();
                             });
