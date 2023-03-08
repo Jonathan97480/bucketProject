@@ -1,13 +1,13 @@
-import { Button, CheckBox } from "@rneui/base";
+import { Button, CheckBox, Icon } from "@rneui/base";
 import { Input } from "@rneui/themed";
 import React, { useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, TouchableOpacity, Modal, Alert } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
-import { StepTask } from "../components/stepStack/stepStack";
-import { Task } from "../components/Task/Task";
-import { addList, addListArray, listInterface } from "../redux/listSlice";
-import DatabaseManager from "../utils/DataBase";
-import { CreateDateCurentString } from "../utils/TextManipulation";
+import { StepTask } from "../../components/stepStack/stepStack";
+import { Task } from "../../components/Task/Task";
+import { addList, addListArray, listInterface } from "../../redux/listSlice";
+import DatabaseManager from "../../utils/DataBase";
+import { CreateDateCurentString, ListAlphabetizeOrder } from "../../utils/TextManipulation";
 
 
 
@@ -128,13 +128,20 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
 
     const dispatch = useDispatch();
     const allList = useSelector((state: any) => state.list.list);
-    const list: listInterface = allList[index_list];
+    let list: listInterface = { ...allList[index_list], steps: [...allList[index_list].steps] };
+    let steps = ListAlphabetizeOrder(list.steps);
+    list.steps = [...steps];
+    const [curentList, setCurentList] = React.useState(list);
     const [newItem, setNewItem] = React.useState("");
 
-    const handleKeyPress = (e: any) => {
-        let key = e.nativeEvent.key;
-        console.log(key)
-    };
+
+    useEffect(() => {
+        list = { ...allList[index_list], steps: [...allList[index_list].steps] };
+        steps = ListAlphabetizeOrder(list.steps);
+        list.steps = [...steps];
+        setCurentList(list);
+    }, [allList]);
+
 
     return (
         <Modal
@@ -159,11 +166,34 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
                     }}
 
                 >{list.name}</Text>
+
+                <Input
+                    label="Rechercher"
+                    placeholder="rechercher une element dans la liste"
+                    keyboardType="default"
+                    rightIcon={
+                        <Icon
+                            name="search"
+                            size={30}
+                            color="black"
+
+                        />
+                    }
+                    onChange={(e) => {
+                        let text = e.nativeEvent.text;
+                        let newList = list.steps.filter((item) => {
+                            return item.name.toLowerCase().includes(text.toLowerCase());
+                        });
+
+                        setCurentList({ ...list, steps: newList });
+                    }}
+
+                />
                 <ScrollView>
                     {
 
 
-                        list.steps.map((item, index) => {
+                        curentList.steps.map((item, index) => {
                             return (
                                 <StepTask
                                     key={index + "-step"}
@@ -209,9 +239,10 @@ function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTa
     )
 
 
-    function UpdateList(isChecked: boolean, index: number, ItemArray?: any) {
+    function UpdateList(isChecked: boolean, id: number, ItemArray?: any) {
 
         let newItemArray = ItemArray ? [...ItemArray] : [...list.steps];
+        let index = newItemArray.findIndex((item) => item.id === id);
         newItemArray[index] = {
             ...newItemArray[index],
             isChecked: isChecked

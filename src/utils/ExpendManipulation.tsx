@@ -29,14 +29,13 @@ export async function ItemAddExpendSlice(Expend: listeExpendInterface, indexBudg
         newBudgets[indexBudget] = budgetCurent;
 
 
-        const newBudgetMontant = CalculateNewBudgetMontant(newBudgets, indexBudget, Expend.montant, Expend.type);
+        const newAllBudget = CalculateNewBudgetMontant(newBudgets, indexBudget);
 
 
-        DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetMontant).then(() => {
+        DatabaseManager.updateBudgetMontant(budgetCurent.id, newAllBudget[indexBudget].montant).then(() => {
 
-            newBudgets[indexBudget].montant = newBudgetMontant;
 
-            resolve(newBudgets);
+            resolve(newAllBudget);
 
         }).catch((error) => {
 
@@ -66,21 +65,36 @@ export function ItemDeleteExpendSlice(indexBudget: number, idExpend: number, All
 
         if (curentExpends !== undefined) {
 
-            const newBudgetMontant = CalculateNewBudgetMontant(newBudgets, indexBudget, curentExpends.montant_total, curentExpends.type, true);
-
-            newBudgets[indexBudget] = budgetCurent;
-
-            DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetMontant).then(() => {
-
-                newBudgets[indexBudget].montant = newBudgetMontant;
+            const curentListExpends = newBudgets[indexBudget].listeExpend.filter((item) => item.id !== idExpend);
 
 
-                resolve(newBudgets);
+            budgetCurent.listeExpend = [...curentListExpends];
+            newBudgets[indexBudget] = { ...budgetCurent };
+
+            console.log("newBudgets FILTER ", newBudgets);
+
+            const newBudgetAllBudget = CalculateNewBudgetMontant(newBudgets, indexBudget);
+
+
+            DatabaseManager.updateBudgetMontant(budgetCurent.id, newBudgetAllBudget[indexBudget].montant).then(() => {
+
+                DatabaseManager.deleteExpend(idExpend).then(() => {
+
+                    console.log("delete expend success");
+                    resolve(newBudgetAllBudget);
+
+                }).catch((error) => {
+
+                    console.log(error);
+                });
+
             }).catch((error) => {
 
                 console.log(error);
                 reject(error);
             });
+
+
 
 
 
@@ -97,19 +111,28 @@ export function fixedFloatNumber(number: number): number {
     return parseFloat(number.toFixed(2));
 }
 
-function CalculateNewBudgetMontant(newBudgets: PoleExpend[], indexBudget: number, montant: number, typeOperation: string, inverseCalcul?: boolean): number {
+function CalculateNewBudgetMontant(newBudgets: PoleExpend[], indexBudget: number): PoleExpend[] {
 
-    let newBudgetMontant = newBudgets[indexBudget].montant;
+    const CurentBudget = newBudgets[indexBudget];
+    const newAllBudgets = [...newBudgets];
 
-    if (inverseCalcul && inverseCalcul === true) {
-        typeOperation = typeOperation === "add" ? "withdrawal" : "add";
-    }
 
-    if (typeOperation === "add") {
-        newBudgetMontant = newBudgetMontant + montant;
-    } else {
-        newBudgetMontant = newBudgetMontant - montant;
-    }
+    CurentBudget.montant = CurentBudget.montantStart;
 
-    return fixedFloatNumber(newBudgetMontant);
+    CurentBudget.listeExpend.forEach((expend) => {
+        switch (expend.type) {
+            case "add":
+                CurentBudget.montant += expend.montant_total;
+                break;
+
+            default:
+                CurentBudget.montant -= expend.montant_total;
+                break;
+        }
+
+    });
+    CurentBudget.montant = fixedFloatNumber(CurentBudget.montant);
+    newAllBudgets[indexBudget] = CurentBudget;
+
+    return newAllBudgets;
 }

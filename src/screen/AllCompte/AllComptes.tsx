@@ -3,14 +3,14 @@ import { View, StyleSheet, ScrollView } from "react-native";
 import { Button } from "@rneui/base";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSelector, useDispatch } from "react-redux";
-import DatabaseManager from "../utils/DataBase";
-import { addComptes, CompteInterface } from "../redux/comptesSlice";
-import { ComptesItem } from "../components/ComptesItem/ComptesItem";
-import { ModalAddCompte } from "../components/ModalAddCompte/ModalAddCompte";
+import DatabaseManager from "../../utils/DataBase";
+import { addComptes, CompteInterface } from "../../redux/comptesSlice";
+import { ComptesItem } from "../../components/ComptesItem/ComptesItem";
+import { ModalAddCompte } from "../../components/ModalAddCompte/ModalAddCompte";
 
 
 
-export default function AllComptes() {
+export default function AllComptes({ navigation }: any) {
     const [isCompteModalVisible, setIsCompteModalVisible] = React.useState(false);
 
     const comptes: CompteInterface[] = useSelector((state: any) => state.compte.comptes);
@@ -45,6 +45,7 @@ export default function AllComptes() {
                                         date: compte.date,
                                         index: index
                                     }}
+                                    navigation={navigation}
                                 />
                             )
                         })

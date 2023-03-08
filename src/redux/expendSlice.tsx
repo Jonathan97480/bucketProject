@@ -49,8 +49,15 @@ export const expendSlice = createSlice({
     initialState: initialState,
     reducers: {
         addExpend: (state, action) => {
+
             state.expends = action.payload
             state.status = 'loading'
+        },
+
+        clearExpend: (state) => {
+            state.expends = []
+            state.status = 'idle'
+            state.error = null
         },
 
         setError: (state, action) => {
@@ -61,7 +68,7 @@ export const expendSlice = createSlice({
 })
 
 
-export const { addExpend, setError } = expendSlice.actions
+export const { addExpend, setError, clearExpend } = expendSlice.actions
 
 export default expendSlice.reducer
 

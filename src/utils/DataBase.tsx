@@ -17,6 +17,10 @@ export default class DatabaseManager {
 
             );
             tx.executeSql(
+                "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT, identifiant TEXT, password TEXT);",
+
+            );
+            tx.executeSql(
 
                 "CREATE TABLE IF NOT EXISTS category (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT);",
 
@@ -28,9 +32,14 @@ export default class DatabaseManager {
             );
             tx.executeSql(
 
-                "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, start_montant REAL, date TEXT, is_list INTEGER);",
+                "CREATE TABLE IF NOT EXISTS budget (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL, start_montant REAL, date TEXT, is_list INTEGER,status TEXT);",
 
             );
+            tx.executeSql(
+
+                "CREATE TABLE IF NOT EXISTS compte_users (id INTEGER PRIMARY KEY AUTOINCREMENT, compte_id INTEGER, user_id INTEGER);",
+            );
+
             tx.executeSql(
 
                 "CREATE TABLE IF NOT EXISTS budget_expenses (id INTEGER PRIMARY KEY AUTOINCREMENT, budget_id INTEGER, expenses_id INTEGER);",
@@ -1292,6 +1301,92 @@ export default class DatabaseManager {
                 console.error("ERREUR + " + e)
                 reject(e);
             });
+        });
+
+    }
+
+    static GetIsAsUser = (): Promise<boolean> => {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM users",
+                    [],
+                    (_, { rows: { _array } }) => {
+                        if (_array.length > 0) {
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET IS AS USER")
+                }
+            );
+        });
+
+    }
+
+    static RegisterUser = (identifiant: string, password: string): Promise<boolean> => {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "INSERT INTO users ( identifiant, password) VALUES ( ?, ?)",
+                    [identifiant, password]
+
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + REGISTER USER")
+                    resolve(true);
+                }
+            );
+        });
+
+    }
+
+    static LoginUser = (identifiant: string, password: string): Promise<{
+        id: number,
+        identifiant: string,
+        password: string
+    } | boolean> => {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM users WHERE identifiant = ? AND password = ?",
+                    [identifiant, password],
+                    (_, { rows: { _array } }) => {
+
+                        if (_array.length > 0) {
+                            console.log("ARRAY LOGIN USER : ", _array)
+                            resolve({
+                                id: _array[0].id,
+                                identifiant: _array[0].identifiant,
+                                password: _array[0].password
+                            });
+                        } else {
+                            resolve(false);
+                        }
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + LOGIN USER")
+                }
+            );
         });
 
     }

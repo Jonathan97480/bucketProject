@@ -36,7 +36,7 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
             }}
             onPress={() => {
 
-                UpdateList(!step.isChecked, index);
+                UpdateList(!step.isChecked, step.id);
             }}
 
 
@@ -93,9 +93,10 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
     function deleteTask(index: number) {
 
         let newStepArray = [...task.steps];
+        let stepID = newStepArray[index].id;
         newStepArray.splice(index, 1);
 
-        UpdateList(false, newStepArray.length - 1, newStepArray);
+        UpdateList(false, stepID, newStepArray);
 
     }
 }

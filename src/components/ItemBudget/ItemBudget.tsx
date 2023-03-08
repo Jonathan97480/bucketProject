@@ -42,7 +42,7 @@ export const ItemBudget = ({ indexBudget, expend, idBudget }: ItemBudgetProps) =
                             text: "OK", onPress: () => {
                                 DatabaseManager.deleteExpend(expend.id).then(() => {
 
-                                    ItemDeleteExpendSlice(indexBudget, expend.id, budget).then((newBudget: PoleExpend[]) => {
+                                    ItemDeleteExpendSlice(indexBudget, expend.id, budget).then((newBudget) => {
 
                                         dispatch(addExpend(newBudget));
 

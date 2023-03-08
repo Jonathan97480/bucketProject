@@ -1,4 +1,5 @@
 import { listeExpendInterface, PoleExpend } from "../redux/expendSlice";
+import { listInterface, stepInterface } from "../redux/listSlice";
 
 export function textSizeFixe(text: string, size: number) {
     if (text.length > size) {
@@ -12,6 +13,8 @@ export function TextArrayAlphabetizeOrder(a: []) {
         return x.toString().localeCompare(y.toString());
     });
 }
+
+
 export function ExpendArrayAlphabetizeOrder(a: listeExpendInterface[]) {
     return a.sort(function (x: listeExpendInterface, y: listeExpendInterface,) {
         return x.name.toLowerCase().localeCompare(y.name.toLowerCase(), "fr", { sensitivity: "base", ignorePunctuation: true, });
@@ -19,6 +22,12 @@ export function ExpendArrayAlphabetizeOrder(a: listeExpendInterface[]) {
 
 
 
+}
+
+export function ListAlphabetizeOrder(a: stepInterface[]) {
+    return a.sort(function (x, y) {
+        return x.name.toLowerCase().localeCompare(y.name.toLowerCase(), "fr", { sensitivity: "base", ignorePunctuation: true, });
+    },);
 }
 
 export function CreateDateCurentString(): string {

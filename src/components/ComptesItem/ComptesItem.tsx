@@ -12,9 +12,10 @@ import { ModalInfoCompte } from '../ModalInfoCompte/ModalInfoCompte';
 
 interface ComptesItemProps {
     item: any;
+    navigation?: any;
 }
 
-export const ComptesItem = ({ item }: ComptesItemProps) => {
+export const ComptesItem = ({ item, navigation = undefined }: ComptesItemProps) => {
 
     const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
     const [budgets, setBudgets] = React.useState<PoleExpend[]>([]);
@@ -38,7 +39,11 @@ export const ComptesItem = ({ item }: ComptesItemProps) => {
         <>
             <TouchableOpacity
                 style={styles.container}
-                onPress={onPress}
+                onPress={() => {
+                    if (navigation !== undefined) {
+                        navigation.navigate("Tab");
+                    }
+                }}
                 onLongPress={onLongPress}
             >
                 <View style={styles.headerCard}>
@@ -77,19 +82,18 @@ export const ComptesItem = ({ item }: ComptesItemProps) => {
         </>
     )
 
-    function onPress() {
-        setIsModalVisible(true);
-    }
+
 
     function onLongPress() {
-        console.log("onLongPress");
+
+        setIsModalVisible(true);
     }
 
     function CalculCompteRest(budgets: PoleExpend[], montant: number): number {
 
         let montantRest = montant;
         budgets.forEach((budget) => {
-            montantRest -= budget.montant;
+            montantRest -= budget.montantStart;
         });
         return montantRest;
 

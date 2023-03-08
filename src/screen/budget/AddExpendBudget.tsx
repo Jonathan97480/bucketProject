@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, addons } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { Icon, Input } from "@rneui/base";
@@ -31,15 +31,33 @@ export const AddExpendBudget = () => {
             getAllExpend().then((data) => {
                 if (data.length > 0) {
                     dispatch(addExpend(data));
+                    UpdateView();
                 }
             });
 
 
+        } else {
+            UpdateView();
         }
 
-        setCurentBudget(budget[indexBudget]);
+
     }, [budget]);
 
+
+    const UpdateView = useCallback(() => {
+
+        console.log('BudGET UPDATE', budget);
+        setCurentBudget(budget[indexBudget]);
+
+    }, [budget, indexBudget]);
+
+    if (budget.length <= 0) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text>Chargement...</Text>
+            </View>
+        );
+    }
 
     return (
 
