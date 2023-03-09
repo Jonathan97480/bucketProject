@@ -56,7 +56,7 @@ export default class DatabaseManager {
 
             tx.executeSql(
 
-                "CREATE TABLE IF NOT EXISTS compte (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, montant REAL , category TEXT, date TEXT );",
+                "CREATE TABLE IF NOT EXISTS compte (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, pay REAL , withdrawal REAL , deposit REAL, transactions TEXT, date TEXT );",
             );
             tx.executeSql(
 
@@ -885,26 +885,36 @@ export default class DatabaseManager {
 
     }
 
-    static createCompte({ name, montant }: {
+    static CreateCompte({ idUser, name }: {
+        idUser: number
         name: string,
-        montant: number
+
     }): Promise<CompteInterface> {
 
         const date = this.CreateDateCurentString();
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "INSERT INTO compte (name, montant, date) VALUES (?, ?, ?);",
-                    [name, montant, date],
+                    "INSERT INTO compte (name, date) VALUES (?,?);",
+                    [name, date],
                     (_, { insertId }) => {
+                        if (insertId != undefined && insertId > 0) {
+                            tx.executeSql(
+                                "INSERT INTO compte_users (user_id, compte_id) VALUES (?,?);",
+                                [idUser, parseInt(insertId.toString())],
+                                (_) => {
 
-                        if (insertId) {
-                            this.getCompteById(insertId).then((compte) => {
-                                resolve(compte);
-                            });
-                        } else {
-                            console.error("ERREUR + INSERT COMPTE")
+                                    this.GetCompteByID(insertId).then((compte) => {
+                                        resolve(compte);
+                                    });
+
+                                },
+
+
+                            );
                         }
+
+
                     }
 
                 );
@@ -920,7 +930,7 @@ export default class DatabaseManager {
 
     }
 
-    static getCompteById(id: number): Promise<CompteInterface> {
+    static GetCompteByID(id: number): Promise<CompteInterface> {
 
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
@@ -960,33 +970,19 @@ export default class DatabaseManager {
 
     }
 
-    static getAllCompte(): Promise<CompteInterface[]> {
-
+    static async GetIDComptesByIDUser(id: number): Promise<{
+        user_id: number,
+        compte_id: number
+    }[]> {
         return new Promise((resolve, reject) => {
+
             db.transaction(tx => {
                 tx.executeSql(
-                    "SELECT * FROM compte",
-                    [],
+                    "SELECT * FROM compte_users WHERE user_id = ?",
+                    [id],
                     (_, { rows: { _array } }) => {
 
-                        if (_array.length > 0) {
-
-                            const compteInterface: CompteInterface[] = [];
-
-                            _array.forEach((compte) => {
-                                compteInterface.push({
-                                    id: compte.id,
-                                    name: compte.name,
-                                    montant: compte.montant,
-                                    date: compte.date,
-                                })
-                            });
-
-                            resolve(compteInterface);
-
-                        } else {
-                            resolve([]);
-                        }
+                        resolve(_array);
 
                     }
                 );
@@ -995,11 +991,23 @@ export default class DatabaseManager {
                 reject(e);
             },
                 () => {
-                    console.info("OK + GET ALL COMPTE")
+                    console.info("OK + GET COMPTE BY ID")
                 }
             );
         });
 
+    }
+
+    static async GetAllComptesByListID(listID: number[]): Promise<CompteInterface[]> {
+
+        const comptes: CompteInterface[] = [];
+
+        for (let i = 0; i < listID.length; i++) {
+            const compte = await this.GetCompteByID(listID[i]);
+            comptes.push(compte);
+        }
+
+        return comptes;
     }
 
     static linkCompteToBudget(id_budget: number, id_compte: number): Promise<void> {
@@ -1157,13 +1165,22 @@ export default class DatabaseManager {
 
     }
 
-    static deleteCompteById(id: number, isDeleteBudget?: boolean): Promise<void> {
+    static DeleteCompteById(id_compte: number, id_user: number): Promise<boolean> {
 
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
                     "DELETE FROM compte WHERE id = ?",
-                    [id]
+                    [id_compte],
+                    (_, { rows: { _array } }) => {
+                        tx.executeSql(
+                            "DELETE FROM compte_users WHERE user_id = ?",
+                            [id_user],
+                            (_, { rows: { _array } }) => {
+                                resolve(true);
+                            }
+                        );
+                    }
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -1171,30 +1188,7 @@ export default class DatabaseManager {
             },
                 () => {
                     console.info("OK + DELETE COMPTE BY ID")
-                    if (isDeleteBudget) {
-                        this.getAllBudgetIdByCompteId(id).then((idBudget) => {
 
-                            idBudget.forEach((id) => {
-                                this.deleteBudget(id).then(() => {
-                                    this.deleteLinkCompteToBudget(id).then(() => {
-                                        resolve();
-                                    });
-                                });
-                            });
-
-                            resolve();
-
-                        }).catch((e) => {
-                            console.error("ERREUR + " + e)
-                            reject(e);
-                        });
-
-                    } else {
-                        this.deleteLinkCompteToBudget(id).then(() => {
-                            resolve();
-                        });
-
-                    }
 
                 }
             );

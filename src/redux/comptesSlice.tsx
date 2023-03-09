@@ -42,11 +42,17 @@ export const comptesSlice = createSlice({
         clearComptes: (state) => {
             state.comptes = []
             state.status = 'idle'
+        },
+
+        deleteCompteArray: (state, action) => {
+            state.comptes = state.comptes.filter((compte) => compte.id !== action.payload)
+            state.status = 'loading'
+
         }
     },
 })
 
 // Action creators are generated for each case reducer function
-export const { addComptes, setError, clearComptes, addComptesArray } = comptesSlice.actions
+export const { addComptes, setError, clearComptes, addComptesArray, deleteCompteArray } = comptesSlice.actions
 
 export default comptesSlice.reducer

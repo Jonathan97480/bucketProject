@@ -3,10 +3,10 @@ import React, { useState, useEffect } from "react";
 import { Text } from "react-native";
 import { FormValidate, GetUser, LoginUser, RegisterUser, SaveUser } from "./logic";
 import { View } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Title, CustomSafeAreaView, CustomActivityIndicator } from "../../components";
 import DatabaseManager from "../../utils/DataBase";
-import { setUser } from "../../redux/userSlice";
+import { setUser, userInterface } from "../../redux/userSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
 
@@ -37,12 +37,9 @@ export default function LoginAndRegister({ navigation }: any) {
 
                     if (typeof user !== "boolean") {
 
-                        dispatch(setUser({
-                            id: user.id,
-                            identifiant: user.identifiant,
-                            password: user.password,
-                            isConnected: true
-                        }))
+
+
+                        dispatch(setUser(user))
                         navigation.replace("AllComptes")
 
                     } else {
@@ -108,6 +105,7 @@ export default function LoginAndRegister({ navigation }: any) {
                         value={form.password}
                         secureTextEntry={true}
                         onChangeText={(text) => setForm({ ...form, password: text })}
+
                     />
 
                     <Button

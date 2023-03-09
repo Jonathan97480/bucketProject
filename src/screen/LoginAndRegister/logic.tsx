@@ -96,3 +96,14 @@ export const GetUser = async (): Promise<
     return false
 }
 
+/* remove user from local storage mobile */
+export const RemoveUser = async () => {
+
+    try {
+        await AsyncStorage.removeItem("user")
+    } catch (e) {
+        console.error(e)
+    }
+
+}
+

@@ -3,16 +3,16 @@ import { createSlice } from '@reduxjs/toolkit'
 
 export interface userInterface {
 
-    id: number,
-    identifiant: string,
-    password: string,
+    user: {
+        id: number,
+        identifiant: string,
+        password: string,
+    } | undefined,
     isConnected: boolean
 }
 
 const initialState: userInterface = {
-    id: 0,
-    identifiant: "",
-    password: "",
+    user: undefined,
     isConnected: false
 }
 
@@ -22,7 +22,8 @@ export const userSlice = createSlice({
     initialState: initialState,
     reducers: {
         setUser: (state, action) => {
-            state = action.payload
+            state.user = action.payload
+            state.isConnected = true
 
         },
 
