@@ -93,13 +93,7 @@ export default function AllComptes({ navigation }: any) {
                                     <ComptesItem
                                         key={index + "-compte"}
                                         id_user={user.user?.id || 1}
-                                        item={{
-                                            name: compte.name,
-                                            montant: compte.montant,
-                                            id: compte.id,
-                                            date: compte.date,
-                                            index: index
-                                        }}
+                                        item={compte}
                                         navigation={navigation}
                                     />
                                 )

@@ -1,6 +1,6 @@
 
 import * as SQLite from 'expo-sqlite';
-import { CompteInterface } from '../redux/comptesSlice';
+import { CompteInterface, TransactionInterface } from '../redux/comptesSlice';
 import { PoleExpend } from '../redux/expendSlice';
 import { listInterface, stepInterface } from '../redux/listSlice';
 
@@ -946,8 +946,11 @@ export default class DatabaseManager {
                             const compteInterface: CompteInterface = {
                                 id: compte.id,
                                 name: compte.name,
-                                montant: compte.montant,
+                                pay: compte.pay,
                                 date: compte.date,
+                                withdrawal: compte.withdrawal,
+                                deposit: compte.deposit,
+                                transactions: JSON.parse(compte.transactions) as TransactionInterface[],
                             }
 
                             resolve(compteInterface);
@@ -1161,6 +1164,43 @@ export default class DatabaseManager {
                 console.error("ERREUR + " + e)
                 reject(e);
             });
+        });
+
+    }
+
+    static UpdateCompte = (id: number, name: string, pay: number, withdrawal: number, deposit: number, transactions: TransactionInterface[]): Promise<CompteInterface> => {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+                tx.executeSql(
+                    "UPDATE compte SET name = ?, pay = ?, withdrawal = ?, deposit = ?, transactions = ? WHERE id = ?",
+                    [name, pay, withdrawal, deposit, JSON.stringify(transactions), id],
+                    (_, { rows: { _array } }) => {
+
+                        this.GetCompteByID(id).then((compte) => {
+
+                            resolve(compte);
+
+                        }).catch((e) => {
+
+                            console.error("ERREUR + " + e)
+                            reject(e);
+
+                        }
+                        );
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + UPDATE COMPTE")
+
+
+
+                }
+            );
         });
 
     }

@@ -1,5 +1,5 @@
 
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Budget } from './src/screen/budget/Budget';
@@ -13,9 +13,20 @@ import { AddExpendBudget } from './src/screen/budget/AddExpendBudget';
 import AllComptes from './src/screen/AllCompte/AllComptes';
 import Compte from './src/screen/Compte/Compte';
 import LoginAndRegister from './src/screen/LoginAndRegister/LoginAnRegister';
+import React from 'react';
+import { TabBardCustom } from './src/components';
 
 const Tab = createBottomTabNavigator();
 const stackBudget = createNativeStackNavigator();
+
+
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#282525'
+  },
+};
 
 export default function App() {
 
@@ -24,11 +35,14 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <NavigationContainer>
+      <NavigationContainer
+        theme={MyTheme}
+      >
         <stackBudget.Navigator
           initialRouteName='LoginAndRegister'
           screenOptions={{
             headerShown: false,
+
 
           }}
         >
@@ -50,47 +64,18 @@ export const TabButton = () => {
   return (
     <Tab.Navigator
       initialRouteName='compte'
+
+      tabBar={props => <TabBardCustom {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#e91e63',
-        tabBarStyle: { backgroundColor: '#fff' },
+
 
       }}
     >
 
-      <Tab.Screen name="compte"
-
-        options={
-          {
-            tabBarLabel: 'Votre compte',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="account-balance-wallet" color={color} size={size} />
-            ),
-          }
-        }
-        component={Compte} />
-      <Tab.Screen name="Budget"
-
-        options={
-          {
-            tabBarLabel: 'Tous les budgets',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="dollar" type='font-awesome' color={color} size={size} />
-            ),
-          }
-        }
-        component={Budget} />
-      <Tab.Screen name="AllList"
-
-        options={
-          {
-            tabBarLabel: 'Mes listes',
-            tabBarIcon: ({ color, size }) => (
-              <Icon name="list" type='font-awesome' color={color} size={size} />
-            ),
-          }
-        }
-        component={AllList} />
+      <Tab.Screen name="Compte" component={Compte} />
+      <Tab.Screen name="transactions" component={Budget} />
+      <Tab.Screen name="Liste" component={AllList} />
     </Tab.Navigator>
   );
 }

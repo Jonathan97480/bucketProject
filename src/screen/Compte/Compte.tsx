@@ -1,66 +1,93 @@
 import { Icon } from "@rneui/base";
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, SafeAreaView, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { View, StyleSheet, ScrollView, Text } from "react-native";
+import globalStyle from "../../assets/styleSheet/globalStyle";
+import styleSheet from "./styleSheet";
+import ArchiveItem from "./components/ArchiveItem/ArchiveItem";
+import InfoCompte from "./components/InfoCompte/InfoCompte";
+import { useSelector, useDispatch } from "react-redux";
+import { CompteInterface, setCUrentCompte } from "../../redux/comptesSlice";
 import { getMonthByNumber } from "../../utils/DateManipulation";
+import { FixeIsYearAndMonthExist } from "./logic";
+import DatabaseManager from "../../utils/DataBase";
 
 export default function Compte() {
 
-    const date = new Date();
-    const Month = date.getMonth() + 1;
-    const Year = date.getFullYear();
+    const dispatch = useDispatch();
+
+    const currentCompte: CompteInterface = useSelector((state: any) => state.compte.currentCompte);
+
+
+    useEffect(() => {
+
+        const newCompte = FixeIsYearAndMonthExist(currentCompte);
+
+        if (newCompte !== null) {
+
+            DatabaseManager.UpdateCompte(
+                newCompte.id,
+                newCompte.name,
+                newCompte.pay,
+                newCompte.withdrawal,
+                newCompte.deposit,
+                newCompte.transactions
+
+            ).then((compte) => {
+                dispatch(setCUrentCompte(compte))
+            }).catch((error) => { console.log(error) })
+
+        }
+
+
+
+    }, [currentCompte])
+
+
 
     return (
-        <>
-            <SafeAreaView>
 
-                <View style={styles.container}>
+        <View style={[globalStyle.backgroundPrimaryColor, { maxHeight: "100%", height: "100%" }]}>
 
-                    <View style={styles.blockCurentMonth} >
+            <InfoCompte
+                compte={currentCompte}
+            />
 
-                        <Text style={styles.blockCurentMonthText}>{getMonthByNumber(Month)} {Year}</Text>
-                        <Text style={[styles.text, styles.textCenter]}>Compte Courant</Text>
-                        <View style={styles.infoBlock}>
-                            <View style={styles.graphe} ></View>
-                            <View style={styles.infoBlockText} >
-                                <Text style={styles.text} >Dépôt total </Text>
-                                <Text>1200€</Text>
-                            </View>
-
-                            <View style={styles.separator} ></View>
-                            <View style={styles.infoBlockText} >
-                                <Text style={styles.text} >Retrait total</Text>
-                                <Text>850€</Text>
-                            </View>
+            <View style={styleSheet.container}>
 
 
-                        </View>
-                        <Text style={[styles.text, styles.textCenter]} >Soldes Restant 400€</Text>
-                    </View>
+                <ScrollView style={[styleSheet.scrollview,]}>
 
-                    <ScrollView style={styles.scrollview}>
-
-
+                    <View style={[globalStyle.containerCenter, { alignItems: "center" }]}>
                         {
 
-                            [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((item, index) => {
+                            currentCompte.transactions.map((YearTransaction, index) => {
                                 return (
-                                    <View style={styles.blockMonthSelect} key={index} >
-
-                                        <Text style={styles.blockCurentMonthText}>{getMonthByNumber(item)} {Year}</Text>
-
+                                    <View key={`list-index-${index}`}>
+                                        <Text style={[globalStyle.textSizeLarge, globalStyle.colorTextPrimary, globalStyle.textAlignCenter, globalStyle.marginVertical]} >{YearTransaction.year} </Text>
+                                        <ArchiveItem
+                                            months={YearTransaction.month}
+                                            year={YearTransaction.year}
+                                        />
                                     </View>
+
+
+
+
+
+
+
 
                                 )
                             })
 
                         }
+                    </View>
+                </ScrollView>
 
-                    </ScrollView>
+            </View>
 
-                </View>
+        </View>
 
-            </SafeAreaView>
-        </>
     )
 
 }
@@ -68,69 +95,3 @@ export default function Compte() {
 
 
 
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'column',
-    },
-    blockCurentMonth: {
-        padding: 16,
-        backgroundColor: "#ffffff",
-
-
-    },
-    infoBlock: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        textAlign: "center",
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    scrollview: {
-        padding: 16,
-        paddingTop: 0,
-        maxHeight: '73%',
-    },
-    infoBlockText: {
-        justifyContent: 'center',
-        textAlign: 'center',
-        alignItems: 'center',
-        alignContent: 'center',
-    },
-    separator: {
-        backgroundColor: "#000000",
-        height: 32,
-        width: 2
-    },
-    blockMonthSelect: {
-        width: '100%',
-        padding: 16,
-        backgroundColor: "#ffffff",
-        justifyContent: 'center',
-        alignItems: 'center',
-        flexDirection: 'row',
-        marginVertical: 8,
-        borderRadius: 10,
-    },
-    blockCurentMonthText: {
-        textAlign: 'center',
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    text: {
-        fontSize: 15,
-
-    },
-    graphe: {
-        width: 80,
-        height: 80,
-        backgroundColor: '#000000',
-        borderRadius: 50,
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold'
-    },
-    textCenter: {
-        textAlign: 'center',
-    }
-})

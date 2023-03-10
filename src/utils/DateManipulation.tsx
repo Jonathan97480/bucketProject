@@ -1,6 +1,6 @@
 
 
-export const getMonthByNumber = (month: number) => {
+export const getMonthByNumber = (month: number): string => {
 
     switch (month) {
         case 1:

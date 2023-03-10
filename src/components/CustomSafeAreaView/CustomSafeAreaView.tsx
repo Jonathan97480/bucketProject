@@ -7,18 +7,18 @@ import globalStyle from "../../assets/styleSheet/globalStyle";
 interface CustomSafeAreaViewProps {
 
     children: any
+    paddingEnabled?: boolean
 }
 
-export default function CustomSafeAreaView({ children }: CustomSafeAreaViewProps) {
+export default function CustomSafeAreaView({ children, paddingEnabled = true }: CustomSafeAreaViewProps) {
 
     /* get theme mobile */
     const { colors } = useTheme();
 
-
-
+    const padding = paddingEnabled ? 32 : 0;
 
     return (
-        <SafeAreaView style={[styleSheet.container, globalStyle.backgroundPrimaryColor]}  >
+        <SafeAreaView style={[styleSheet.container, globalStyle.backgroundPrimaryColor, { padding: padding }]}  >
             <StatusBar style="light" />
             {children}
         </SafeAreaView>

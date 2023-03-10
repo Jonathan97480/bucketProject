@@ -44,9 +44,10 @@ export default StyleSheet.create({
         backgroundColor: "#FF0000",
     },
     containerCenter: {
-        flex: 1,
         justifyContent: "center",
+        flex: 1,
         width: "100%",
+
 
     },
     marginVertical: {
