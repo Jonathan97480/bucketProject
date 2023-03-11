@@ -5,7 +5,7 @@ import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { deleteCompte } from './logic';
 import { styleSheet } from './styleSheet';
 import { useDispatch } from 'react-redux';
-import { CompteInterface, deleteCompteArray, setCUrentCompte } from '../../../../redux/comptesSlice';
+import { CompteInterface, deleteCompteArray, setCurentCompte } from '../../../../redux/comptesSlice';
 import { CustomActivityIndicator } from '../../../../components';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
 
@@ -29,7 +29,7 @@ export const ComptesItem = ({ item, navigation = undefined, id_user }: ComptesIt
                 style={styleSheet.container}
                 onPress={() => {
                     if (navigation !== undefined) {
-                        dispatch(setCUrentCompte(item))
+                        dispatch(setCurentCompte(item))
                         navigation.navigate("Tab");
                     }
                 }}

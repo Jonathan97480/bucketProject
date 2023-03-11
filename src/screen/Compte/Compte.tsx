@@ -6,7 +6,7 @@ import styleSheet from "./styleSheet";
 import ArchiveItem from "./components/ArchiveItem/ArchiveItem";
 import InfoCompte from "./components/InfoCompte/InfoCompte";
 import { useSelector, useDispatch } from "react-redux";
-import { CompteInterface, setCUrentCompte } from "../../redux/comptesSlice";
+import { CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, TransactionInterface } from "../../redux/comptesSlice";
 import { getMonthByNumber } from "../../utils/DateManipulation";
 import { FixeIsYearAndMonthExist } from "./logic";
 import DatabaseManager from "../../utils/DataBase";
@@ -16,7 +16,7 @@ export default function Compte() {
     const dispatch = useDispatch();
 
     const currentCompte: CompteInterface = useSelector((state: any) => state.compte.currentCompte);
-
+    const currentMonth: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
 
     useEffect(() => {
 
@@ -33,11 +33,29 @@ export default function Compte() {
                 newCompte.transactions
 
             ).then((compte) => {
-                dispatch(setCUrentCompte(compte))
+                dispatch(setCurentCompte(compte))
             }).catch((error) => { console.log(error) })
 
         }
 
+        if (currentMonth === null && currentCompte !== null) {
+
+            currentCompte.transactions.find((transactionsParYear: TransactionInterface) => {
+
+                if (transactionsParYear.year === new Date().getFullYear()) {
+                    transactionsParYear.month.find((month: MonthInterface) => {
+                        if (month.nameMonth === getMonthByNumber(new Date().getMonth() + 1)) {
+                            dispatch(setCurentMonth(month))
+                            return month
+                        }
+                    })
+                }
+
+
+
+            })
+
+        }
 
 
     }, [currentCompte])

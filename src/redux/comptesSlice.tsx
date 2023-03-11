@@ -1,29 +1,31 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export interface MonthInterface {
-    numberTransactionMonth: number,
-    nameMonth: string,
-    transactions: {
+export interface TransactionMonthInterface {
+    id: number,
+    name: string,
+    montant: number,
+    start_montant: number,
+    date: string,
+    status: "unique" | "recurring",
+    typeOperation: "income" | "expense",
+    categoryID: number,
+    period: "day" | "week" | "month" | "year" | null,
+    transactionType: "Spent" | "Budget",
+    transaction: {
         id: number,
         name: string,
         montant: number,
-        start_montant: number,
         date: string,
-        status: "unique" | "recurring",
-        type: "income" | "expense",
         category: string,
-        period: "day" | "week" | "month" | "year",
-        transactionType: "simple" | "budget",
-        transaction: {
-            id: number,
-            name: string,
-            montant: number,
-            date: string,
-            category: string,
-            type: "income" | "expense",
-        }[]
-    }[]
+        type: "income" | "expense",
+    }[] | null
 }
+export interface MonthInterface {
+    numberTransactionMonth: number,
+    nameMonth: string,
+    transactions: TransactionMonthInterface[]
+}
+
 
 export interface TransactionInterface {
 
@@ -49,6 +51,7 @@ export interface comptesState {
     comptes: CompteInterface[],
     status: 'idle' | 'loading' | 'failed',
     currentCompte: CompteInterface | null,
+    currentMonth: MonthInterface | null,
     error: string | null,
 }
 
@@ -56,6 +59,7 @@ const initialState: comptesState = {
     comptes: [],
     status: 'idle',
     currentCompte: null,
+    currentMonth: null,
     error: null,
 }
 
@@ -79,12 +83,15 @@ export const comptesSlice = createSlice({
             state.comptes = []
             state.status = 'idle'
         },
-        setCUrentCompte: (state, action) => {
+        setCurentCompte: (state, action) => {
             state.currentCompte = action.payload
             state.status = 'loading'
         },
 
-
+        setCurentMonth: (state, action) => {
+            state.currentMonth = action.payload
+            state.status = 'loading'
+        },
 
         deleteCompteArray: (state, action) => {
             state.comptes = state.comptes.filter((compte) => compte.id !== action.payload)
@@ -95,6 +102,6 @@ export const comptesSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addComptes, setError, setCUrentCompte, clearComptes, addComptesArray, deleteCompteArray } = comptesSlice.actions
+export const { addComptes, setError, setCurentCompte, setCurentMonth, clearComptes, addComptesArray, deleteCompteArray } = comptesSlice.actions
 
 export default comptesSlice.reducer

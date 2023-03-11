@@ -9,7 +9,7 @@ import { Icon } from '@rneui/base';
 import DatabaseManager from './src/utils/DataBase';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/appStore';
-import { AddExpendBudget } from './src/screen/budget/AddExpendBudget';
+import { AddExpendBudget } from './src/screen/budget/components/AddOperation/AddOperation';
 import AllComptes from './src/screen/AllCompte/AllComptes';
 import Compte from './src/screen/Compte/Compte';
 import LoginAndRegister from './src/screen/LoginAndRegister/LoginAnRegister';

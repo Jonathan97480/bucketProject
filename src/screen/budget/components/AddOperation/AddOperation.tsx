@@ -2,13 +2,13 @@ import React, { useCallback, useEffect } from "react";
 import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, addons } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import { Icon, Input } from "@rneui/base";
-import { addExpend, listeExpendInterface, PoleExpend } from '../../redux/expendSlice';
+import { addExpend, listeExpendInterface, PoleExpend } from '../../../../redux/expendSlice';
 import { useRoute } from '@react-navigation/native';
-import { SectionCustom } from "../../components/SectionCustom/SectionCustom";
-import { SectionTitle } from "../../components/SectionTitle/SectionTitle";
-import { ItemBudget } from "../../components/ItemBudget/ItemBudget";
-import { getAllExpend } from "../../utils/GetBudgetAndExpend";
-import { ExpendArrayAlphabetizeOrder } from "../../utils/TextManipulation";
+import { SectionCustom } from "../../../../components/SectionCustom/SectionCustom";
+import { SectionTitle } from "../../../../components/SectionTitle/SectionTitle";
+import { ItemBudget } from "../../../../components/ItemBudget/ItemBudget";
+import { getAllExpend } from "../../../../utils/GetBudgetAndExpend";
+import { ExpendArrayAlphabetizeOrder } from "../../../../utils/TextManipulation";
 
 
 
@@ -46,7 +46,7 @@ export const AddExpendBudget = () => {
 
     const UpdateView = useCallback(() => {
 
-        console.log('BudGET UPDATE', budget);
+
         setCurentBudget(budget[indexBudget]);
 
     }, [budget, indexBudget]);

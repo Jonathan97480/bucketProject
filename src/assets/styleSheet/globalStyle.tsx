@@ -55,8 +55,12 @@ export default StyleSheet.create({
     },
     inputStyle: {
         color: "#FFF",
-    }
+    },
 
+    flexRow: {
+        flexDirection: "row",
+        alignItems: "center",
+    }
 
 
 });

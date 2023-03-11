@@ -1,21 +1,23 @@
 
-import { Button, ListItem, Icon } from "@rneui/base";
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, StatusBar, SafeAreaView } from "react-native";
+import { Button, Icon } from "@rneui/base";
+import React, { useEffect, useCallback } from "react";
+import { View, Text, ScrollView, StatusBar, SafeAreaView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
-
-import { EmptyBudget } from "../../components/EmptyBudget/EmptyBudget";
-import { InfoModal } from "../../components/InfoBudget/InfoBudget";
-import { ModalAddBudget } from "../../components/ModalAddBudget/ModalAddBudget";
+import styleSheet from "./styleSheet";
+import { EmptyBudget } from "./components/EmptyBudget/EmptyBudget";
+import { InfoModal } from "./components/InfoBudget/InfoBudget";
+import { ModalAddBudget } from "./components/ModalAddBudget/ModalAddBudget";
 import { addExpend, PoleExpend } from "../../redux/expendSlice";
-import { colorList, getColorBudget } from "../../utils/ColorCollection";
-import DatabaseManager from "../../utils/DataBase";
+import { colorList } from "../../utils/ColorCollection";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
-import { addComptes } from "../../redux/comptesSlice";
+import BudgetSwipeable from "./components/BudgetSwipeable/BudgetSwipeable";
+import { MonthInterface } from "../../redux/comptesSlice";
+import globalStyle from "../../assets/styleSheet/globalStyle";
 
 
-interface curentBudgetInterface {
+
+export interface curentBudgetInterface {
     budget: PoleExpend;
     indexBudget: number;
 }
@@ -25,7 +27,7 @@ export const Budget = () => {
 
     const navigation = useNavigation();
 
-    const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
+    const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
 
     const [curentBudget, setCurentBudget] = React.useState<curentBudgetInterface | undefined>(undefined);
 
@@ -37,41 +39,35 @@ export const Budget = () => {
 
 
     useEffect(() => {
-        if (budget.length <= 0) {
-            getAllExpend().then((_data) => {
-                if (_data !== undefined && _data !== null && _data.length > 0) {
-                    dispatch(addExpend(_data));
-                }
-            });
-        }
-
-    }, [budget]);
 
 
-    function editBudget() {
+    }, [currentMonthRedux]);
+
+
+    const editTransactionCallBack = useCallback(() => {
         setIsViewModalAddBudget(true);
+    }, []);
 
-    }
 
     return (
         <SafeAreaView
-            style={styles.safeAreaView}
+            style={styleSheet.safeAreaView}
         >
             <StatusBar barStyle="default" />
-            <View style={styles.container}>
+            <View style={styleSheet.container}>
 
                 {
 
-                    budget.length > 0 ?
-                        <ScrollView contentContainerStyle={styles.scrollView}>
+                    currentMonthRedux !== null && currentMonthRedux.transactions.length > 0 ?
+                        <ScrollView contentContainerStyle={styleSheet.scrollView}>
                             <View
-                                style={styles.scrollViewContainer}
+                                style={styleSheet.scrollViewContainer}
                             >
-                                <Text style={styles.title} >
-                                    Liste Des budget
+                                <Text style={[styleSheet.title, globalStyle.colorTextPrimary]} >
+                                    Liste Des transactions
                                 </Text>
                                 {
-                                    budget.map((item: PoleExpend, indexBudget) => {
+                                    currentMonthRedux.transactions.map((item, indexBudget) => {
                                         return (
 
 
@@ -82,8 +78,8 @@ export const Budget = () => {
                                             }} key={item.id}
                                             >
 
-                                                <BudgetSwipeableElement
-                                                    budget={item}
+                                                <BudgetSwipeable
+                                                    transaction={item}
                                                     indexBudget={indexBudget}
                                                     setCurentBudget={setCurentBudget}
                                                     setIsViewModalInfo={setIsViewModalInfo}
@@ -96,7 +92,7 @@ export const Budget = () => {
                                     })
                                 }
                                 <Button
-                                    buttonStyle={styles.buttonAddBudget}
+                                    buttonStyle={styleSheet.buttonAddBudget}
                                     title="Ajouter"
                                     icon={
                                         <Icon
@@ -116,7 +112,11 @@ export const Budget = () => {
                 }
 
 
-                <ModalAddBudget isViewModalAddBudget={isViewModalAddBudget} setIsViewModalAddBudget={setIsViewModalAddBudget} budget={curentBudget?.budget} />
+                <ModalAddBudget
+                    isViewModalAddBudget={isViewModalAddBudget}
+                    setIsViewModalAddBudget={setIsViewModalAddBudget}
+                    transaction={undefined}
+                />
             </View>
 
             {
@@ -127,7 +127,7 @@ export const Budget = () => {
                         setIsViewModalInfo={setIsViewModalInfo}
                         budget={curentBudget.budget}
                         indexBudget={curentBudget.indexBudget}
-                        editBudget={editBudget}
+                        editTransactionCallBack={editTransactionCallBack}
                     /> : null
             }
         </SafeAreaView>
@@ -135,150 +135,13 @@ export const Budget = () => {
 
 }
 
-const styles = StyleSheet.create({
-    safeAreaView: {
-        maxHeight: '100%',
-        height: '100%',
-    },
-    container: {
-        flex: 1,
-        paddingVertical: 10,
-        maxHeight: '100%',
-        justifyContent: 'center',
-        padding: 10,
-        height: '100%',
-    },
-
-    scrollView: {
-        flexGrow: 1,
-        justifyContent: 'center',
-        minHeight: '100%',
-        width: '100%',
-        padding: 10,
-    },
-    scrollViewContainer: {
-        width: '100%',
-        height: '100%',
-        marginTop: 20,
-    },
-
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        textAlign: 'center',
-    },
-    buttonAddBudget: {
-
-        flex: 1,
-        borderRadius: 50,
-        backgroundColor: '#596cab',
-
-    }
-
-
-
-});
 
 
 
 
-interface BudgetSwipeableElementProps {
-    budget: PoleExpend;
-    indexBudget: number;
-    setCurentBudget: (value: curentBudgetInterface) => void;
-    setIsViewModalInfo: (value: boolean) => void;
-    navigation: any;
-}
-
-
-function BudgetSwipeableElement({ budget, indexBudget, setCurentBudget, setIsViewModalInfo, navigation }: BudgetSwipeableElementProps) {
-
-    const dispatch = useDispatch();
-
-    return (
-        <ListItem.Swipeable
-
-            containerStyle={[{ backgroundColor: getColorBudget(budget.montant, budget.montantStart), borderRadius: 20, }]}
-            onPress={() => {
-                navigation.navigate('AddExpendBudget', { curentBudget: budget, indexBudget: indexBudget });
-            }}
-
-
-            leftContent={(reset) => (
-                <Button
-                    containerStyle={{ borderRadius: 20, }}
-                    title="Info"
-                    onPress={() => {
-                        setCurentBudget({ budget: budget, indexBudget });
-                        setIsViewModalInfo(true);
-                        reset()
-                    }}
-                    icon={{ name: 'info', color: 'white' }}
-                    buttonStyle={{ minHeight: '100%' }}
-                />
-            )}
-            rightContent={(reset) => (
-                <Button
-                    containerStyle={{ borderRadius: 20, }}
-                    title="Delete"
-                    onPress={() => {
-                        reset()
-                        DatabaseManager.deleteAllExpendByBudget(budget.id).then(() => {
-
-                            DatabaseManager.deleteBudget(budget.id).then(() => {
-                                DatabaseManager.deleteLinkBudgetByIdBudget(budget.id).then(() => {
-
-                                    getAllExpend().then((_data) => {
-
-                                        if (_data.length > 0) {
-                                            dispatch(addExpend(_data));
-                                        } else {
-                                            dispatch(addExpend([]));
-                                        }
-                                    });
 
 
 
-
-                                });
-
-
-
-                            });
-
-                        });
-
-                    }
-                    }
-                    icon={{ name: 'delete', color: 'white' }}
-                    buttonStyle={{ minHeight: '100%', backgroundColor: 'red' }}
-                />
-            )}
-        >
-            <Icon
-                name="dollar"
-                type='font-awesome'
-                color={colorList.primary}
-            />
-            <ListItem.Content
-
-            >
-                <ListItem.Title
-                    style={{ color: colorList.primary, fontWeight: 'bold' }}
-                >{budget.nom}</ListItem.Title>
-                <ListItem.Subtitle
-                    style={{ color: colorList.primary, fontSize: 12 }}
-                >Montant de départ : {budget.montantStart}€</ListItem.Subtitle>
-                <ListItem.Subtitle
-                    style={{ color: colorList.primary, fontSize: 12 }}
-                >Budget restant : {budget.montant}€</ListItem.Subtitle>
-            </ListItem.Content>
-            <ListItem.Chevron />
-        </ListItem.Swipeable>
-    )
-
-}
 
 
 

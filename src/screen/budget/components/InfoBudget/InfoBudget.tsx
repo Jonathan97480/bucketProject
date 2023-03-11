@@ -1,23 +1,20 @@
 import { Button, Icon } from "@rneui/base";
 import React from "react";
-import { View, Text, StyleSheet, ScrollView, Modal } from "react-native";
-import { PoleExpend } from "../../redux/expendSlice";
-import { addList, addListArray, listInterface } from "../../redux/listSlice";
-import DatabaseManager from "../../utils/DataBase";
-import { ItemBudget } from "../ItemBudget/ItemBudget";
-import { useDispatch, useSelector } from 'react-redux';
-
+import { View, Text, Modal } from "react-native";
+import { PoleExpend } from "../../../../redux/expendSlice";
+import { useDispatch } from 'react-redux';
+import styleSheet from "./styleSheet";
 
 interface InfoModalProps {
     setIsViewModalInfo: (value: boolean) => void,
-    editBudget: () => void,
+    editTransactionCallBack: () => void,
     IsViewModalInfo: boolean,
     budget: PoleExpend,
     indexBudget: number,
 }
 
 
-export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget, editBudget }: InfoModalProps) => {
+export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget, editTransactionCallBack }: InfoModalProps) => {
 
     const dispatch = useDispatch();
 
@@ -26,33 +23,33 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
             animationType="slide"
             transparent={true}
             visible={IsViewModalInfo}
-            style={styles.modal}
+            style={styleSheet.modal}
             onRequestClose={() => {
                 setIsViewModalInfo(false);
             }}
         >
-            <View style={styles.contain}
+            <View style={styleSheet.contain}
             >
 
                 <Text
 
-                    style={styles.budgetTitle}
+                    style={styleSheet.budgetTitle}
                 >{budget.nom}</Text>
                 <View
-                    style={styles.containInfo}
+                    style={styleSheet.containInfo}
                 >
                     <Text
-                        style={styles.textInfo}
+                        style={styleSheet.textInfo}
                     >MONTANT DEPART DU BUDGET</Text>
                     <Text
-                        style={styles.textInfo}
+                        style={styleSheet.textInfo}
                     >{budget.montantStart}€</Text>
 
                     <Text
-                        style={styles.textInfo}
+                        style={styleSheet.textInfo}
                     >MONTANT RESTANT DU BUDGET</Text>
                     <Text
-                        style={styles.textInfo}
+                        style={styleSheet.textInfo}
                     >{budget.montant}€</Text>
 
                 </View>
@@ -73,12 +70,7 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
                     title="Créer une liste"
                     onPress={() => {
 
-                        DatabaseManager.createListByBudget(budget).then((data: listInterface) => {
 
-
-                            dispatch(addListArray(data));
-
-                        });
 
                         setIsViewModalInfo(false);
                     }}
@@ -99,7 +91,7 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
                     title="Éditer le budget"
                     onPress={() => {
                         setIsViewModalInfo(false);
-                        editBudget();
+                        editTransactionCallBack();
                     }}
                 />
 
@@ -111,53 +103,4 @@ export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBu
 
 }
 
-const styles = StyleSheet.create({
-    modal: {
 
-        maxHeight: '100%',
-    },
-    contain: {
-
-        flex: 1,
-        alignItems: 'center',
-        minHeight: '100%',
-        maxWidth: '100%',
-        backgroundColor: "#fff"
-
-    }, budgetTitle: {
-
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20
-
-    }, containInfo: {
-        width: "100%",
-        backgroundColor: "blue",
-        marginBottom: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    }, textInfo: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20,
-        color: "#fff"
-
-    }, containInfo2: {
-
-
-        backgroundColor: "#000",
-        width: "100%",
-
-
-    }, blockRest: {
-
-        width: "100%",
-        height: 100,
-        backgroundColor: "blue",
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginVertical: 20,
-    }
-
-
-})

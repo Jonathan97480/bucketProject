@@ -1,11 +1,13 @@
 
 import { createSlice } from '@reduxjs/toolkit'
 
+export interface CategoryInterface {
+    id: number,
+    name: string,
+}
+
 export interface CategoryState {
-    category: {
-        id: number,
-        name: string,
-    }[],
+    category: CategoryInterface[],
     status: 'idle' | 'loading' | 'failed',
     error: string | null,
 
@@ -23,7 +25,7 @@ export const categorySlice = createSlice({
     initialState: initialState,
     reducers: {
         addCategory: (state, action) => {
-            state.category.push(action.payload)
+            state.category = action.payload
             state.status = 'loading'
         },
         setError: (state, action) => {

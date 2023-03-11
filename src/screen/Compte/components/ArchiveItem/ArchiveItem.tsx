@@ -1,7 +1,6 @@
 import { View, Text } from "react-native";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
-import { MonthInterface, TransactionInterface } from "../../../../redux/comptesSlice";
-import { getMonthByNumber } from "../../../../utils/DateManipulation";
+import { MonthInterface } from "../../../../redux/comptesSlice";
 import styleSheet from "./styleSheet";
 
 interface ArchiveItemProps {
@@ -16,7 +15,7 @@ export default function ArchiveItem({ months, year }: ArchiveItemProps) {
     if (months === null) {
         months = []
     }
-    /*   if (months.length === 0) return (<></>) */
+
     console.log(months)
     return (
         <>
