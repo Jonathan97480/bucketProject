@@ -3,7 +3,7 @@ import { PoleExpend } from "../../../../redux/expendSlice";
 import { colorList, getColorBudget } from "../../../../utils/ColorCollection";
 import { Button, ListItem, Icon } from "@rneui/base";
 import { View, Text, ScrollView, StatusBar, SafeAreaView } from "react-native";
-import { curentBudgetInterface } from "../../Budget";
+import { curentBudgetInterface } from "../../Transaction";
 import { TransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 
 interface BudgetSwipeableProps {
@@ -15,7 +15,7 @@ interface BudgetSwipeableProps {
 }
 
 
-export default function BudgetSwipeable({ transaction, indexBudget, setCurentBudget, setIsViewModalInfo, navigation }: BudgetSwipeableProps) {
+export default function TransactionSwipeable({ transaction, indexBudget, setCurentBudget, setIsViewModalInfo, navigation }: BudgetSwipeableProps) {
 
     const dispatch = useDispatch();
 

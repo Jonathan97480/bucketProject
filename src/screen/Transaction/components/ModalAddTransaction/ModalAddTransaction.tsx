@@ -272,14 +272,34 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 title={transaction ? "Enregistrée" : 'Ajouter'}
                                 onPress={() => {
 
-                                    if (transaction) {
+                                    if (!transaction) {
                                         /* ADD TRANSACTION  */
                                         if (ValidateForm(formAddBudget, setFormAddBudget)) {
 
-                                            const newTransaction: TransactionMonthInterface = createNewTransaction(currentMonthRedux.transactions.length + 1, formAddBudget)
+                                            const newID = formAddBudget.typeOperation === 'income' ? currentMonthRedux.transactions.income.length + 1 : currentMonthRedux.transactions.expense.length + 1
+
+                                            const newTransaction: TransactionMonthInterface = createNewTransaction(newID, formAddBudget)
 
                                             const newM = { ...currentMonthRedux }
-                                            newM.transactions = [...currentMonthRedux.transactions, newTransaction]
+
+                                            if (newTransaction.typeOperation === 'income') {
+
+                                                newM.transactions = {
+                                                    ...currentMonthRedux.transactions,
+                                                    income: [...currentMonthRedux.transactions.income, newTransaction]
+                                                }
+
+                                            } else if (newTransaction.typeOperation === 'expense') {
+
+                                                newM.transactions = {
+                                                    ...currentMonthRedux.transactions,
+                                                    expense: [...currentMonthRedux.transactions.expense, newTransaction]
+                                                }
+
+                                            } else {
+
+                                                throw new Error('typeOperation not found')
+                                            }
 
                                             saveTransaction({ ...currentCompteRedux }, { ...newM }).then((res) => {
 

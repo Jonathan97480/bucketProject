@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { Modal, View, StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { addComptesArray } from '../../../../redux/comptesSlice';
-import { creteCompte } from './logic';
+import { createCompte } from './logic';
 import { styleSheet } from './styleSheet';
 import { CustomActivityIndicator } from '../../../../components';
 
@@ -69,10 +69,10 @@ export const ModalAddCompte = ({ visible, setVisible, id_user }: ModalAddCompteP
 
     async function onPress() {
         setIsLoading(true);
-        const result = await creteCompte(
+        const result = await createCompte(
             {
-                nameCompte: Compte.name,
-                idUser: id_user,
+                _nameCompte: Compte.name,
+                _idUser: id_user,
             }
         );
         setTimeout(() => {

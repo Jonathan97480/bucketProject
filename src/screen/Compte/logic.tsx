@@ -1,4 +1,4 @@
-import { CompteInterface } from "../../redux/comptesSlice";
+import { CompteInterface, MonthInterface } from "../../redux/comptesSlice";
 import { getMonthByNumber } from "../../utils/DateManipulation";
 
 export const FixeIsYearAndMonthExist = (currentCompte: CompteInterface) => {
@@ -30,7 +30,9 @@ const fixeYear = (currentCompte: CompteInterface) => {
 
     }
 
+
     const newCurent = { ...currentCompte };
+
     newCurent.transactions = [...currentCompte.transactions]
     newCurent.transactions.push(curentYearTransaction)
 
@@ -43,36 +45,42 @@ const fixeYear = (currentCompte: CompteInterface) => {
 
 const fixeMonth = (currentCompte: CompteInterface, index: number): CompteInterface | null => {
 
+    const curentNameMonth: string = getMonthByNumber(new Date().getMonth() + 1);
+
     let curentYearTransaction = { ...currentCompte.transactions[index] };
 
-    const curentMonthTransaction = {
+    let curentMonthTransaction = {
 
         ...curentYearTransaction.month.filter((transaction) => {
 
-            return transaction.nameMonth === getMonthByNumber(new Date().getMonth() + 1);
+            return transaction.nameMonth === curentNameMonth;
 
         })
 
     }
-    console.log("Curent Month", curentMonthTransaction, new Date().getMonth() + 1)
+
     if (Object.keys(curentMonthTransaction).length === 0) {
 
-        curentMonthTransaction[0] = {
+        const NewMonthTransaction: MonthInterface = {
 
-            nameMonth: getMonthByNumber(new Date().getMonth() + 1),
-            transactions: [],
+            nameMonth: curentNameMonth,
+            transactions: {
+                income: [],
+                expense: []
+            },
+            AccountBalanceBeginningMonth: currentCompte.pay,
             numberTransactionMonth: 0
 
         }
 
         curentYearTransaction.month = [...curentYearTransaction.month]
-        curentYearTransaction.month.push(curentMonthTransaction[0])
+        curentYearTransaction.month.push(NewMonthTransaction)
 
         const newCurent = { ...currentCompte };
         newCurent.transactions = [...currentCompte.transactions]
 
         newCurent.transactions[index] = curentYearTransaction
-        console.log("New CUrent", newCurent)
+
         return newCurent
 
     }

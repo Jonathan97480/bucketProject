@@ -8,10 +8,8 @@ export default StyleSheet.create({
     },
     container: {
         flex: 1,
-        paddingVertical: 10,
         maxHeight: '100%',
         justifyContent: 'center',
-        padding: 10,
         height: '100%',
     },
 

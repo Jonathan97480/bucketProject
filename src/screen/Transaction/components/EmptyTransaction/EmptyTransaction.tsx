@@ -10,7 +10,7 @@ interface EmptyBudgetProps {
     setIsViewModalAddBudget: (value: boolean) => void
 }
 
-export const EmptyBudget = ({ setIsViewModalAddBudget }: EmptyBudgetProps) => {
+export const EmptyTransaction = ({ setIsViewModalAddBudget }: EmptyBudgetProps) => {
 
     return (
         <View style={styleSheet.container}>

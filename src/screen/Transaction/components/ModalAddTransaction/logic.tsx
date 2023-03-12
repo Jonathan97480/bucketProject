@@ -58,7 +58,7 @@ export const createNewTransaction = (index: number, formAddBudget: FormAddBudget
         categoryID: formAddBudget.categoryTransaction,
         period: formAddBudget.isUnique ? null : formAddBudget.period,
         transactionType: formAddBudget.typeTransaction,
-        transaction: formAddBudget.typeTransaction === "Spent" ? null : []
+        transaction: formAddBudget.typeTransaction === "Spent" ? null : { income: [], expense: [] }
 
     }
 
@@ -79,6 +79,11 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
                     transactionsParYear.numberTransactionYear += 1;
                     currentCompte = { ...currentCompte, transactions: [...currentCompte.transactions] }
                     currentCompte.transactions[index] = transactionsParYear;
+
+                    const newResultCompte = calculTransactionByCompte(currentCompte, currentMonth);
+                    currentCompte.pay = newResultCompte.pay;
+                    currentCompte.withdrawal = newResultCompte.withdrawal;
+                    currentCompte.deposit = newResultCompte.deposit;
 
                     DatabaseManager.UpdateCompte(
                         currentCompte.id,
@@ -106,5 +111,33 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
     return currentCompte;
 
 
+
+}
+
+
+export const calculTransactionByCompte = (compte: CompteInterface, currentMonth: MonthInterface): {
+    pay: number,
+    withdrawal: number,
+    deposit: number
+} => {
+
+    let result = {
+        pay: currentMonth.AccountBalanceBeginningMonth,
+        withdrawal: 0,
+        deposit: 0
+    }
+
+    currentMonth.transactions.income.forEach((transaction: TransactionMonthInterface) => {
+        result.deposit += transaction.montant;
+        result.pay += transaction.montant;
+    })
+
+    currentMonth.transactions.expense.forEach((transaction: TransactionMonthInterface) => {
+        result.withdrawal += transaction.montant;
+        result.pay -= transaction.montant;
+    })
+
+
+    return result;
 
 }

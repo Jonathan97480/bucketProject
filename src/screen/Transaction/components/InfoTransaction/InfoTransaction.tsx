@@ -14,7 +14,7 @@ interface InfoModalProps {
 }
 
 
-export const InfoModal = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget, editTransactionCallBack }: InfoModalProps) => {
+export const InfoTransaction = ({ setIsViewModalInfo, IsViewModalInfo, budget, indexBudget, editTransactionCallBack }: InfoModalProps) => {
 
     const dispatch = useDispatch();
 

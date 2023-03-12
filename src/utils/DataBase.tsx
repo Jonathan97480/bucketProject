@@ -36,7 +36,7 @@ export default class DatabaseManager {
 
             tx.executeSql(
 
-                "CREATE TABLE IF NOT EXISTS compte (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, pay REAL , withdrawal REAL , deposit REAL, transactions TEXT, date TEXT );",
+                "CREATE TABLE IF NOT EXISTS compte (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, pay REAL , withdrawal REAL , deposit REAL, transactions TEXT, date TEXT, discovered INTEGER, discoveredMontant REAL );",
             );
 
 
@@ -301,9 +301,11 @@ export default class DatabaseManager {
 
     }
 
-    static CreateCompte({ idUser, name }: {
-        idUser: number
-        name: string,
+    static CreateCompte({ _idUser, _name, _discovered, _discoveredMontant }: {
+        _idUser: number
+        _name: string,
+        _discovered: boolean,
+        _discoveredMontant: number
 
     }): Promise<CompteInterface> {
 
@@ -311,13 +313,13 @@ export default class DatabaseManager {
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
                 tx.executeSql(
-                    "INSERT INTO compte (name, date) VALUES (?,?);",
-                    [name, date],
+                    "INSERT INTO compte (name, date, discovered, discoveredMontant) VALUES (?,?,?,?);",
+                    [_name, date, _discovered ? 1 : 0, _discoveredMontant],
                     (_, { insertId }) => {
                         if (insertId != undefined && insertId > 0) {
                             tx.executeSql(
                                 "INSERT INTO compte_users (user_id, compte_id) VALUES (?,?);",
-                                [idUser, parseInt(insertId.toString())],
+                                [_idUser, parseInt(insertId.toString())],
                                 (_) => {
 
                                     this.GetCompteByID(insertId).then((compte) => {
@@ -367,6 +369,8 @@ export default class DatabaseManager {
                                 withdrawal: compte.withdrawal,
                                 deposit: compte.deposit,
                                 transactions: JSON.parse(compte.transactions) as TransactionInterface[],
+                                discovered: compte.discovered == 1 ? true : false,
+                                discoveredMontant: compte.discoveredMontant,
                             }
 
                             resolve(compteInterface);

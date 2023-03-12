@@ -5,15 +5,16 @@ import { View, Text, ScrollView, StatusBar, SafeAreaView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import styleSheet from "./styleSheet";
-import { EmptyBudget } from "./components/EmptyBudget/EmptyBudget";
-import { InfoModal } from "./components/InfoBudget/InfoBudget";
-import { ModalAddBudget } from "./components/ModalAddBudget/ModalAddBudget";
+import { EmptyTransaction } from "./components/EmptyTransaction/EmptyTransaction";
+import { InfoTransaction } from "./components/InfoTransaction/InfoTransaction";
+import { ModalAddBudget } from "./components/ModalAddTransaction/ModalAddTransaction";
 import { addExpend, PoleExpend } from "../../redux/expendSlice";
 import { colorList } from "../../utils/ColorCollection";
 import { getAllExpend } from "../../utils/GetBudgetAndExpend";
-import BudgetSwipeable from "./components/BudgetSwipeable/BudgetSwipeable";
+import BudgetSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
 import { MonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
+import { CustomSafeAreaView } from "../../components";
 
 
 
@@ -23,7 +24,7 @@ export interface curentBudgetInterface {
 }
 
 
-export const Budget = () => {
+export const Transaction = () => {
 
     const navigation = useNavigation();
 
@@ -50,15 +51,13 @@ export const Budget = () => {
 
 
     return (
-        <SafeAreaView
-            style={styleSheet.safeAreaView}
-        >
-            <StatusBar barStyle="default" />
+        <CustomSafeAreaView >
+
             <View style={styleSheet.container}>
 
                 {
 
-                    currentMonthRedux !== null && currentMonthRedux.transactions.length > 0 ?
+                    currentMonthRedux !== null && currentMonthRedux.transactions.expense.length > 0 || currentMonthRedux.transactions.income.length > 0 ?
                         <ScrollView contentContainerStyle={styleSheet.scrollView}>
                             <View
                                 style={styleSheet.scrollViewContainer}
@@ -66,8 +65,35 @@ export const Budget = () => {
                                 <Text style={[styleSheet.title, globalStyle.colorTextPrimary]} >
                                     Liste Des transactions
                                 </Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]} >Dépôt sur le compte</Text>
                                 {
-                                    currentMonthRedux.transactions.map((item, indexBudget) => {
+                                    currentMonthRedux.transactions.income.map((item, indexBudget) => {
+                                        return (
+
+
+                                            <View style={{
+                                                marginVertical: 5,
+                                                height: "auto",
+
+                                            }} key={item.id}
+                                            >
+
+                                                <BudgetSwipeable
+                                                    transaction={item}
+                                                    indexBudget={indexBudget}
+                                                    setCurentBudget={setCurentBudget}
+                                                    setIsViewModalInfo={setIsViewModalInfo}
+                                                    navigation={navigation}
+                                                />
+                                            </View>
+
+                                        )
+
+                                    })
+                                }
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]}>Retrait sur le compte</Text>
+                                {
+                                    currentMonthRedux.transactions.expense.map((item, indexBudget) => {
                                         return (
 
 
@@ -107,7 +133,7 @@ export const Budget = () => {
                             </View>
 
                         </ScrollView>
-                        : <EmptyBudget setIsViewModalAddBudget={setIsViewModalAddBudget} />
+                        : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget} />
 
                 }
 
@@ -122,7 +148,7 @@ export const Budget = () => {
             {
                 curentBudget !== undefined ?
 
-                    <InfoModal
+                    <InfoTransaction
                         IsViewModalInfo={isViewModalInfo}
                         setIsViewModalInfo={setIsViewModalInfo}
                         budget={curentBudget.budget}
@@ -130,7 +156,7 @@ export const Budget = () => {
                         editTransactionCallBack={editTransactionCallBack}
                     /> : null
             }
-        </SafeAreaView>
+        </CustomSafeAreaView>
     );
 
 }

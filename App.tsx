@@ -2,14 +2,12 @@
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Budget } from './src/screen/budget/Budget';
+import { Transaction } from './src/screen/Transaction/Transaction';
 import { AllList } from './src/screen/AllList/AllList';
-import { Icon } from '@rneui/base';
-
 import DatabaseManager from './src/utils/DataBase';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/appStore';
-import { AddExpendBudget } from './src/screen/budget/components/AddOperation/AddOperation';
+import { AddExpendBudget } from './src/screen/Transaction/components/AddOperation/AddOperation';
 import AllComptes from './src/screen/AllCompte/AllComptes';
 import Compte from './src/screen/Compte/Compte';
 import LoginAndRegister from './src/screen/LoginAndRegister/LoginAnRegister';
@@ -74,7 +72,7 @@ export const TabButton = () => {
     >
 
       <Tab.Screen name="Compte" component={Compte} />
-      <Tab.Screen name="transactions" component={Budget} />
+      <Tab.Screen name="transactions" component={Transaction} />
       <Tab.Screen name="Liste" component={AllList} />
     </Tab.Navigator>
   );

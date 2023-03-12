@@ -1,10 +1,20 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+export interface SimpleTransactionInterface {
+    id: number,
+    name: string,
+    montant: number,
+    montant_real: number,
+    date: string,
+    category: string,
+    type: "income" | "expense",
+}
 export interface TransactionMonthInterface {
     id: number,
     name: string,
     montant: number,
     start_montant: number,
+    montant_real: number,
     date: string,
     status: "unique" | "recurring",
     typeOperation: "income" | "expense",
@@ -12,18 +22,18 @@ export interface TransactionMonthInterface {
     period: "day" | "week" | "month" | "year" | null,
     transactionType: "Spent" | "Budget",
     transaction: {
-        id: number,
-        name: string,
-        montant: number,
-        date: string,
-        category: string,
-        type: "income" | "expense",
-    }[] | null
+        income: SimpleTransactionInterface[],
+        expense: SimpleTransactionInterface[],
+    } | null
 }
 export interface MonthInterface {
     numberTransactionMonth: number,
     nameMonth: string,
-    transactions: TransactionMonthInterface[]
+    AccountBalanceBeginningMonth: number,
+    transactions: {
+        income: TransactionMonthInterface[],
+        expense: TransactionMonthInterface[],
+    }
 }
 
 
@@ -42,6 +52,8 @@ export interface CompteInterface {
     withdrawal: number,
     deposit: number,
     date: string,
+    discovered: boolean,
+    discoveredMontant: 0,
     transactions: TransactionInterface[],
 
 
