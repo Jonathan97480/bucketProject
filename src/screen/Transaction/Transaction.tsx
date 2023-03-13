@@ -1,27 +1,21 @@
 
 import { Button, Icon } from "@rneui/base";
 import React, { useEffect, useCallback } from "react";
-import { View, Text, ScrollView, StatusBar, SafeAreaView } from "react-native";
+import { View, Text, ScrollView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import styleSheet from "./styleSheet";
 import { EmptyTransaction } from "./components/EmptyTransaction/EmptyTransaction";
 import { InfoTransaction } from "./components/InfoTransaction/InfoTransaction";
 import { ModalAddBudget } from "./components/ModalAddTransaction/ModalAddTransaction";
-import { addExpend, PoleExpend } from "../../redux/expendSlice";
 import { colorList } from "../../utils/ColorCollection";
-import { getAllExpend } from "../../utils/GetBudgetAndExpend";
-import BudgetSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
-import { MonthInterface } from "../../redux/comptesSlice";
+import TransactionSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
+import { MonthInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { CustomSafeAreaView } from "../../components";
 
 
 
-export interface curentBudgetInterface {
-    budget: PoleExpend;
-    indexBudget: number;
-}
 
 
 export const Transaction = () => {
@@ -30,25 +24,46 @@ export const Transaction = () => {
 
     const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
 
-    const [curentBudget, setCurentBudget] = React.useState<curentBudgetInterface | undefined>(undefined);
+    const [curentTransaction, setCurentTransaction] = React.useState<TransactionMonthInterface | null>(null);
 
     const dispatch = useDispatch();
 
     const [isViewModalAddBudget, setIsViewModalAddBudget] = React.useState(false);
     const [isViewModalInfo, setIsViewModalInfo] = React.useState(false);
-
+    const [curentMonth, setCurentMonth] = React.useState<MonthInterface | null>(null);
 
 
     useEffect(() => {
 
 
+        console.log("currentMonthRedux", currentMonthRedux);
+        setCurentMonth(currentMonthRedux);
+
+
+
     }, [currentMonthRedux]);
 
 
-    const editTransactionCallBack = useCallback(() => {
-        setIsViewModalAddBudget(true);
+    const editTransactionCallBack = useCallback((val: boolean, Transaction: TransactionMonthInterface | null) => {
+        setIsViewModalAddBudget(val);
+        setCurentTransaction(Transaction);
+
+
     }, []);
 
+    if (curentMonth === null) {
+        return (
+            <CustomSafeAreaView >
+                <View style={styleSheet.container}>
+                    <EmptyTransaction
+
+                        setIsViewModalAddBudget={setIsViewModalAddBudget}
+
+                    />
+                </View>
+            </CustomSafeAreaView>
+        )
+    }
 
     return (
         <CustomSafeAreaView >
@@ -57,7 +72,7 @@ export const Transaction = () => {
 
                 {
 
-                    currentMonthRedux !== null && currentMonthRedux.transactions.expense.length > 0 || currentMonthRedux.transactions.income.length > 0 ?
+                    curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
                         <ScrollView contentContainerStyle={styleSheet.scrollView}>
                             <View
                                 style={styleSheet.scrollViewContainer}
@@ -67,55 +82,56 @@ export const Transaction = () => {
                                 </Text>
                                 <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]} >Dépôt sur le compte</Text>
                                 {
-                                    currentMonthRedux.transactions.income.map((item, indexBudget) => {
-                                        return (
+                                    curentMonth.transactions.income.length > 0 ?
+                                        curentMonth.transactions.income.map((item, indexBudget) => {
+                                            return (
 
 
-                                            <View style={{
-                                                marginVertical: 5,
-                                                height: "auto",
+                                                <View style={{
+                                                    marginVertical: 5,
+                                                    height: "auto",
 
-                                            }} key={item.id}
-                                            >
+                                                }} key={item.id}
+                                                >
 
-                                                <BudgetSwipeable
-                                                    transaction={item}
-                                                    indexBudget={indexBudget}
-                                                    setCurentBudget={setCurentBudget}
-                                                    setIsViewModalInfo={setIsViewModalInfo}
-                                                    navigation={navigation}
-                                                />
-                                            </View>
+                                                    <TransactionSwipeable
+                                                        transaction={item}
+                                                        indexBudget={indexBudget}
+                                                        setModalEdit={editTransactionCallBack}
+                                                        navigation={navigation}
+                                                    />
+                                                </View>
 
-                                        )
+                                            )
 
-                                    })
+                                        })
+                                        : null
+
                                 }
                                 <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]}>Retrait sur le compte</Text>
                                 {
-                                    currentMonthRedux.transactions.expense.map((item, indexBudget) => {
-                                        return (
+                                    curentMonth.transactions.expense.length > 0 ?
+                                        curentMonth.transactions.expense.map((item, indexBudget) => {
+                                            return (
 
 
-                                            <View style={{
-                                                marginVertical: 5,
-                                                height: "auto",
+                                                <View style={{
+                                                    marginVertical: 5,
+                                                    height: "auto",
 
-                                            }} key={item.id}
-                                            >
+                                                }} key={item.id}
+                                                >
+                                                    <TransactionSwipeable
+                                                        transaction={item}
+                                                        indexBudget={indexBudget}
+                                                        setModalEdit={editTransactionCallBack}
+                                                        navigation={navigation}
+                                                    />
+                                                </View>
 
-                                                <BudgetSwipeable
-                                                    transaction={item}
-                                                    indexBudget={indexBudget}
-                                                    setCurentBudget={setCurentBudget}
-                                                    setIsViewModalInfo={setIsViewModalInfo}
-                                                    navigation={navigation}
-                                                />
-                                            </View>
+                                            )
 
-                                        )
-
-                                    })
+                                        }) : null
                                 }
                                 <Button
                                     buttonStyle={styleSheet.buttonAddBudget}
@@ -140,13 +156,13 @@ export const Transaction = () => {
 
                 <ModalAddBudget
                     isViewModalAddBudget={isViewModalAddBudget}
-                    setIsViewModalAddBudget={setIsViewModalAddBudget}
-                    transaction={undefined}
+                    setIsViewModalAddBudget={editTransactionCallBack}
+                    transaction={curentTransaction}
                 />
             </View>
 
-            {
-                curentBudget !== undefined ?
+            {/*          {
+                curentTransaction !== undefined ?
 
                     <InfoTransaction
                         IsViewModalInfo={isViewModalInfo}
@@ -155,7 +171,7 @@ export const Transaction = () => {
                         indexBudget={curentBudget.indexBudget}
                         editTransactionCallBack={editTransactionCallBack}
                     /> : null
-            }
+            } */}
         </CustomSafeAreaView>
     );
 

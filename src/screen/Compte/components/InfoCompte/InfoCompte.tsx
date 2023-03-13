@@ -13,7 +13,12 @@ interface InfoCompteProps {
 
 export default function InfoCompte({ compte }: InfoCompteProps) {
 
-    const curentYear = new Date(compte.date).getFullYear()
+    let date: string | string[] = compte.date;
+    date = date.split('/');
+    date = date[2] + '-' + date[1] + '-' + date[0];
+
+
+    const curentYear = new Date(date).getFullYear()
 
     return (
         <View style={styleSheet.blockCurentMonth} >
@@ -27,20 +32,20 @@ export default function InfoCompte({ compte }: InfoCompteProps) {
             <View style={styleSheet.infoBlock}>
 
                 <View style={styleSheet.infoBlockText} >
-                    <Text style={globalStyle.colorTextPrimary}>{compte.deposit}</Text>
+                    <Text style={globalStyle.colorTextPrimary}>{compte.deposit.toFixed(2)} €</Text>
                     <Text style={[globalStyle.textSizeSmall, globalStyle.colorTextPrimary]} >Revenues</Text>
 
                 </View>
 
                 <View style={styleSheet.separator} ></View>
                 <View style={styleSheet.infoBlockText} >
-                    <Text style={globalStyle.colorTextPrimary}>{compte.withdrawal}</Text>
+                    <Text style={globalStyle.colorTextPrimary}>{compte.withdrawal.toFixed(2)} €</Text>
                     <Text style={[globalStyle.textSizeSmall, globalStyle.colorTextPrimary]} >Dépense</Text>
 
                 </View>
                 <View style={styleSheet.separator} ></View>
                 <View style={styleSheet.infoBlockText} >
-                    <Text style={globalStyle.colorTextPrimary}>{compte.pay}</Text>
+                    <Text style={globalStyle.colorTextPrimary}>{compte.pay.toFixed(2)} €</Text>
                     <Text style={[globalStyle.textSizeSmall, globalStyle.colorTextPrimary]} >Solde</Text>
 
                 </View>

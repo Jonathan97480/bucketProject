@@ -28,7 +28,7 @@ export const getAllCategory = async () => {
 
 
 export function ResetForm(): FormAddBudget {
-    return { name: '', montant: '', errorMontant: '', errorName: '', typeTransaction: 'Spent', typeOperation: 'expense', categoryTransaction: 0, isUnique: true, period: "day" };
+    return { name: '', montant: '', errorMontant: '', errorName: '', typeTransaction: 'Spent', typeOperation: 'expense', categoryTransaction: 1, isUnique: true, period: "day" };
 }
 
 export function ValidateForm(formAddBudget: FormAddBudget, setFormAddBudget: (value: FormAddBudget) => void) {
@@ -50,6 +50,7 @@ export const createNewTransaction = (index: number, formAddBudget: FormAddBudget
     return {
         id: index,
         name: formAddBudget.name,
+        montant_real: 0,
         start_montant: parseFloat(formAddBudget.montant),
         montant: parseFloat(formAddBudget.montant),
         date: new Date().toDateString(),
@@ -115,6 +116,85 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
 }
 
 
+export const UpdateTransaction = async ({ allTransaction, curentCompte, curentMonth, newTransaction }: { allTransaction: TransactionMonthInterface, curentCompte: CompteInterface, curentMonth: MonthInterface, newTransaction: FormAddBudget }) => {
+
+    curentCompte = { ...curentCompte, transactions: [...curentCompte.transactions] }
+    curentMonth = { ...curentMonth, transactions: { ...curentMonth.transactions } }
+    if (newTransaction.typeOperation === 'income') {
+        curentMonth.transactions.income = curentMonth.transactions.income.map((transaction: TransactionMonthInterface) => {
+
+            if (transaction.id === allTransaction.id) {
+                transaction = {
+                    ...transaction,
+                    montant: parseFloat(newTransaction.montant),
+                    name: newTransaction.name,
+                    start_montant: parseFloat(newTransaction.montant),
+                    categoryID: newTransaction.categoryTransaction,
+                    period: newTransaction.isUnique ? null : newTransaction.period,
+                    status: newTransaction.isUnique ? 'unique' : 'recurring',
+                    transactionType: newTransaction.typeTransaction,
+                    typeOperation: newTransaction.typeOperation
+
+                }
+            }
+            return transaction;
+
+        })
+    } else {
+
+
+
+
+        curentMonth.transactions.expense = curentMonth.transactions.expense.map((transaction: TransactionMonthInterface) => {
+
+            if (transaction.id === allTransaction.id) {
+                transaction = {
+                    ...transaction,
+                    montant: parseFloat(newTransaction.montant),
+                    start_montant: parseFloat(newTransaction.montant),
+                    name: newTransaction.name,
+                    categoryID: newTransaction.categoryTransaction,
+                    period: newTransaction.isUnique ? null : newTransaction.period,
+                    status: newTransaction.isUnique ? 'unique' : 'recurring',
+                    transactionType: newTransaction.typeTransaction,
+                    typeOperation: newTransaction.typeOperation
+
+                }
+            }
+            return transaction;
+
+        })
+
+    }
+    const newResultCompte = calculTransactionByCompte(curentCompte, curentMonth);
+    curentCompte.pay = newResultCompte.pay;
+    curentCompte.withdrawal = newResultCompte.withdrawal;
+    curentCompte.deposit = newResultCompte.deposit;
+
+
+
+    DatabaseManager.UpdateCompte(
+        curentCompte.id,
+        curentCompte.name,
+        curentCompte.pay,
+        curentCompte.withdrawal,
+        curentCompte.deposit,
+        curentCompte.transactions
+    ).then((_compte) => {
+        curentCompte = _compte;
+        return true;
+    });
+
+    return {
+
+        compte: curentCompte,
+        curentMonth: curentMonth
+    };
+
+
+}
+
+
 export const calculTransactionByCompte = (compte: CompteInterface, currentMonth: MonthInterface): {
     pay: number,
     withdrawal: number,
@@ -122,7 +202,7 @@ export const calculTransactionByCompte = (compte: CompteInterface, currentMonth:
 } => {
 
     let result = {
-        pay: currentMonth.AccountBalanceBeginningMonth,
+        pay: currentMonth.AccountBalanceBeginningMonth == null ? 0 : currentMonth.AccountBalanceBeginningMonth,
         withdrawal: 0,
         deposit: 0
     }
@@ -139,5 +219,37 @@ export const calculTransactionByCompte = (compte: CompteInterface, currentMonth:
 
 
     return result;
+
+}
+
+export const defineFormAddBudget = (transaction: TransactionMonthInterface | undefined | null): FormAddBudget => {
+
+
+    return transaction ? {
+        name: transaction.name,
+        montant: transaction.montant.toString(),
+        errorMontant: '',
+        errorName: '',
+        typeTransaction: transaction.transactionType,
+        typeOperation: transaction.typeOperation,
+        categoryTransaction: transaction.categoryID,
+        isUnique: transaction.status === 'unique' ? true : false,
+        period: transaction.period ? transaction.period : "day"
+
+
+    } as FormAddBudget : ResetForm()
+
+}
+
+export const defineIDTransaction = (currentMonth: MonthInterface, typeOperation: "income" | "expense"): number => {
+
+
+    const currentTransaction = currentMonth.transactions[typeOperation];
+    const lastTransaction = currentTransaction[currentTransaction.length - 1];
+    const id = lastTransaction ? lastTransaction.id + 1 : 1;
+    return id;
+
+
+
 
 }

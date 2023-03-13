@@ -9,13 +9,13 @@ import { Picker } from '@react-native-picker/picker';
 import { PoleExpend } from '../../../../redux/expendSlice';
 import { CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, TransactionMonthInterface } from '../../../../redux/comptesSlice';
 import { addCategory, CategoryInterface } from '../../../../redux/categorySlice';
-import { createNewTransaction, FormAddBudget, getAllCategory, ResetForm, saveTransaction, ValidateForm } from './logic';
+import { createNewTransaction, defineFormAddBudget, defineIDTransaction, FormAddBudget, getAllCategory, ResetForm, saveTransaction, UpdateTransaction, ValidateForm } from './logic';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
 
 interface ModalAddBudgetProps {
     isViewModalAddBudget: boolean,
-    setIsViewModalAddBudget: (value: boolean) => void,
-    transaction?: any
+    setIsViewModalAddBudget: (value: boolean, transaction: TransactionMonthInterface | null) => void,
+    transaction?: TransactionMonthInterface | null
 }
 
 
@@ -27,7 +27,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
     const currentCompteRedux: CompteInterface = useSelector((state: any) => state.compte.currentCompte);
     const [curentEtape, setCurentEtape] = useState<'Etape1' | 'Etape2' | 'Etape3'>('Etape1');
 
-    const [formAddBudget, setFormAddBudget] = useState<FormAddBudget>(ResetForm());
+
+    const [formAddBudget, setFormAddBudget] = useState<FormAddBudget>(defineFormAddBudget(transaction));
 
 
     useEffect(() => {
@@ -42,6 +43,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
 
         }
+
+        setFormAddBudget(defineFormAddBudget(transaction));
 
     }, [transaction, categoryRedux])
 
@@ -276,7 +279,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                         /* ADD TRANSACTION  */
                                         if (ValidateForm(formAddBudget, setFormAddBudget)) {
 
-                                            const newID = formAddBudget.typeOperation === 'income' ? currentMonthRedux.transactions.income.length + 1 : currentMonthRedux.transactions.expense.length + 1
+                                            const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
 
                                             const newTransaction: TransactionMonthInterface = createNewTransaction(newID, formAddBudget)
 
@@ -311,6 +314,26 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
                                     } else {
                                         /* EDIT TRANSACTION  */
+
+                                        if (ValidateForm(formAddBudget, setFormAddBudget)) {
+
+                                            UpdateTransaction({
+                                                allTransaction: transaction,
+                                                curentCompte: currentCompteRedux,
+                                                curentMonth: currentMonthRedux,
+                                                newTransaction: formAddBudget
+                                            }).then((res: {
+                                                compte: CompteInterface,
+                                                curentMonth: MonthInterface
+                                            }) => {
+
+                                                dispatch(setCurentCompte(res.compte));
+                                                dispatch(setCurentMonth(res.curentMonth))
+                                                closeModal()
+
+                                            }).catch((err) => { console.log(err) })
+
+                                        }
                                     }
                                 }
                                 }
@@ -373,7 +396,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
         setFormAddBudget(ResetForm())
         setCurentEtape('Etape1')
-        setIsViewModalAddBudget(false)
+        setIsViewModalAddBudget(false, null)
     }
 
 
