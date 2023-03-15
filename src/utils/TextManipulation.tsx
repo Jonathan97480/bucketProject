@@ -1,3 +1,4 @@
+import { SimpleTransactionInterface } from "../redux/comptesSlice";
 import { listeExpendInterface, PoleExpend } from "../redux/expendSlice";
 import { listInterface, stepInterface } from "../redux/listSlice";
 
@@ -15,8 +16,9 @@ export function TextArrayAlphabetizeOrder(a: []) {
 }
 
 
-export function ExpendArrayAlphabetizeOrder(a: listeExpendInterface[]) {
-    return a.sort(function (x: listeExpendInterface, y: listeExpendInterface,) {
+export function OperationArrayAlphabetizeOrder(a: SimpleTransactionInterface[]) {
+    return a.sort(function (x: SimpleTransactionInterface, y: SimpleTransactionInterface,) {
+
         return x.name.toLowerCase().localeCompare(y.name.toLowerCase(), "fr", { sensitivity: "base", ignorePunctuation: true, });
     },);
 

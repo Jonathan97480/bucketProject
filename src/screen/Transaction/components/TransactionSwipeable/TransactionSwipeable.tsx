@@ -2,7 +2,7 @@
 
 import { colorList } from "../../../../utils/ColorCollection";
 import { Button, ListItem, Icon } from "@rneui/base";
-import { setCurentCompte, setCurentMonth, TransactionMonthInterface } from "../../../../redux/comptesSlice";
+import { setCurentBudget, setCurentCompte, setCurentMonth, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { IconsCategory } from "../../../../components";
 import { deleteTransaction } from "./logic";
@@ -27,7 +27,11 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
             containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20, }]}
             onPress={() => {
-                navigation.navigate('AddExpendBudget', { curentBudget: transaction, indexBudget: indexBudget });
+                if (transaction.transactionType === "Budget") {
+                    dispatch(setCurentBudget(transaction));
+                    navigation.navigate('AddExpendBudget');
+                }
+
             }}
 
 

@@ -7,7 +7,7 @@ import { AllList } from './src/screen/AllList/AllList';
 import DatabaseManager from './src/utils/DataBase';
 import { Provider } from 'react-redux';
 import { store } from './src/redux/appStore';
-import { AddExpendBudget } from './src/screen/Transaction/components/AddOperation/AddOperation';
+import { AddOperationInTheBudget } from './src/screen/AddOperationInTheBudget/AddOperationInTheBudget';
 import AllComptes from './src/screen/AllCompte/AllComptes';
 import Compte from './src/screen/Compte/Compte';
 import LoginAndRegister from './src/screen/LoginAndRegister/LoginAnRegister';
@@ -46,7 +46,7 @@ export default function App() {
         >
           <stackBudget.Screen name="LoginAndRegister" component={LoginAndRegister} />
           <stackBudget.Screen name="Tab" component={TabButton} />
-          <stackBudget.Screen name="AddExpendBudget" component={AddExpendBudget} />
+          <stackBudget.Screen name="AddExpendBudget" component={AddOperationInTheBudget} />
           <stackBudget.Screen name="AllComptes" component={AllComptes} />
 
 

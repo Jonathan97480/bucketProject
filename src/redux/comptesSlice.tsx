@@ -5,8 +5,11 @@ export interface SimpleTransactionInterface {
     name: string,
     montant: number,
     montant_real: number,
+    total_real: number,
+    total: number,
     date: string,
-    category: string,
+    category: number,
+    quantity: number,
     type: "income" | "expense",
 }
 export interface TransactionMonthInterface {
@@ -64,6 +67,7 @@ export interface comptesState {
     status: 'idle' | 'loading' | 'failed',
     currentCompte: CompteInterface | null,
     currentMonth: MonthInterface | null,
+    curentBudget: TransactionMonthInterface | null,
     error: string | null,
 }
 
@@ -72,6 +76,7 @@ const initialState: comptesState = {
     status: 'idle',
     currentCompte: null,
     currentMonth: null,
+    curentBudget: null,
     error: null,
 }
 
@@ -105,6 +110,16 @@ export const comptesSlice = createSlice({
             state.status = 'loading'
         },
 
+        setCurentBudget: (state, action) => {
+            state.curentBudget = action.payload
+            state.status = 'loading'
+        },
+
+        clearBudget: (state) => {
+            state.curentBudget = null
+            state.status = 'loading'
+        },
+
         deleteCompteArray: (state, action) => {
             state.comptes = state.comptes.filter((compte) => compte.id !== action.payload)
             state.status = 'loading'
@@ -114,6 +129,16 @@ export const comptesSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addComptes, setError, setCurentCompte, setCurentMonth, clearComptes, addComptesArray, deleteCompteArray } = comptesSlice.actions
+export const {
+    addComptes,
+    setError,
+    setCurentCompte,
+    setCurentMonth,
+    clearComptes,
+    addComptesArray,
+    deleteCompteArray,
+    setCurentBudget,
+    clearBudget
+} = comptesSlice.actions
 
 export default comptesSlice.reducer

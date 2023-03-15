@@ -6,7 +6,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import styleSheet from "./styleSheet";
 import { EmptyTransaction } from "./components/EmptyTransaction/EmptyTransaction";
-import { InfoTransaction } from "./components/InfoTransaction/InfoTransaction";
 import { ModalAddBudget } from "./components/ModalAddTransaction/ModalAddTransaction";
 import { colorList } from "../../utils/ColorCollection";
 import TransactionSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
@@ -29,17 +28,12 @@ export const Transaction = () => {
     const dispatch = useDispatch();
 
     const [isViewModalAddBudget, setIsViewModalAddBudget] = React.useState(false);
-    const [isViewModalInfo, setIsViewModalInfo] = React.useState(false);
     const [curentMonth, setCurentMonth] = React.useState<MonthInterface | null>(null);
 
 
     useEffect(() => {
 
-
-        console.log("currentMonthRedux", currentMonthRedux);
         setCurentMonth(currentMonthRedux);
-
-
 
     }, [currentMonthRedux]);
 
@@ -161,17 +155,7 @@ export const Transaction = () => {
                 />
             </View>
 
-            {/*          {
-                curentTransaction !== undefined ?
 
-                    <InfoTransaction
-                        IsViewModalInfo={isViewModalInfo}
-                        setIsViewModalInfo={setIsViewModalInfo}
-                        budget={curentBudget.budget}
-                        indexBudget={curentBudget.indexBudget}
-                        editTransactionCallBack={editTransactionCallBack}
-                    /> : null
-            } */}
         </CustomSafeAreaView>
     );
 

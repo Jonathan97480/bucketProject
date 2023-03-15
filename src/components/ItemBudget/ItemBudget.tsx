@@ -1,29 +1,26 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native"; import DatabaseManager from "../../utils/DataBase";
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { textSizeFixe } from "../../utils/TextManipulation";
-import { Image } from "@rneui/themed/";
-import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../../utils/IconCustom";
 import { ExpendInfo } from "../ExpendInfo/ExpendInfo";
-import { ItemDeleteExpendSlice } from "../../utils/ExpendManipulation";
-import { useSelector, useDispatch } from 'react-redux';
-import { addExpend, listeExpendInterface, PoleExpend } from "../../redux/expendSlice";
+import { useDispatch } from 'react-redux';
+import { SimpleTransactionInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
+import globalStyle from "../../assets/styleSheet/globalStyle";
 
 
 
 
 interface ItemBudgetProps {
 
-    indexBudget: number,
-    expend: listeExpendInterface
-    idBudget: number
+    operation: SimpleTransactionInterface
+    budget: TransactionMonthInterface
 }
 
 
-export const ItemBudget = ({ indexBudget, expend, idBudget }: ItemBudgetProps) => {
+export const ItemBudget = ({ operation, budget }: ItemBudgetProps) => {
 
     const [modalVisible, setModalVisible] = useState(false);
     const dispatch = useDispatch();
-    const budget: PoleExpend[] = useSelector((state: any) => state.expend.expends);
+
 
     return (
         <TouchableOpacity style={{ marginBottom: 20 }}
@@ -40,7 +37,7 @@ export const ItemBudget = ({ indexBudget, expend, idBudget }: ItemBudgetProps) =
                         },
                         {
                             text: "OK", onPress: () => {
-                                DatabaseManager.deleteExpend(expend.id).then(() => {
+                                /* DatabaseManager.deleteExpend(expend.id).then(() => {
 
                                     ItemDeleteExpendSlice(indexBudget, expend.id, budget).then((newBudget) => {
 
@@ -51,7 +48,7 @@ export const ItemBudget = ({ indexBudget, expend, idBudget }: ItemBudgetProps) =
                                         console.log(error);
 
                                     });
-                                });
+                                }); */
                             }
                         }
                     ],
@@ -63,38 +60,20 @@ export const ItemBudget = ({ indexBudget, expend, idBudget }: ItemBudgetProps) =
             }}>
             <View style={styles.itemBudget}>
                 <Text
-                    style={{
-                        width: "45%",
-                    }}
+                    style={[{ width: "45%", }, globalStyle.colorTextPrimary]}
 
-                >{textSizeFixe(expend.name, 17)}</Text>
-                <Text>{expend.montant_total}€</Text>
-                <View style={[{ backgroundColor: expend.type === "add" ? "#203EAA" : "#E1424B", }, styles.pastille]}>
-                    <Text style={{ color: "#fff" }} >{expend.type === "add" ? "Depot" : "Retrait"}</Text>
+                >{textSizeFixe(operation.name, 17)}</Text>
+                <Text style={[globalStyle.colorTextPrimary]} >{operation.montant}€</Text>
+                <View style={[{ backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B", }, styles.pastille]}>
+                    <Text style={{ color: "#fff" }} >{operation.type === "income" ? "Depot" : "Retrait"}</Text>
                 </View>
-                <Image
-                    resizeMode="cover"
-                    style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 15,
-                        marginLeft: 10
-                    }}
-                    source={
-                        expend.category === "Alimentation" ? IconAlimentation :
-                            expend.category === "Loisirs" ? IconLoisir :
-                                expend.category === "Santé" ? IconSanté :
-                                    expend.category === "Vêtements" ? IconVetement :
-                                        expend.category === "Logement" ? IconLogement :
-                                            IconAutres
-                    }
-                />
+
                 <ExpendInfo
                     isModalVisible={modalVisible}
                     setIsModalVisible={setModalVisible}
-                    expend={expend}
-                    index_budget={indexBudget}
-                    id_budget={idBudget}
+                    operation={operation}
+                    budget={budget}
+
 
                 />
             </View>
@@ -110,7 +89,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        borderColor: "rgba(0,0,0,0.72)",
+        borderColor: "#E5E5E5",
         borderBottomWidth: 2,
         paddingBottom: 13,
         paddingHorizontal: 20,

@@ -96,6 +96,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 color: curentEtape === 'Etape3' ? '#817FE5' : 'rgba(129, 127, 229, 0.26)'
                             }]}>Etape 3</Text>
                         </TouchableOpacity>
+
+
                     </View>
                     {
                         curentEtape === 'Etape1' &&
@@ -103,6 +105,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>nom :</Text>
                                 <Input placeholder="nom de votre budget"
+                                    errorMessage={formAddBudget.errorName}
                                     value={formAddBudget.name}
                                     onChangeText={(value) => {
                                         setFormAddBudget({ ...formAddBudget, name: value });
@@ -113,6 +116,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 <Text style={styleSheet.modalInputLabel}>montant :</Text>
                                 <Input placeholder="montant de votre budget"
                                     keyboardType="numeric"
+                                    errorMessage={formAddBudget.errorMontant}
                                     value={formAddBudget.montant}
                                     onChangeText={(value) => {
                                         setFormAddBudget({ ...formAddBudget, montant: value });
@@ -310,6 +314,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                                 dispatch(setCurentMonth(newM))
                                                 closeModal()
                                             })
+                                        } else {
+                                            setCurentEtape('Etape1')
                                         }
 
                                     } else {
@@ -333,6 +339,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
                                             }).catch((err) => { console.log(err) })
 
+                                        } else {
+                                            setCurentEtape('Etape1')
                                         }
                                     }
                                 }

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { getColorBudget } from "../../utils/ColorCollection";
 import { textSizeFixe } from "../../utils/TextManipulation";
-import { ModalAddExpend } from "../ModalAddExpend/ModalAddExpend";
+import { ModalAddExpend } from "../../screen/AddOperationInTheBudget/ModalAddExpend/ModalAddOperation";
 
 
 interface SectionTitleProps {

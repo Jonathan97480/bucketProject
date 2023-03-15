@@ -29,7 +29,7 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
         return month.nameMonth === curentMonth.nameMonth;
     });
 
-    console.log("indexYear", indexYear, "indexMonth", indexMonth, "curentMonth", curentMonth);
+
 
     curentCompte.transactions = [...curentCompte.transactions];
 
@@ -37,7 +37,6 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
     curentCompte.transactions[indexYear] = { ...curentCompte.transactions[indexYear], month: [...curentCompte.transactions[indexYear].month] };
     curentCompte.transactions[indexYear].month[indexMonth] = curentMonth;
 
-    console.log("curentCompte", curentCompte);
     const newResultCompte = calculTransactionByCompte(curentCompte, curentMonth);
 
     curentCompte.pay = newResultCompte.pay;

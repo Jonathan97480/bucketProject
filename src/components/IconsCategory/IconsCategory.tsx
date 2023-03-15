@@ -18,7 +18,7 @@ export default function IconsCategory({ id_category }: Props) {
     return (
         <View style={styleSheet.container}>
             {categories.map((category: CategoryInterface, index: number) => {
-                console.log(id_category);
+
                 if (category.id === id_category) {
 
                     switch (category.name) {

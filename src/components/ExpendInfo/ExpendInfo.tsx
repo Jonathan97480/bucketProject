@@ -5,31 +5,32 @@ import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, Ico
 import { useSelector, useDispatch } from 'react-redux';
 import { addExpend, clearExpend, listeExpendInterface, PoleExpend } from "../../redux/expendSlice";
 import { ItemDeleteExpendSlice } from "../../utils/ExpendManipulation";
-import { ModalAddExpend } from "../ModalAddExpend/ModalAddExpend";
+import { ModalAddExpend } from "../../screen/AddOperationInTheBudget/ModalAddExpend/ModalAddOperation";
+import { SimpleTransactionInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 
 interface ItemBudgetProps {
 
-    index_budget: number,
+
     isModalVisible: boolean,
     setIsModalVisible: (value: boolean) => void
-    expend: listeExpendInterface
-    id_budget: number
+    operation: SimpleTransactionInterface
+    budget: TransactionMonthInterface
 
 }
 
-export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, expend, id_budget }: ItemBudgetProps) {
+export function ExpendInfo({ budget, isModalVisible, setIsModalVisible, operation, }: ItemBudgetProps) {
 
     const [modalEditExpendVisible, setModalEditExpendVisible] = React.useState(false);
 
     const dispatch = useDispatch();
-    const budget = useSelector((state: any) => state.expend.expends);
+
 
     function setAllModal(value: boolean) {
         setIsModalVisible(value);
         setModalEditExpendVisible(value);
     }
 
-    if (expend === undefined || expend === null) {
+    if (operation === undefined || operation === null) {
         return (
             <View><Text>Expend empty</Text></View>
         );
@@ -50,10 +51,10 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
         >
             <ModalAddExpend
                 isVisible={modalEditExpendVisible}
-                id_budget={id_budget}
+                budget={budget}
                 setIsVisible={setAllModal}
-                expend={expend}
-                indexBudget={index_budget}
+                CurrentOperation={operation}
+
 
             />
             <View
@@ -88,30 +89,11 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                             marginTop: 20,
                         }}
 
-                    >{expend.name}</Text>
+                    >{operation.name}</Text>
 
-                    <Image
-                        resizeMode="contain"
-                        style={{
-                            width: 9,
-                            height: 90,
-                            marginStart: "30%",
-                            marginTop: 20,
 
-                            borderRadius: 15,
-                            marginLeft: "35%",
-                        }}
-                        source={
-                            expend.category === "Alimentation" ? IconAlimentation :
-                                expend.category === "Loisirs" ? IconLoisir :
-                                    expend.category === "Santé" ? IconSanté :
-                                        expend.category === "Vêtements" ? IconVetement :
-                                            expend.category === "Logement" ? IconLogement :
-                                                IconAutres
-                        }
-                    />
                     <View style={{
-                        backgroundColor: expend.type === "add" ? "#203EAA" : "#E1424B",
+                        backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B",
 
                         paddingHorizontal: 12,
                         borderRadius: 5,
@@ -123,7 +105,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
 
 
                     }}>
-                        <Text style={{ color: "#fff" }} >{expend.type === "add" ? "Depot" : "Retrait"}</Text>
+                        <Text style={{ color: "#fff" }} >{operation.type === "income" ? "Depot" : "Retrait"}</Text>
                     </View>
 
                     <View
@@ -149,7 +131,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
 
                             }}
                         >
-                            {expend.date}
+                            {operation.date}
                         </Text>
                         <Text
 
@@ -160,7 +142,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                                 marginTop: 10,
                             }}
 
-                        >Prix unitaire : {expend.montant}€
+                        >Prix unitaire : {operation.montant}€
                         </Text>
                         <Text
                             style={{
@@ -170,7 +152,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                                 marginTop: 10,
                             }}
                         >
-                            Quantité : {expend.quantity}
+                            Quantité : {operation.quantity}
                         </Text>
                         <Text
                             style={{
@@ -180,7 +162,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                                 marginTop: 10,
                             }}
                         >
-                            TOTAL : {expend.montant_total}€
+                            TOTAL : {operation.total}€
                         </Text>
 
                     </View>
@@ -216,7 +198,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                                 onPress={() => {
                                     Alert.alert(
                                         "Suppression",
-                                        `Voulez-vous vraiment supprimer ${expend.type === "add" ? "ce dépôt" : "cette dépense"} ?`,
+                                        `Voulez-vous vraiment supprimer ${operation.type === "income" ? "ce dépôt" : "cette dépense"} ?`,
                                         [
                                             {
                                                 text: "Annuler",
@@ -225,11 +207,7 @@ export function ExpendInfo({ index_budget, isModalVisible, setIsModalVisible, ex
                                             },
                                             {
                                                 text: "Oui", onPress: () => {
-                                                    ItemDeleteExpendSlice(index_budget, expend.id, budget).then((_data) => {
 
-                                                        dispatch(addExpend(_data));
-                                                        setIsModalVisible(false);
-                                                    });
 
 
                                                 }
