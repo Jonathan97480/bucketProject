@@ -1,36 +1,31 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, ScrollView, StyleSheet, StatusBar, SafeAreaView, addons } from "react-native";
-import { useSelector, useDispatch } from 'react-redux';
-import { Icon, Input } from "@rneui/base";
-import { addExpend, listeExpendInterface, PoleExpend } from '../../redux/expendSlice';
-import { useRoute } from '@react-navigation/native';
-import { SectionTitle } from "../../components/SectionTitle/SectionTitle";
-import { ItemBudget } from "../../components/ItemBudget/ItemBudget";
-import { getAllExpend } from "../../utils/GetBudgetAndExpend";
-import { OperationArrayAlphabetizeOrder, textSizeFixe } from "../../utils/TextManipulation";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
+import { useSelector } from 'react-redux';
+import { Icon } from "@rneui/base";
+import { textSizeFixe } from "../../utils/TextManipulation";
 import { SimpleTransactionInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { getColorBudget } from "../../utils/ColorCollection";
-import { ModalAddExpend } from "./ModalAddExpend/ModalAddOperation";
+import { ModalAddExpend } from "./components/ModalAddExpend/ModalAddOperation";
 import { CustomSafeAreaView } from "../../components";
-import { rechercheExpendByName } from "./logic";
+import { OperationArrayAlphabetizeOrder } from "./components/Search/logic";
+import { Search } from "./components/Search/Search";
+import { Filters } from "./components/Filters/Filters";
+import OperationItems from "./components/OperationItems/OperationItems";
 
 
-interface AddOperationInTheBudgetProps {
 
-    route: any
-}
 
-export const AddOperationInTheBudget = ({ route }: AddOperationInTheBudgetProps) => {
+export const AddOperationInTheBudget = () => {
 
-    const dispatch = useDispatch();
     const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
-    console.log("BUDGET OPEN", budget);
-
-
     const [curentBudget, setCurentBudget] = React.useState<TransactionMonthInterface>(budget);
     const [modalVisible, setModalVisible] = useState(false);
+    const [filters, setFilters] = useState<"All" | "Income" | "Expense">("All");
+
+
     const [curentOperations, setCurentOperations] = useState<{
+
         income: SimpleTransactionInterface[],
         expense: SimpleTransactionInterface[]
     }>({ income: [], expense: [] });
@@ -70,8 +65,6 @@ export const AddOperationInTheBudget = ({ route }: AddOperationInTheBudgetProps)
 
         <CustomSafeAreaView>
 
-
-
             <View style={
                 [
                     styles2.centenaire,
@@ -106,60 +99,42 @@ export const AddOperationInTheBudget = ({ route }: AddOperationInTheBudgetProps)
 
                 />
             </View>
-            <View>
-                <Input
-                    style={[
-                        globalStyle.colorTextPrimary,
-                    ]}
-                    placeholder="Rechercher"
-                    onChangeText={(text) => {
-                        if (text.length >= 3 && budget.transaction) {
+            <Search
+                budget={curentBudget}
+                onSearch={({ income, expense }) => {
 
-                            const newOperations = rechercheExpendByName({
-                                recherche: text,
-                                income: budget.transaction?.income,
-                                expense: budget.transaction?.expense,
-                            })
+                    setCurentOperations({ income, expense });
 
-                            setCurentOperations({
-                                income: newOperations.income,
-                                expense: newOperations.expense
-                            });
+                }}
 
-                        } else if (text.length <= 0 && budget.transaction) {
+            />
+            <Filters
+                onChanges={(value) => {
+                    setFilters(value);
 
-                            setCurentOperations({
-                                income: OperationArrayAlphabetizeOrder([...budget.transaction.income]),
-                                expense: OperationArrayAlphabetizeOrder([...budget.transaction.expense])
-                            });
+                }}
 
-                        }
-                    }}
-
-                    rightIcon={
-                        <Icon
-                            name="search"
-                            size={27}
-                            color="#ffffff"
-
-                        />
-                    }
-
-                />
-            </View>
+            />
             <ScrollView >
                 {curentBudget.transaction &&
                     <>
-                        <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
-                            Nombre de sortie :   {curentBudget.transaction?.expense.length}
-                        </Text>
-                        <GenerateListeComponentsItemExpend listeExpend={curentOperations.expense} idBudget={curentBudget.id} isFilter={true} />
+                        {
+                            filters === "All" || filters == "Expense" ?
+                                <View>
+                                    <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
+                                        Nombre de sortie :   {curentBudget.transaction?.expense.length}
+                                    </Text>
+                                    <OperationItems listeExpend={curentOperations.expense} idBudget={curentBudget.id} />
+                                </View> : null}
 
-                        <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
-                            Nombre de entrées :   {curentBudget.transaction?.income.length}
-                        </Text>
-                        <GenerateListeComponentsItemExpend listeExpend={curentOperations.income} idBudget={curentBudget.id} isFilter={true} />
-
+                        {
+                            filters === "All" || filters == "Income" ?
+                                <View>
+                                    <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
+                                        Nombre de entrées :   {curentBudget.transaction?.income.length}
+                                    </Text>
+                                    <OperationItems listeExpend={curentOperations.income} idBudget={curentBudget.id} />
+                                </View> : null}
                     </>
 
                 }
@@ -231,54 +206,6 @@ const styles2 = StyleSheet.create({
     }
 });
 
-interface GenerateListeComponentsItemExpendProps {
-    listeExpend: SimpleTransactionInterface[],
-
-
-    idBudget: number
-    isFilter?: boolean
-}
-
-
-export function GenerateListeComponentsItemExpend({ listeExpend, idBudget, isFilter }: GenerateListeComponentsItemExpendProps) {
-
-    const [NewListeExpend, setNewListeExpend] = React.useState<SimpleTransactionInterface[]>(listeExpend);
-    const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
-    useEffect(() => {
-
-        setNewListeExpend(/* ExpendArrayAlphabetizeOrder([...listeExpend]) */ listeExpend);
-
-    }, [listeExpend]);
-
-
-
-    return (
-        <>
-
-            {
-                NewListeExpend.length > 0 ?
-                    NewListeExpend.map((item, index) => {
-                        return (
-                            <ItemBudget
-                                key={item.id + "-" + index + "-NewListeExpend"}
-
-                                operation={item}
-                                budget={budget}
-                            />
-
-                        )
-                    })
-                    : <Text style={{ textAlign: "center" }}>Vous n'avez pas encore d'éléments dans ce budget</Text>
-
-            }
-
-        </>
-    )
-
-
-
-
-}
 
 
 

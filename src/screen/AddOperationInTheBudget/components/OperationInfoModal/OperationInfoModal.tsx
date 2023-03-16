@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
 import { View, Text, ImageBackground, Alert, Modal } from "react-native";
-import { Icon, Image } from "@rneui/themed/";
-import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../../utils/IconCustom";
-import { useSelector, useDispatch } from 'react-redux';
-import { addExpend, clearExpend, listeExpendInterface, PoleExpend } from "../../redux/expendSlice";
-import { ItemDeleteExpendSlice } from "../../utils/ExpendManipulation";
-import { ModalAddExpend } from "../../screen/AddOperationInTheBudget/ModalAddExpend/ModalAddOperation";
-import { SimpleTransactionInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
+import { Icon } from "@rneui/themed/";
+import { useDispatch } from 'react-redux';
+import { ModalAddExpend } from "../ModalAddExpend/ModalAddOperation";
+import { SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
+
 
 interface ItemBudgetProps {
 
@@ -18,7 +16,7 @@ interface ItemBudgetProps {
 
 }
 
-export function ExpendInfo({ budget, isModalVisible, setIsModalVisible, operation, }: ItemBudgetProps) {
+export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, }: ItemBudgetProps) {
 
     const [modalEditExpendVisible, setModalEditExpendVisible] = React.useState(false);
 
@@ -70,7 +68,7 @@ export function ExpendInfo({ budget, isModalVisible, setIsModalVisible, operatio
                 }}
             >
                 <ImageBackground
-                    source={require("../../assets/images/Background_recipe.png")}
+                    source={require("../../../../assets/images/Background_recipe.png")}
                     resizeMode="contain"
                     style={{
                         height: "80%",

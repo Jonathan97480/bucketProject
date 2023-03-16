@@ -16,15 +16,6 @@ export function TextArrayAlphabetizeOrder(a: []) {
 }
 
 
-export function OperationArrayAlphabetizeOrder(a: SimpleTransactionInterface[]) {
-    return a.sort(function (x: SimpleTransactionInterface, y: SimpleTransactionInterface,) {
-
-        return x.name.toLowerCase().localeCompare(y.name.toLowerCase(), "fr", { sensitivity: "base", ignorePunctuation: true, });
-    },);
-
-
-
-}
 
 export function ListAlphabetizeOrder(a: stepInterface[]) {
     return a.sort(function (x, y) {

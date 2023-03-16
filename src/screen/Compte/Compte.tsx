@@ -88,13 +88,6 @@ export default function Compte() {
                                         />
                                     </View>
 
-
-
-
-
-
-
-
                                 )
                             })
 

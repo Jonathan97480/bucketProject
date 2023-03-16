@@ -1,6 +1,6 @@
-import { CompteInterface, MonthInterface, SimpleTransactionInterface, TransactionMonthInterface } from "../../../redux/comptesSlice";
-import DatabaseManager from "../../../utils/DataBase";
-import { fixedFloatNumber } from "../../../utils/ExpendManipulation";
+import { CompteInterface, MonthInterface, SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
+import DatabaseManager from "../../../../utils/DataBase";
+import { fixedFloatNumber } from "../../../../utils/ExpendManipulation";
 
 
 export interface FormAddOperationInterface {
@@ -178,9 +178,10 @@ function getLastID(budget: TransactionMonthInterface | null | undefined, typeOpe
 
         } else {
 
-            lastID = budget.transaction?.expense[budget.transaction?.income.length - 1]?.id;
+            lastID = budget.transaction?.expense[budget.transaction?.expense.length - 1]?.id;
 
         }
+        console.log("LAST ID", lastID)
         return lastID ? lastID + 1 : 1;
     } else {
         return 1;

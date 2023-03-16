@@ -4,9 +4,9 @@ import styleSheet from "./styleSheet";
 import { Input, Button } from "@rneui/themed/";
 import { Picker } from '@react-native-picker/picker';
 import { useSelector, useDispatch } from 'react-redux';
-import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface } from "../../../redux/comptesSlice";
+import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import { checkForm, createNewOperation, FormAddOperationInterface, resetForm, returnDefaultValueForm, saveOperation } from "./logic";
-import { CategoryInterface } from "../../../redux/categorySlice";
+import { CategoryInterface } from "../../../../redux/categorySlice";
 
 
 
