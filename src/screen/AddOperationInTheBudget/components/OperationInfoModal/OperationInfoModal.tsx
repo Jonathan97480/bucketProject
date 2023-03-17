@@ -4,7 +4,8 @@ import { Icon } from "@rneui/themed/";
 import { useDispatch } from 'react-redux';
 import { ModalAddExpend } from "../ModalAddExpend/ModalAddOperation";
 import { SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
-
+import styleSheet from "./styleSheet";
+import globalStyle from "../../../../assets/styleSheet/globalStyle";
 
 interface ItemBudgetProps {
 
@@ -13,10 +14,11 @@ interface ItemBudgetProps {
     setIsModalVisible: (value: boolean) => void
     operation: SimpleTransactionInterface
     budget: TransactionMonthInterface
+    callbackDeleteBtn: () => void
 
 }
 
-export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, }: ItemBudgetProps) {
+export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, callbackDeleteBtn }: ItemBudgetProps) {
 
     const [modalEditExpendVisible, setModalEditExpendVisible] = React.useState(false);
 
@@ -55,110 +57,48 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
 
 
             />
-            <View
-                style={{
+            <View style={styleSheet.container}>
+                <View
 
-                    height: "100%",
-                    width: "100%",
-                    justifyContent: "center",
-                    backgroundColor: "rgba(0,0,0,0.2)",
-
-
-
-                }}
-            >
-                <ImageBackground
-                    source={require("../../../../assets/images/Background_recipe.png")}
-                    resizeMode="contain"
-                    style={{
-                        height: "80%",
-                        width: "100%",
-
-
-
-                    }}
+                    style={styleSheet.backgroundRecipe}
 
                 >
-                    <Text
-                        style={{
-                            fontSize: 20,
-                            fontWeight: "bold",
-                            textAlign: "center",
-                            marginTop: 20,
-                        }}
-
-                    >{operation.name}</Text>
+                    <Text style={styleSheet.titleTicket}>{operation.name}</Text>
 
 
-                    <View style={{
-                        backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B",
-
-                        paddingHorizontal: 12,
-                        borderRadius: 5,
-                        alignItems: "center",
-                        justifyContent: "center",
-                        width: "50%",
-                        height: 30,
-                        marginLeft: "25%",
-
-
-                    }}>
-                        <Text style={{ color: "#fff" }} >{operation.type === "income" ? "Depot" : "Retrait"}</Text>
+                    <View style={[
+                        { backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B" },
+                        styleSheet.viewTypeOperation
+                    ]}>
+                        <Text style={globalStyle.colorTextPrimary} >{operation.type === "income" ? "Entrée" : "Sortie"}</Text>
                     </View>
 
-                    <View
-                        style={{
+                    <View style={{ alignItems: "center", }}>
 
-                            alignItems: "center",
-                        }}
-                    >
                         <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                marginTop: 10,
-                            }}
 
-                        >Le</Text>
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-
-                            }}
-                        >
-                            {operation.date}
+                            style={[
+                                globalStyle.textAlignCenter,
+                                globalStyle.textSizeMedium,
+                                styleSheet.textInfo
+                            ]}>
+                            Prix unitaire : {operation.montant}€
                         </Text>
                         <Text
-
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                marginTop: 10,
-                            }}
-
-                        >Prix unitaire : {operation.montant}€
-                        </Text>
-                        <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                marginTop: 10,
-                            }}
+                            style={[
+                                globalStyle.textAlignCenter,
+                                globalStyle.textSizeMedium,
+                                styleSheet.textInfo
+                            ]}
                         >
                             Quantité : {operation.quantity}
                         </Text>
                         <Text
-                            style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                textAlign: "center",
-                                marginTop: 10,
-                            }}
+                            style={[
+                                globalStyle.textAlignCenter,
+                                globalStyle.textSizeXLarge,
+                                styleSheet.textInfo
+                            ]}
                         >
                             TOTAL : {operation.total}€
                         </Text>
@@ -174,24 +114,16 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                         }}
                     >
                         <View
-                            style={{
-                                width: "50%",
-                                alignItems: "center",
-                                flexDirection: "row",
-                                justifyContent: "center",
-                            }}
+                            style={[
+                                styleSheet.viewRowCenter,
+                                { width: '50%' }
+                            ]}
                         >
                             <Icon
                                 name="delete"
                                 type="material-community"
-                                size={50}
-                                style={{
-                                    elevation: 2,
-                                    marginRight: 40,
-                                    backgroundColor: "#E1424B",
-                                    borderRadius: 50,
-                                    padding: 5,
-                                }}
+                                size={40}
+                                style={styleSheet.iconDeleteStyle}
                                 color={"#fff"}
                                 onPress={() => {
                                     Alert.alert(
@@ -206,7 +138,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                             {
                                                 text: "Oui", onPress: () => {
 
-
+                                                    callbackDeleteBtn();
 
                                                 }
                                             }
@@ -218,13 +150,8 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                             <Icon
                                 name="pencil"
                                 type="material-community"
-                                size={50}
-                                style={{
-                                    elevation: 2,
-                                    backgroundColor: "#203EAA",
-                                    borderRadius: 50,
-                                    padding: 5,
-                                }}
+                                size={40}
+                                style={styleSheet.iconEditStyle}
                                 color={"#fff"}
                                 onPress={() => {
 
@@ -237,7 +164,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
 
 
 
-                </ImageBackground>
+                </View>
 
 
             </View >

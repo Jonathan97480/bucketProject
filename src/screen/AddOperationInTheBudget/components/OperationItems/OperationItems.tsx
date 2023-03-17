@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'
 import { Alert, Text, TouchableOpacity, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import styleSheet from './styleSheet'
@@ -35,6 +35,28 @@ export default function OperationItems({ listeExpend, idBudget }: OperationItems
     const [modalVisible, setModalVisible] = useState(false);
     const dispatch = useDispatch();
 
+
+    const deleteOperationCallBack = useCallback(async (operation: SimpleTransactionInterface) => {
+
+        deleteOperation({
+            compte: CurentCompte,
+            month: CurentMonth,
+            budget: budget,
+            operation: operation,
+        }).then((res) => {
+
+            dispatch(setCurentBudget(res.budget));
+            dispatch(setCurentCompte(res.compte));
+            dispatch(setCurentMonth(res.month));
+            setModalVisible(false);
+
+        }).catch((err) => {
+            console.error("ERROR DELETED OPERATION", err);
+        });
+
+    }, []);
+
+
     return (
         <>
 
@@ -57,20 +79,7 @@ export default function OperationItems({ listeExpend, idBudget }: OperationItems
                                             },
                                             {
                                                 text: "OK", onPress: () => {
-                                                    deleteOperation({
-                                                        compte: CurentCompte,
-                                                        month: CurentMonth,
-                                                        budget: budget,
-                                                        operation: operation,
-                                                    }).then((res) => {
-
-                                                        dispatch(setCurentBudget(res.budget));
-                                                        dispatch(setCurentCompte(res.compte));
-                                                        dispatch(setCurentMonth(res.month));
-
-                                                    }).catch((err) => {
-                                                        console.error("ERROR DELETED OPERATION", err);
-                                                    });
+                                                    deleteOperationCallBack(operation);
                                                 }
                                             }
                                         ],
@@ -95,6 +104,10 @@ export default function OperationItems({ listeExpend, idBudget }: OperationItems
                                         setIsModalVisible={setModalVisible}
                                         operation={operation}
                                         budget={budget}
+                                        callbackDeleteBtn={() => {
+                                            deleteOperationCallBack(operation);
+
+                                        }}
 
 
                                     />

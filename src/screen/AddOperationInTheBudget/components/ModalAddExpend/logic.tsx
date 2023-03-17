@@ -190,7 +190,7 @@ function getLastID(budget: TransactionMonthInterface | null | undefined, typeOpe
 }
 
 
-function CalculBudget({ budget }: { budget: TransactionMonthInterface }) {
+export function CalculBudget({ budget }: { budget: TransactionMonthInterface }) {
 
     let total = {
         income: 0,
