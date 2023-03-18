@@ -21,7 +21,10 @@ interface OperationItemsProps {
 export default function OperationItems({ listeExpend, idBudget }: OperationItemsProps) {
 
     const [NewListeExpend, setNewListeExpend] = React.useState<SimpleTransactionInterface[]>(listeExpend);
+
     const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
+
+
     const CurentCompte = useSelector((state: any) => state.compte.currentCompte);
     const CurentMonth = useSelector((state: any) => state.compte.currentMonth);
 
@@ -94,7 +97,7 @@ export default function OperationItems({ listeExpend, idBudget }: OperationItems
                                         style={[{ width: "45%", }, globalStyle.colorTextPrimary]}
 
                                     >{textSizeFixe(operation.name, 17)}</Text>
-                                    <Text style={[globalStyle.colorTextPrimary]} >{operation.montant}€</Text>
+                                    <Text style={[globalStyle.colorTextPrimary]} >{operation.total_real !== 0 ? operation.total_real : operation.total}€</Text>
                                     <View style={[{ backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B", }, styleSheet.pastille]}>
                                         <Text style={{ color: "#fff" }} >{operation.type === "income" ? "Depot" : "Retrait"}</Text>
                                     </View>

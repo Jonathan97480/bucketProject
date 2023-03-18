@@ -71,20 +71,21 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                         <Text style={actionType === "income" ? styleSheet.title : styleSheet.titleActive}
                             onPress={() => {
                                 setActionType("expense");
-                                setFormOperation({
-                                    ...formOperation,
-                                    type: "expense",
-                                });
+                                checkForm({
+                                    form: { ...formOperation, type: "expense" },
+                                    setFormOperation: setFormOperation,
+                                })
+
 
                             }}
                         >Sortie</Text>
                         <Text style={actionType === "expense" ? styleSheet.title : styleSheet.titleActive}
                             onPress={() => {
                                 setActionType("income");
-                                setFormOperation({
-                                    ...formOperation,
-                                    type: "income",
-                                });
+                                checkForm({
+                                    form: { ...formOperation, type: "income" },
+                                    setFormOperation: setFormOperation,
+                                })
                             }}
                         >Entrée</Text>
 

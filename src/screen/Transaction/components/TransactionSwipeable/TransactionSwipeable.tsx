@@ -28,6 +28,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20, }]}
             onPress={() => {
                 if (transaction.transactionType === "Budget") {
+
                     dispatch(setCurentBudget(transaction));
                     navigation.navigate('AddExpendBudget');
                 }

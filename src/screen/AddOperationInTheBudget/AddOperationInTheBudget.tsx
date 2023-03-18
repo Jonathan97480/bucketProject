@@ -19,8 +19,10 @@ import OperationItems from "./components/OperationItems/OperationItems";
 export const AddOperationInTheBudget = () => {
 
     const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
+
     const [curentBudget, setCurentBudget] = React.useState<TransactionMonthInterface>(budget);
     const [modalVisible, setModalVisible] = useState(false);
+
     const [filters, setFilters] = useState<"All" | "Income" | "Expense">("All");
 
 
