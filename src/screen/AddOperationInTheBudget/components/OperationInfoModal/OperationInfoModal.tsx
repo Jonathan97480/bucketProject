@@ -82,7 +82,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                 globalStyle.textSizeMedium,
                                 styleSheet.textInfo
                             ]}>
-                            Prix unitaire : {operation.montant}€
+                            Prix unitaire : {operation.montant_real === 0 ? operation.montant : operation.montant_real}€
                         </Text>
                         <Text
                             style={[
@@ -100,7 +100,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                 styleSheet.textInfo
                             ]}
                         >
-                            TOTAL : {operation.total}€
+                            TOTAL : {operation.total_real === 0 ? operation.total.toFixed(2) : operation.montant_real}€
                         </Text>
 
                     </View>

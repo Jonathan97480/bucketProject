@@ -95,7 +95,8 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         <>
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
-                            >Montant de départ : {transaction.start_montant}€</ListItem.Subtitle>
+                            >Montant de départ : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
+
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
                             >Budget restant : {transaction.montant}€</ListItem.Subtitle>
@@ -105,7 +106,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
-                            >Montant : {transaction.montant}€</ListItem.Subtitle>
+                            >Montant : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
                         </>
                 }
             </ListItem.Content>

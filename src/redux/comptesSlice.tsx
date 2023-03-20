@@ -27,7 +27,7 @@ export interface TransactionMonthInterface {
     transaction: {
         income: SimpleTransactionInterface[],
         expense: SimpleTransactionInterface[],
-    }
+    } | null
 }
 export interface MonthInterface {
     numberTransactionMonth: number,
@@ -41,7 +41,10 @@ export interface MonthInterface {
 
 
 export interface TransactionInterface {
-
+    operationRecurring: {
+        income: TransactionMonthInterface[],
+        expense: TransactionMonthInterface[],
+    },
     year: number,
     numberTransactionYear: number,
     month: MonthInterface[]

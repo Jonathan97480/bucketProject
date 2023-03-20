@@ -8,6 +8,7 @@ export const deleteOperation = async ({ compte, budget, operation, month }: {
     operation: SimpleTransactionInterface,
 }) => {
 
+    console.log("B", budget);
 
 
     const _budget: TransactionMonthInterface = {
@@ -31,29 +32,17 @@ export const deleteOperation = async ({ compte, budget, operation, month }: {
 
 
 
-    let indexOperation = operation.type === "expense" ?
-        _budget.transaction.expense.findIndex((item) => {
-            return item.id === operation.id
-        }) :
-        _budget.transaction.income.findIndex((item) => {
-            return item.id === operation.id
-        });
-
-
+    let indexOperation = _budget.transaction[operation.type].findIndex((item) => {
+        return item.id === operation.id
+    });
+    console.log("DELETE OPERATION", operation, _budget.transaction[operation.type], indexOperation, "BUDGET", _budget);
     if (indexOperation !== -1) {
 
-        if (operation.type === "expense") {
-            _budget.transaction.expense = [
-                ..._budget.transaction.expense.filter((item) => {
 
-                    return item.id !== operation.id
+        _budget.transaction[operation.type] = [
+            ..._budget.transaction[operation.type].filter((item) => { return item.id !== operation.id })
+        ];
 
-
-                })
-            ];
-        } else {
-            _budget.transaction.income = [..._budget.transaction.income.filter((item) => { return item.id !== operation.id })];
-        }
 
 
 
@@ -166,12 +155,5 @@ export const deleteOperation = async ({ compte, budget, operation, month }: {
     } else {
         throw new Error("Operation not found");
     }
-
-
-
-
-
-    throw new Error("ERROR INCONNU");
-
 
 }

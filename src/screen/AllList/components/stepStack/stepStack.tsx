@@ -1,22 +1,35 @@
 import { CheckBox } from "@rneui/base";
 import React from "react";
 import { Alert, TouchableOpacity, View, Text } from "react-native";
-import { listInterface, stepInterface } from "../../redux/listSlice";
+import { addList, listInterface, stepInterface } from "../../../../redux/listSlice";
+import { useDispatch } from "react-redux";
 
 
 
 
 export interface StepTaskProps {
-    UpdateList: (isChecked: boolean, index: number, steps?: stepInterface[]) => void;
+    UpdateList: ({
+        isChecked,
+        id,
+        ItemArray,
+        list
+    }: {
+        isChecked: boolean,
+        id: number,
+        ItemArray?: any,
+        list: listInterface
+    }) => Promise<listInterface[]>;
+
     index: number;
     step: stepInterface;
     task: listInterface;
+
 }
 
 
 export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
 
-
+    const dispatch = useDispatch();
     return (
         <TouchableOpacity
 
@@ -34,9 +47,16 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
                     ],)
 
             }}
-            onPress={() => {
+            onPress={async () => {
 
-                UpdateList(!step.isChecked, step.id);
+                const newAllList = await UpdateList({
+                    isChecked: !step.isChecked,
+                    id: step.id,
+                    list: task,
+                });
+
+                dispatch(addList(newAllList));
+
             }}
 
 
@@ -90,13 +110,21 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
 
         </TouchableOpacity>
     )
-    function deleteTask(index: number) {
+    async function deleteTask(index: number) {
 
         let newStepArray = [...task.steps];
         let stepID = newStepArray[index].id;
         newStepArray.splice(index, 1);
 
-        UpdateList(false, stepID, newStepArray);
+        const newAllList = await UpdateList({
+            isChecked: false,
+            id: stepID,
+            ItemArray: newStepArray,
+            list: task,
+        });
+
+        dispatch(addList(newAllList));
+
 
     }
 }

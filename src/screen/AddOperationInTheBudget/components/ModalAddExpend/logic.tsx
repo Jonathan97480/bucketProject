@@ -49,8 +49,8 @@ export function resetForm(): FormAddOperationInterface {
         errorTitle: "",
         montant: "",
         errorMontant: "",
-        category: -1,
-        type: "income",
+        category: 1,
+        type: "expense",
         quantity: "",
         errorQuantity: "",
         btnEnabled: true,
@@ -85,10 +85,15 @@ export function checkForm({ form, setFormOperation }: {
     } else {
         form.errorMontant = "";
     }
+    if (form.quantity === "") {
+        form.errorQuantity = "Le champ est vide";
+    } else {
+        form.errorQuantity = "";
+    }
 
 
 
-    if (form.errorTitle == "" && form.errorMontant == "") {
+    if (form.errorTitle == "" && form.errorMontant == "" && form.errorQuantity == "") {
         form.btnEnabled = false;
 
         setFormOperation(form);
@@ -211,6 +216,7 @@ export function CalculBudget({ budget }: { budget: TransactionMonthInterface }) 
     budget.montant = budget.start_montant;
     budget.montant += total.income;
     budget.montant -= total.expense;
+    budget.montant = fixedFloatNumber(budget.montant);
 
     console.log("CALCUL BUDGET", budget, total)
 
@@ -244,67 +250,64 @@ function prepareRequest({ compteCurrent, CurrentMonth, budget, newOperation, old
 
 
                 let _budget: TransactionMonthInterface = { ...budget };
-                if (budget.transaction) {
-                    _budget.transaction = {
-                        ...budget.transaction, income: [..._budget.transaction ? _budget.transaction.income : []]
-                        , expense: [..._budget.transaction ? _budget.transaction.expense : []]
 
-                    };
+                _budget.transaction = {
+                    ...budget.transaction, income: [..._budget.transaction ? _budget.transaction.income : []]
+                    , expense: [..._budget.transaction ? _budget.transaction.expense : []]
+
+                };
 
 
-                    if (oldOperation) {
+                if (oldOperation) {
 
-                        let indexOldOperation = _budget.transaction[oldOperation.type].findIndex((operation) => operation.id === oldOperation.id);
+                    let indexOldOperation = _budget.transaction[oldOperation.type].findIndex((operation) => operation.id === oldOperation.id);
 
-                        if (indexOldOperation !== -1) {
-                            _budget.transaction[oldOperation.type].splice(indexOldOperation, 1);
-                        }
-
+                    if (indexOldOperation !== -1) {
+                        _budget.transaction[oldOperation.type].splice(indexOldOperation, 1);
                     }
 
-
-                    if (newOperation.type === "income") {
-                        _budget.transaction.income.push(newOperation);
-                    }
-                    if (newOperation.type === "expense") {
-                        _budget.transaction.expense.push(newOperation);
-                    }
-
-                    let compte = {
-                        ...compteCurrent,
-                        transactions: [...compteCurrent.transactions]
-                    };
-                    compte.transactions[indexYear] = { ...compte.transactions[indexYear] }
-                    compte.transactions[indexYear].month = [...compte.transactions[indexYear].month];
-
-                    let month = {
-                        ...CurrentMonth,
-                        transactions: { ...CurrentMonth.transactions }
-                    };
-                    month.transactions = {
-                        income: [...CurrentMonth.transactions.income],
-                        expense: [...CurrentMonth.transactions.expense]
-                    }
-
-
-                    _budget = CalculBudget({
-                        budget: _budget,
-
-                    });
-
-                    month.transactions[budget.typeOperation][indexBudget] = _budget;
-                    compte.transactions[indexYear].month[indexMonth] = month;
-
-                    return {
-                        compte: compte,
-                        month: month,
-                        budget: _budget
-                    }
-
-                } else {
-                    /* Nos transaction objet define in the budget */
-                    throw new Error("Aucune transaction n'est définie dans le budget");
                 }
+
+
+                if (newOperation.type === "income") {
+                    _budget.transaction.income.push(newOperation);
+                }
+                if (newOperation.type === "expense") {
+                    _budget.transaction.expense.push(newOperation);
+                }
+
+                let compte = {
+                    ...compteCurrent,
+                    transactions: [...compteCurrent.transactions]
+                };
+                compte.transactions[indexYear] = { ...compte.transactions[indexYear] }
+                compte.transactions[indexYear].month = [...compte.transactions[indexYear].month];
+
+                let month = {
+                    ...CurrentMonth,
+                    transactions: { ...CurrentMonth.transactions }
+                };
+                month.transactions = {
+                    income: [...CurrentMonth.transactions.income],
+                    expense: [...CurrentMonth.transactions.expense]
+                }
+
+
+                _budget = CalculBudget({
+                    budget: _budget,
+
+                });
+
+                month.transactions[budget.typeOperation][indexBudget] = _budget;
+                compte.transactions[indexYear].month[indexMonth] = month;
+
+                return {
+                    compte: compte,
+                    month: month,
+                    budget: _budget
+                }
+
+
 
 
 

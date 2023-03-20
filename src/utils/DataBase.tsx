@@ -255,7 +255,7 @@ export default class DatabaseManager {
         task: number
         steps: stepInterface[],
         validate: boolean
-    }): Promise<void> {
+    }): Promise<listInterface> {
 
         const listStepValidate = steps.filter((step: stepInterface) => {
             return step.isChecked;
@@ -265,7 +265,15 @@ export default class DatabaseManager {
             db.transaction(tx => {
                 tx.executeSql(
                     "UPDATE list SET name = ?, montant = ?, date = ?, items = ?, validate = ?, task_terminer = ?, task = ? WHERE id = ?;",
-                    [name, montant, date, JSON.stringify(steps), validate ? 1 : 0, listStepValidate.length, task, id]
+                    [name, montant, date, JSON.stringify(steps), validate ? 1 : 0, listStepValidate.length, task, id],
+                    (_, { rowsAffected }) => {
+
+                        DatabaseManager.getListById(id).then((list) => {
+                            resolve(list);
+                        });
+
+
+                    }
                 );
             }, (e) => {
                 console.error("ERREUR + " + e)
@@ -273,14 +281,14 @@ export default class DatabaseManager {
             },
                 () => {
                     console.info("OK + UPDATE LIST")
-                    resolve();
+
 
                 }
             );
         });
     }
 
-    static deleteList(id: number, id_budget: number): Promise<void> {
+    static deleteList(id: number): Promise<void> {
 
         return new Promise((resolve, reject) => {
             db.transaction(tx => {

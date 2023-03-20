@@ -1,5 +1,5 @@
 
-import { Button, Icon } from "@rneui/base";
+import { Button, FAB, Icon } from "@rneui/base";
 import React, { useEffect, useCallback } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
@@ -127,22 +127,13 @@ export const Transaction = () => {
 
                                         }) : null
                                 }
-                                <Button
-                                    buttonStyle={styleSheet.buttonAddBudget}
-                                    title="Ajouter"
-                                    icon={
-                                        <Icon
-                                            name="plus"
-                                            type='font-awesome'
-                                            color={colorList.primary}
-                                        />
-                                    }
-                                    onPress={() => setIsViewModalAddBudget(true)}
-                                />
+
+
 
                             </View>
 
                         </ScrollView>
+
                         : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget} />
 
                 }
@@ -153,6 +144,14 @@ export const Transaction = () => {
                     setIsViewModalAddBudget={editTransactionCallBack}
                     transaction={curentTransaction}
                 />
+                {curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
+                    <FAB
+                        visible={true}
+                        icon={{ name: 'add', color: 'white' }}
+                        placement="right"
+                        color="#4F94BB"
+                        onPress={() => setIsViewModalAddBudget(true)}
+                    /> : null}
             </View>
 
 

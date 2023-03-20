@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Icon } from "@rneui/base";
 import { textSizeFixe } from "../../utils/TextManipulation";
-import { SimpleTransactionInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
+import { setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface, setCurentBudget } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { getColorBudget } from "../../utils/ColorCollection";
 import { ModalAddExpend } from "./components/ModalAddExpend/ModalAddOperation";
@@ -12,16 +12,26 @@ import { OperationArrayAlphabetizeOrder } from "./components/Search/logic";
 import { Search } from "./components/Search/Search";
 import { Filters } from "./components/Filters/Filters";
 import OperationItems from "./components/OperationItems/OperationItems";
+import ModalCreateListe from "./components/ModalCreateListe/ModalCreateListe";
+import { deleteOperation } from "./components/OperationItems/logic";
+import { OperationInfoModal } from "./components/OperationInfoModal/OperationInfoModal";
 
 
 
 
 export const AddOperationInTheBudget = () => {
 
-    const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
+    const dispatch = useDispatch();
 
-    const [curentBudget, setCurentBudget] = React.useState<TransactionMonthInterface>(budget);
+    const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
+    const CurentCompte = useSelector((state: any) => state.compte.currentCompte);
+    const CurentMonth = useSelector((state: any) => state.compte.currentMonth);
+
+    const [localCurentBudget, setLocalCurentBudget] = React.useState<TransactionMonthInterface>(budget);
+    const [curentOperation, setCurentOperation] = useState<SimpleTransactionInterface | null>(null);
+
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisible2, setModalVisible2] = useState(false);
 
     const [filters, setFilters] = useState<"All" | "Income" | "Expense">("All");
 
@@ -37,13 +47,31 @@ export const AddOperationInTheBudget = () => {
     }, [budget]);
 
 
+    const deleteOperationCallBack = useCallback(async (operation: SimpleTransactionInterface) => {
 
+        deleteOperation({
+            compte: CurentCompte,
+            month: CurentMonth,
+            budget: budget,
+            operation: operation,
+        }).then((res) => {
+
+            dispatch(setCurentBudget(res.budget));
+            dispatch(setCurentCompte(res.compte));
+            dispatch(setCurentMonth(res.month));
+            setModalVisible(false);
+
+        }).catch((err) => {
+            console.error("ERROR DELETED OPERATION", err);
+        });
+
+    }, [budget]);
 
 
     const UpdateView = useCallback(() => {
 
 
-        setCurentBudget(budget);
+        setLocalCurentBudget(budget);
         if (budget.transaction) {
             setCurentOperations({
                 income: OperationArrayAlphabetizeOrder([...budget.transaction.income]),
@@ -71,7 +99,7 @@ export const AddOperationInTheBudget = () => {
                 [
                     styles2.centenaire,
                     {
-                        backgroundColor: getColorBudget(curentBudget.montant, curentBudget.start_montant)
+                        backgroundColor: getColorBudget(localCurentBudget.montant, localCurentBudget.start_montant)
                     }
                 ]
             }
@@ -79,30 +107,67 @@ export const AddOperationInTheBudget = () => {
                 <Text
                     style={styles2.title}
                 >
-                    {curentBudget.montant}€
+                    {localCurentBudget.montant.toFixed(2)}€
                 </Text>
-                <Text style={styles2.title}>{textSizeFixe(curentBudget.name, 20)}</Text>
-                <Icon
-                    name="plus"
-                    type="font-awesome"
-                    size={20}
-                    color="#000"
-                    onPress={() => {
-                        setModalVisible(true);
-                    }}
+                <Text style={styles2.title}>{textSizeFixe(localCurentBudget.name, 20)}</Text>
+                <View
+                    style={styles.containerIcon}
+                >
+                    <Icon
+                        name="plus"
+                        type="font-awesome"
+                        style={{
+                            backgroundColor: "#4F94BB",
+                            padding: 8,
+                            borderRadius: 25,
+                            width: 30,
+                            height: 30,
+                        }}
+                        size={15}
+                        color="#fff"
+                        onPress={() => {
+                            setModalVisible(true);
+                        }}
 
-                    style={styles2.icon}
 
-                />
+
+                    />
+                    <Icon
+                        name="list"
+                        type="font-awesome"
+                        style={{
+                            backgroundColor: "#4F94BB",
+                            padding: 8,
+                            borderRadius: 25,
+                            width: 30,
+                            height: 30,
+                        }}
+                        size={25}
+                        color="#fff"
+                        onPress={() => {
+                            setModalVisible2(true);
+                        }}
+                    />
+                </View>
+
+
                 <ModalAddExpend
-                    budget={curentBudget}
+                    budget={budget}
                     isVisible={modalVisible}
                     setIsVisible={setModalVisible}
 
                 />
+                <ModalCreateListe
+                    budget={budget}
+                    isVisible={modalVisible2}
+                    setIsVisible={setModalVisible2}
+
+
+                />
+
             </View>
             <Search
-                budget={curentBudget}
+                budget={localCurentBudget}
                 onSearch={({ income, expense }) => {
 
                     setCurentOperations({ income, expense });
@@ -118,24 +183,37 @@ export const AddOperationInTheBudget = () => {
 
             />
             <ScrollView >
-                {curentBudget.transaction &&
+                {localCurentBudget.transaction &&
                     <>
                         {
                             filters === "All" || filters == "Expense" ?
                                 <View>
                                     <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
-                                        Nombre de sortie :   {curentBudget.transaction?.expense.length}
+                                        Nombre de sortie :   {localCurentBudget.transaction?.expense.length}
                                     </Text>
-                                    <OperationItems listeExpend={curentOperations.expense} idBudget={curentBudget.id} />
+                                    <OperationItems listeExpend={curentOperations.expense}
+                                        deleteCallBack={deleteOperationCallBack}
+                                        infoPanelOpen={(operation) => {
+                                            setCurentOperation(operation);
+
+                                        }}
+                                    />
                                 </View> : null}
 
                         {
                             filters === "All" || filters == "Income" ?
                                 <View>
                                     <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
-                                        Nombre de entrées :   {curentBudget.transaction?.income.length}
+                                        Nombre de entrées :   {localCurentBudget.transaction?.income.length}
                                     </Text>
-                                    <OperationItems listeExpend={curentOperations.income} idBudget={curentBudget.id} />
+                                    <OperationItems listeExpend={curentOperations.income}
+
+                                        deleteCallBack={deleteOperationCallBack}
+                                        infoPanelOpen={(operation) => {
+                                            setCurentOperation(operation);
+
+                                        }}
+                                    />
                                 </View> : null}
                     </>
 
@@ -145,7 +223,18 @@ export const AddOperationInTheBudget = () => {
                 <View style={styles.container} ></View>
 
             </ScrollView>
+            <OperationInfoModal
+                isModalVisible={curentOperation != null}
+                setIsModalVisible={() => setCurentOperation(null)}
+                operation={curentOperation!}
+                budget={budget}
+                callbackDeleteBtn={() => {
+                    deleteOperationCallBack(curentOperation!);
 
+                }}
+
+
+            />
         </CustomSafeAreaView >
 
     );
@@ -173,6 +262,12 @@ const styles = StyleSheet.create({
         textAlign: "center",
         lineHeight: 30,
 
+    },
+    containerIcon: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: 70,
     }
 
 });
@@ -184,10 +279,8 @@ const styles2 = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         padding: 10,
-        paddingHorizontal: 20,
+        paddingVertical: 15,
         backgroundColor: "#fff",
-        borderBottomWidth: 1,
-        borderBottomColor: "#eee",
         marginBottom: 20,
         borderRadius: 20,
 
@@ -197,16 +290,9 @@ const styles2 = StyleSheet.create({
         fontWeight: "bold",
         color: "#fff"
     },
-    icon: {
-        padding: 10,
-        backgroundColor: "#fff",
-        borderRadius: 50,
-        width: 40,
-        height: 40,
-        borderWidth: 1,
-        overflow: 'hidden',
-    }
+
 });
+
 
 
 

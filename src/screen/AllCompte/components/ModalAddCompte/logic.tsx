@@ -57,6 +57,10 @@ function generatedTransactionDefault({ _AccountBalanceBeginningMonth = 0 }: {
     const monthName = getMonthByNumber(curentDate.getMonth() + 1);
 
     const transaction: TransactionInterface = {
+        operationRecurring: {
+            income: [],
+            expense: []
+        },
         year: curentDate.getFullYear(),
         numberTransactionYear: 0,
         month: [{

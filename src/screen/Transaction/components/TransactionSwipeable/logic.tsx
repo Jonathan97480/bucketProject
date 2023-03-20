@@ -11,15 +11,12 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
     const curentCompte: CompteInterface = { ..._compte, transactions: [..._compte.transactions] };
     const curentMonth: MonthInterface = { ..._curentMonth, transactions: { ..._curentMonth.transactions } };
 
-    if (_transaction.typeOperation === "income") {
-        curentMonth.transactions.income = curentMonth.transactions.income.filter((transaction: TransactionMonthInterface) => {
-            return transaction.id !== _transaction.id;
-        })
-    } else {
-        curentMonth.transactions.expense = curentMonth.transactions.expense.filter((transaction: TransactionMonthInterface) => {
-            return transaction.id !== _transaction.id;
-        })
-    }
+
+    curentMonth.transactions[_transaction.typeOperation] = curentMonth.transactions[_transaction.typeOperation].filter((transaction: TransactionMonthInterface) => {
+        return transaction.id !== _transaction.id;
+    })
+
+
 
     let indexYear = curentCompte.transactions.findIndex((year) => {
         return year.year === new Date().getFullYear();
@@ -33,8 +30,22 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
 
     curentCompte.transactions = [...curentCompte.transactions];
 
-    ;
+
     curentCompte.transactions[indexYear] = { ...curentCompte.transactions[indexYear], month: [...curentCompte.transactions[indexYear].month] };
+
+    /* delete recurring operation if existe */
+    if (_transaction.status !== 'unique') {
+        curentCompte.transactions[indexYear].operationRecurring = {
+            ...curentCompte.transactions[indexYear].operationRecurring
+        };
+        curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation] = [...curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation]];
+
+        curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation] = curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation].filter((transaction: TransactionMonthInterface) => {
+            return transaction.name !== _transaction.name;
+        });
+    }
+
+
     curentCompte.transactions[indexYear].month[indexMonth] = curentMonth;
 
     const newResultCompte = calculTransactionByCompte(curentCompte, curentMonth);

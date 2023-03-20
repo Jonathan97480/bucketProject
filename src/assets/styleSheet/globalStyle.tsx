@@ -5,12 +5,17 @@ export default StyleSheet.create({
     backgroundPrimaryColor: {
         backgroundColor: "#282525",
     },
+
     backgroundSecondaryColor: {
         backgroundColor: "#817FE5",
+    },
+    backgroundTrinaryColor: {
+        backgroundColor: "#6A6464",
     },
     backgroundSuccessColor: {
         backgroundColor: "#00FF00",
     },
+
     colorTextPrimary: {
         color: "#fff",
 

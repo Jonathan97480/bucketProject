@@ -1,63 +1,40 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect } from 'react'
 import { Alert, Text, TouchableOpacity, View } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
 import styleSheet from './styleSheet'
-import { setCurentBudget, setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface } from '../../../../redux/comptesSlice'
+import { SimpleTransactionInterface } from '../../../../redux/comptesSlice'
 import globalStyle from '../../../../assets/styleSheet/globalStyle'
 import { textSizeFixe } from '../../../../utils/TextManipulation'
-import { OperationInfoModal } from '../OperationInfoModal/OperationInfoModal'
-import { deleteOperation } from './logic'
+
 
 
 interface OperationItemsProps {
     listeExpend: SimpleTransactionInterface[],
 
+    deleteCallBack: (operation: SimpleTransactionInterface) => void
+    infoPanelOpen: (operation: SimpleTransactionInterface) => void
 
-    idBudget: number
 
 }
 
 
-export default function OperationItems({ listeExpend, idBudget }: OperationItemsProps) {
+export default function OperationItems({ listeExpend, deleteCallBack, infoPanelOpen }: OperationItemsProps) {
 
     const [NewListeExpend, setNewListeExpend] = React.useState<SimpleTransactionInterface[]>(listeExpend);
 
-    const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
 
 
-    const CurentCompte = useSelector((state: any) => state.compte.currentCompte);
-    const CurentMonth = useSelector((state: any) => state.compte.currentMonth);
 
     useEffect(() => {
 
         setNewListeExpend(listeExpend);
 
-    }, [listeExpend]);
+
+    }, [listeExpend,]);
 
 
-    const [modalVisible, setModalVisible] = useState(false);
-    const dispatch = useDispatch();
 
 
-    const deleteOperationCallBack = useCallback(async (operation: SimpleTransactionInterface) => {
 
-        deleteOperation({
-            compte: CurentCompte,
-            month: CurentMonth,
-            budget: budget,
-            operation: operation,
-        }).then((res) => {
-
-            dispatch(setCurentBudget(res.budget));
-            dispatch(setCurentCompte(res.compte));
-            dispatch(setCurentMonth(res.month));
-            setModalVisible(false);
-
-        }).catch((err) => {
-            console.error("ERROR DELETED OPERATION", err);
-        });
-
-    }, []);
 
 
     return (
@@ -82,7 +59,7 @@ export default function OperationItems({ listeExpend, idBudget }: OperationItems
                                             },
                                             {
                                                 text: "OK", onPress: () => {
-                                                    deleteOperationCallBack(operation);
+                                                    deleteCallBack(operation);
                                                 }
                                             }
                                         ],
@@ -90,30 +67,21 @@ export default function OperationItems({ listeExpend, idBudget }: OperationItems
                                     );
                                 }}
                                 onPress={() => {
-                                    setModalVisible(true);
+                                    infoPanelOpen(operation);
                                 }}>
                                 <View style={styleSheet.itemBudget}>
                                     <Text
                                         style={[{ width: "45%", }, globalStyle.colorTextPrimary]}
 
                                     >{textSizeFixe(operation.name, 17)}</Text>
-                                    <Text style={[globalStyle.colorTextPrimary]} >{operation.total_real !== 0 ? operation.total_real : operation.total}€</Text>
+
+                                    <Text style={[globalStyle.colorTextPrimary]} >{operation.total_real !== 0 ? operation.total_real.toFixed(2) : operation.total.toFixed(2)}€</Text>
+
                                     <View style={[{ backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B", }, styleSheet.pastille]}>
                                         <Text style={{ color: "#fff" }} >{operation.type === "income" ? "Depot" : "Retrait"}</Text>
                                     </View>
 
-                                    <OperationInfoModal
-                                        isModalVisible={modalVisible}
-                                        setIsModalVisible={setModalVisible}
-                                        operation={operation}
-                                        budget={budget}
-                                        callbackDeleteBtn={() => {
-                                            deleteOperationCallBack(operation);
 
-                                        }}
-
-
-                                    />
                                 </View>
                             </TouchableOpacity>
 

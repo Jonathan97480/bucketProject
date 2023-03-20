@@ -308,7 +308,9 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                                 throw new Error('typeOperation not found')
                                             }
 
-                                            saveTransaction({ ...currentCompteRedux }, { ...newM }).then((res) => {
+
+
+                                            saveTransaction({ ...currentCompteRedux }, { ...newM }, newTransaction).then((res) => {
 
                                                 dispatch(setCurentCompte(res));
                                                 dispatch(setCurentMonth(newM))

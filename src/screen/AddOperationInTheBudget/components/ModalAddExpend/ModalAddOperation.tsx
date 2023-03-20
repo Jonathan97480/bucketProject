@@ -23,7 +23,7 @@ interface ModalAddExpendProps {
 export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperation }: ModalAddExpendProps) => {
 
 
-    const [actionType, setActionType] = useState<"income" | "expense">("income");
+    const [actionType, setActionType] = useState<"income" | "expense">("expense");
     const dispatch = useDispatch();
     const currentCompte: CompteInterface = useSelector((state: any) => state.compte.currentCompte);
     const curentMonth = useSelector((state: any) => state.compte.currentMonth);
@@ -92,7 +92,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                     </View>
 
                     <Input
-                        placeholder={`nom du ${actionType === "income" ? " Entrée" : " Sortie"}`}
+                        placeholder={`Nom de  ${actionType === "income" ? "l'entrée" : "la sortie"}`}
                         value={formOperation.title}
                         onChangeText={(value) => {
                             checkForm({
@@ -106,7 +106,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                     />
                     <Input
                         keyboardType="numeric"
-                        placeholder={`montant du ${actionType === "income" ? " Entrée" : " Sortie"}`}
+                        placeholder={`Montant de  ${actionType === "income" ? "l'entrée" : "la sortie"}`}
                         value={formOperation.montant}
                         onChangeText={(value) => {
                             checkForm({
@@ -120,6 +120,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                     <Input
                         keyboardType="numeric"
                         placeholder={"Quantité"}
+                        errorMessage={formOperation.errorQuantity}
                         value={formOperation.quantity}
                         onChangeText={(value) => {
                             checkForm({
@@ -129,7 +130,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                             });
                         }}
                     />
-                    < View >
+                    {/*             < View >
 
                         <Picker
 
@@ -153,9 +154,20 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                             }
 
                         </Picker>
-                    </View>
+                    </View> */}
                     <Button
-                        radius={5}
+                        radius={25}
+                        disabledStyle={{
+                            backgroundColor: "rgba(156, 104, 221, 0.42)",
+                        }}
+                        buttonStyle={{
+                            backgroundColor: "#9C68DD",
+                            width: "100%",
+                            height: 50,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginTop: 10,
+                        }}
                         disabled={formOperation.btnEnabled}
                         title={CurrentOperation ? "Sauvegarder les modifications" : "Ajouter l'operation"}
                         onPress={() => {

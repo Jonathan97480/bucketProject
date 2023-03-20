@@ -65,11 +65,31 @@ export const createNewTransaction = (index: number, formAddBudget: FormAddBudget
 
 }
 
-export const saveTransaction = async (currentCompte: CompteInterface, currentMonth: MonthInterface) => {
+export const saveTransaction = async (currentCompte: CompteInterface, currentMonth: MonthInterface, newTransaction: TransactionMonthInterface) => {
 
     currentCompte.transactions.find((transactionsParYear: TransactionInterface, index) => {
 
+        /* Save TRANSACTION RECURRING */
         if (transactionsParYear.year === new Date().getFullYear()) {
+
+            if (newTransaction.status !== 'unique') {
+
+                transactionsParYear = { ...transactionsParYear, operationRecurring: { ...transactionsParYear.operationRecurring } }
+
+                const tIndex = transactionsParYear.operationRecurring[newTransaction.typeOperation].findIndex((transaction: TransactionMonthInterface, index) => {
+
+                    return transaction.name === newTransaction.name;
+
+                });
+                if (tIndex === -1) {
+                    transactionsParYear.operationRecurring[newTransaction.typeOperation] = [...transactionsParYear.operationRecurring[newTransaction.typeOperation], newTransaction];
+                } else {
+                    transactionsParYear.operationRecurring[newTransaction.typeOperation][tIndex] = newTransaction;
+                }
+            }
+
+            /* Save TRANSACTION MONTH */
+
             transactionsParYear.month.find((month: MonthInterface, _index) => {
                 if (month.nameMonth === currentMonth.nameMonth) {
 
