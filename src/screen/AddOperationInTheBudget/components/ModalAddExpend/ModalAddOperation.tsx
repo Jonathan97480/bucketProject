@@ -31,15 +31,21 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
     const [formOperation, setFormOperation] = useState<FormAddOperationInterface>(resetForm());
 
 
+
+
     useEffect(() => {
 
+
         checkFormCallBack(CurrentOperation);
+
+
 
 
     }, [CurrentOperation]);
 
 
     const checkFormCallBack = useCallback((_currentOperation: SimpleTransactionInterface | null | undefined) => {
+
         if (CurrentOperation) {
 
 
@@ -50,7 +56,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
             setFormOperation(resetForm());
             setActionType(resetForm().type);
         }
-    }, []);
+    }, [CurrentOperation]);
 
     return (
         <Modal

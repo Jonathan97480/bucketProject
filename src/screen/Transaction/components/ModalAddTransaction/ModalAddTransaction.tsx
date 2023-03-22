@@ -104,7 +104,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                         <View>
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>nom :</Text>
-                                <Input placeholder="nom de votre budget"
+                                <Input placeholder="nom de votre transaction"
                                     errorMessage={formAddBudget.errorName}
                                     value={formAddBudget.name}
                                     onChangeText={(value) => {
@@ -114,7 +114,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                             </View>
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>montant :</Text>
-                                <Input placeholder="montant de votre budget"
+                                <Input placeholder="montant de votre transaction"
                                     keyboardType="numeric"
                                     errorMessage={formAddBudget.errorMontant}
                                     value={formAddBudget.montant}
@@ -273,9 +273,9 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                             </View>
                             <Button
                                 color={"#817FE5"}
-                                radius={5}
+                                radius={25}
                                 disabledStyle={{ backgroundColor: "rgba(129, 127, 229, 0.26)" }}
-
+                                style={globalStyle.btnStyle}
                                 title={transaction ? "Enregistrée" : 'Ajouter'}
                                 onPress={() => {
 
@@ -325,11 +325,26 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
                                         if (ValidateForm(formAddBudget, setFormAddBudget)) {
 
+                                            let newTransaction: TransactionMonthInterface | null = null;
+                                            /* prepare Transaction */
+                                            if (transaction.typeOperation !== formAddBudget.typeOperation) {
+                                                const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
+                                                newTransaction = createNewTransaction(newID, formAddBudget)
+
+                                            } else {
+                                                newTransaction = createNewTransaction(transaction.id, formAddBudget)
+
+                                            }
+
+
+
                                             UpdateTransaction({
-                                                allTransaction: transaction,
+
+                                                oldTransaction: transaction,
                                                 curentCompte: currentCompteRedux,
                                                 curentMonth: currentMonthRedux,
-                                                newTransaction: formAddBudget
+                                                newTransaction: newTransaction
+
                                             }).then((res: {
                                                 compte: CompteInterface,
                                                 curentMonth: MonthInterface
@@ -352,10 +367,12 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                         name="check"
                                         size={15}
                                         color="white"
+                                        style={{ marginLeft: 10 }}
                                         type='font-awesome'
 
                                     />
                                 }
+                                iconPosition="right"
 
                             />
                         </View>}
@@ -364,6 +381,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                         curentEtape !== 'Etape3' &&
                         <Button
                             title="Suivant"
+                            radius={25}
+                            style={globalStyle.btnStyle}
                             onPress={() => {
                                 switch (curentEtape) {
                                     case 'Etape1':
@@ -382,9 +401,12 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                     size={15}
                                     color="white"
                                     type='font-awesome'
+                                    style={{ marginLeft: 10 }}
+
 
                                 />
                             }
+                            iconPosition="right"
                             color="#841584"
 
 

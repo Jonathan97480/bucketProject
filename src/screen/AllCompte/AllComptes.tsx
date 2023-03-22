@@ -104,10 +104,8 @@ export default function AllComptes({ navigation }: any) {
                 <Button
                     title="Ajouter un compte"
                     onPress={onPress}
-                    buttonStyle={
-                        [globalStyle.backgroundSecondaryColor]
-                    }
-                    radius={5}
+                    buttonStyle={globalStyle.btnStyle}
+                    radius={25}
                     icon={{
                         name: "wallet",
                         size: 20,

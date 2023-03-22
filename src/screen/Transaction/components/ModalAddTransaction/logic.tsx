@@ -1,6 +1,7 @@
 import { CategoryInterface } from "../../../../redux/categorySlice";
-import { CompteInterface, MonthInterface, TransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
+import { CompteInterface, MonthInterface, SimpleTransactionInterface, TransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase"
+import { calculateTotalExpend, CalculBudget } from "../../../AddOperationInTheBudget/components/ModalAddExpend/logic";
 
 
 export interface FormAddBudget {
@@ -44,8 +45,7 @@ export function ValidateForm(formAddBudget: FormAddBudget, setFormAddBudget: (va
     return isValid;
 }
 
-export const createNewTransaction = (index: number, formAddBudget: FormAddBudget): TransactionMonthInterface => {
-
+export const createNewTransaction = (index: number, formAddBudget: FormAddBudget, oldOperation?: TransactionMonthInterface | null): TransactionMonthInterface => {
 
     return {
         id: index,
@@ -136,56 +136,94 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
 }
 
 
-export const UpdateTransaction = async ({ allTransaction, curentCompte, curentMonth, newTransaction }: { allTransaction: TransactionMonthInterface, curentCompte: CompteInterface, curentMonth: MonthInterface, newTransaction: FormAddBudget }) => {
+export const UpdateTransaction = async ({ oldTransaction, curentCompte, curentMonth, newTransaction }:
+    {
+        oldTransaction: TransactionMonthInterface,
+        curentCompte: CompteInterface,
+        curentMonth: MonthInterface,
+        newTransaction: TransactionMonthInterface
+    }): Promise<{
+        compte: CompteInterface,
+        curentMonth: MonthInterface
+    }> => {
 
-    curentCompte = { ...curentCompte, transactions: [...curentCompte.transactions] }
-    curentMonth = { ...curentMonth, transactions: { ...curentMonth.transactions } }
-    if (newTransaction.typeOperation === 'income') {
-        curentMonth.transactions.income = curentMonth.transactions.income.map((transaction: TransactionMonthInterface) => {
+    curentCompte = JSON.parse(JSON.stringify(curentCompte));
+    curentMonth = JSON.parse(JSON.stringify(curentMonth));
 
-            if (transaction.id === allTransaction.id) {
-                transaction = {
-                    ...transaction,
-                    montant: parseFloat(newTransaction.montant),
-                    name: newTransaction.name,
-                    start_montant: parseFloat(newTransaction.montant),
-                    categoryID: newTransaction.categoryTransaction,
-                    period: newTransaction.isUnique ? null : newTransaction.period,
-                    status: newTransaction.isUnique ? 'unique' : 'recurring',
-                    transactionType: newTransaction.typeTransaction,
-                    typeOperation: newTransaction.typeOperation
 
-                }
+
+
+
+    /* Mise ajour de la transaction dans le moi courant */
+    if (newTransaction.typeOperation === oldTransaction.typeOperation) {
+
+        curentMonth.transactions[newTransaction.typeOperation] = curentMonth.transactions[newTransaction.typeOperation].map((transaction: TransactionMonthInterface) => {
+            if (transaction.id === oldTransaction.id) {
+                return newTransaction;
             }
             return transaction;
-
         })
+
     } else {
 
-
-
-
-        curentMonth.transactions.expense = curentMonth.transactions.expense.map((transaction: TransactionMonthInterface) => {
-
-            if (transaction.id === allTransaction.id) {
-                transaction = {
-                    ...transaction,
-                    montant: parseFloat(newTransaction.montant),
-                    start_montant: parseFloat(newTransaction.montant),
-                    name: newTransaction.name,
-                    categoryID: newTransaction.categoryTransaction,
-                    period: newTransaction.isUnique ? null : newTransaction.period,
-                    status: newTransaction.isUnique ? 'unique' : 'recurring',
-                    transactionType: newTransaction.typeTransaction,
-                    typeOperation: newTransaction.typeOperation
-
-                }
-            }
-            return transaction;
-
+        curentMonth.transactions[oldTransaction.typeOperation] = curentMonth.transactions[oldTransaction.typeOperation].filter((transaction: TransactionMonthInterface) => {
+            return transaction.id !== oldTransaction.id;
         })
 
+        curentMonth.transactions[newTransaction.typeOperation].push(newTransaction);
+
     }
+
+    /* save old Operation */
+    if (oldTransaction && oldTransaction.transactionType === "Budget" && newTransaction.transactionType === "Budget") {
+
+        newTransaction.transaction = oldTransaction.transaction;
+
+        newTransaction = CalculBudget({
+
+            budget: newTransaction
+        });
+    }
+
+
+    /* Mise ajour des opérations récurant si nécessaire */
+    if (newTransaction.status === "recurring" || oldTransaction.status === "recurring") {
+
+        curentCompte.transactions.find((transactionsParYear: TransactionInterface, index) => {
+
+            if (transactionsParYear.year === new Date().getFullYear()) {
+
+                if (oldTransaction.status === "recurring") {
+
+                    transactionsParYear.operationRecurring[oldTransaction.typeOperation] = transactionsParYear.operationRecurring[oldTransaction.
+
+                        typeOperation].filter((transaction: TransactionMonthInterface) => {
+                            return transaction.name !== oldTransaction.name;
+
+                        })
+                }
+
+                if (newTransaction.status === "recurring") {
+                    transactionsParYear.operationRecurring[newTransaction.typeOperation].push(newTransaction);
+                }
+            }
+
+        });
+    }
+
+
+
+    const IndexYear = curentCompte.transactions.findIndex((transactionsParYear: TransactionInterface) => {
+        return transactionsParYear.year === new Date().getFullYear();
+    });
+
+    const IndexMonth = curentCompte.transactions[IndexYear].month.findIndex((month: MonthInterface) => {
+        return month.nameMonth === curentMonth.nameMonth;
+    });
+
+    curentCompte.transactions[IndexYear].month[IndexMonth] = curentMonth;
+
+
     const newResultCompte = calculTransactionByCompte(curentCompte, curentMonth);
     curentCompte.pay = newResultCompte.pay;
     curentCompte.withdrawal = newResultCompte.withdrawal;
@@ -228,15 +266,18 @@ export const calculTransactionByCompte = (compte: CompteInterface, currentMonth:
     }
 
     currentMonth.transactions.income.forEach((transaction: TransactionMonthInterface) => {
-        result.deposit += transaction.montant;
-        result.pay += transaction.montant;
+        const curentMontant = transaction.transactionType === "Spent" ? transaction.montant : transaction.start_montant;
+        result.deposit += curentMontant;
+        result.pay += curentMontant;
     })
 
     currentMonth.transactions.expense.forEach((transaction: TransactionMonthInterface) => {
-        result.withdrawal += transaction.montant;
-        result.pay -= transaction.montant;
+        const curentMontant = transaction.transactionType === "Spent" ? transaction.montant : transaction.start_montant;
+        result.withdrawal += curentMontant;
+        result.pay -= curentMontant;
     })
 
+    console.log("RESULT", result);
 
     return result;
 
@@ -247,7 +288,7 @@ export const defineFormAddBudget = (transaction: TransactionMonthInterface | und
 
     return transaction ? {
         name: transaction.name,
-        montant: transaction.montant.toString(),
+        montant: transaction.start_montant.toString(),
         errorMontant: '',
         errorName: '',
         typeTransaction: transaction.transactionType,

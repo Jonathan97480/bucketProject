@@ -110,8 +110,8 @@ export default function LoginAndRegister({ navigation }: any) {
 
                     <Button
                         style={globalStyle.marginVertical}
-                        radius={5}
-                        buttonStyle={globalStyle.backgroundSecondaryColor}
+                        radius={25}
+                        buttonStyle={globalStyle.btnStyle}
                         title={isAsUser ? "Se connecter" : "Crée mon compte"}
                         onPress={() => {
                             setIsLoading(true)

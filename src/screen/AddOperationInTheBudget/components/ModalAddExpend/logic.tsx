@@ -149,9 +149,10 @@ export async function saveOperation({ compteCurrent, CurrentMonth, budget, newOp
 
 }
 
-export const createNewOperation = ({ form, budget }: {
+export const createNewOperation = ({ form, budget, oldOperation }: {
     form: FormAddOperationInterface
     budget: TransactionMonthInterface | null | undefined
+    oldOperation?: SimpleTransactionInterface | null
 }): SimpleTransactionInterface => {
 
     return {
@@ -165,6 +166,7 @@ export const createNewOperation = ({ form, budget }: {
         date: new Date().toDateString(),
         montant_real: 0,
         total_real: 0,
+
     }
 
 
@@ -186,7 +188,7 @@ function getLastID(budget: TransactionMonthInterface | null | undefined, typeOpe
             lastID = budget.transaction?.expense[budget.transaction?.expense.length - 1]?.id;
 
         }
-        console.log("LAST ID", lastID)
+
         return lastID ? lastID + 1 : 1;
     } else {
         return 1;
@@ -218,7 +220,7 @@ export function CalculBudget({ budget }: { budget: TransactionMonthInterface }) 
     budget.montant -= total.expense;
     budget.montant = fixedFloatNumber(budget.montant);
 
-    console.log("CALCUL BUDGET", budget, total)
+
 
     return budget;
 }

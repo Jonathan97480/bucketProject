@@ -9,6 +9,8 @@ export async function CreateListe({ budget, selectorElements }: {
 
     let operations: SimpleTransactionInterface[] = [];
 
+    if (budget.transaction === null) throw new Error('Nous ne trouvons pas de transaction pour ce budget');
+
     switch (selectorElements) {
         case 'All':
 

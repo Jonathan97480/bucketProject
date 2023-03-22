@@ -1,5 +1,5 @@
 
-import { Button, FAB, Icon } from "@rneui/base";
+import { FAB } from "@rneui/base";
 import React, { useEffect, useCallback } from "react";
 import { View, Text, ScrollView } from "react-native";
 import { useNavigation } from '@react-navigation/native';
@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import styleSheet from "./styleSheet";
 import { EmptyTransaction } from "./components/EmptyTransaction/EmptyTransaction";
 import { ModalAddBudget } from "./components/ModalAddTransaction/ModalAddTransaction";
-import { colorList } from "../../utils/ColorCollection";
 import TransactionSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
 import { MonthInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
@@ -25,7 +24,6 @@ export const Transaction = () => {
 
     const [curentTransaction, setCurentTransaction] = React.useState<TransactionMonthInterface | null>(null);
 
-    const dispatch = useDispatch();
 
     const [isViewModalAddBudget, setIsViewModalAddBudget] = React.useState(false);
     const [curentMonth, setCurentMonth] = React.useState<MonthInterface | null>(null);

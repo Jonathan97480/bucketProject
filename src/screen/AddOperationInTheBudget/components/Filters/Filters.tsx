@@ -6,12 +6,12 @@ import globalStyle from "../../../../assets/styleSheet/globalStyle";
 
 
 interface FiltersProps {
-    onChanges: (value: "All" | "Income" | "Expense") => void;
+    onChanges: (value: "Income" | "Expense") => void;
 }
 
 export const Filters = ({ onChanges }: FiltersProps) => {
 
-    const [checked, setChecked] = useState<"All" | "Income" | "Expense">("All");
+    const [checked, setChecked] = useState<"Income" | "Expense">("Expense");
 
     return <View style={styleSheet.container}>
         <Text style={[
@@ -20,19 +20,7 @@ export const Filters = ({ onChanges }: FiltersProps) => {
             globalStyle.textSizeMedium,
         ]}>Filtres </Text>
         <View style={styleSheet.containerCheckBox}>
-            <CheckBox
 
-                title="Tout"
-                checkedIcon="dot-circle-o"
-                uncheckedIcon="circle-o"
-                checked={checked === "All" ? true : false}
-                textStyle={checked === "All" ? styleSheet.checkBoxText : null}
-                containerStyle={styleSheet.checkBox}
-                onPress={() => {
-                    setChecked("All");
-                    onChanges("All");
-                }}
-            />
             <CheckBox
 
                 title="Sortie"

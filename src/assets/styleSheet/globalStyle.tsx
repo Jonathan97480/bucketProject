@@ -65,6 +65,16 @@ export default StyleSheet.create({
     flexRow: {
         flexDirection: "row",
         alignItems: "center",
+    },
+    btnStyle: {
+
+        backgroundColor: "#9C68DD",
+        width: "100%",
+        height: 50,
+        justifyContent: "center",
+        alignItems: "center",
+        marginTop: 10,
+
     }
 
 

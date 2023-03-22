@@ -1,9 +1,11 @@
 import { Button, CheckBox } from "@rneui/base";
 import React, { useState } from "react";
-import { View, Text, ScrollView, StyleSheet, Modal } from "react-native";
+import { View, Text, Modal } from "react-native";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import { CreateListe } from "./logic";
+import { useDispatch } from "react-redux";
+import { addListArray } from "../../../../redux/listSlice";
 
 
 interface ModalCreateListeProps {
@@ -18,6 +20,8 @@ interface ModalCreateListeProps {
 export default function ModalCreateListe({ budget, isVisible, setIsVisible }: ModalCreateListeProps) {
 
     const [selectorElements, setSelectorElements] = useState<'All' | 'Income' | 'Expense'>('All');
+    const dispatch = useDispatch();
+
 
     return (
         <Modal
@@ -83,7 +87,12 @@ export default function ModalCreateListe({ budget, isVisible, setIsVisible }: Mo
                         }}
                         onPress={async () => {
 
-                            await CreateListe({ budget, selectorElements: selectorElements });
+                            const newLIst = await CreateListe({ budget, selectorElements: selectorElements });
+
+                            console.log("NEW LIST", newLIst);
+
+                            dispatch(addListArray(newLIst));
+
 
                             setIsVisible(!isVisible);
                         }}
