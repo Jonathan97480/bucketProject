@@ -151,9 +151,6 @@ export const UpdateTransaction = async ({ oldTransaction, curentCompte, curentMo
     curentMonth = JSON.parse(JSON.stringify(curentMonth));
 
 
-
-
-
     /* Mise ajour de la transaction dans le moi courant */
     if (newTransaction.typeOperation === oldTransaction.typeOperation) {
 
@@ -174,52 +171,23 @@ export const UpdateTransaction = async ({ oldTransaction, curentCompte, curentMo
 
     }
 
-    /* save old Operation */
-    if (oldTransaction && oldTransaction.transactionType === "Budget" && newTransaction.transactionType === "Budget") {
-
-        newTransaction.transaction = oldTransaction.transaction;
-
-        newTransaction = CalculBudget({
-
-            budget: newTransaction
-        });
-    }
-
-
-    /* Mise ajour des opérations récurant si nécessaire */
-    if (newTransaction.status === "recurring" || oldTransaction.status === "recurring") {
-
-        curentCompte.transactions.find((transactionsParYear: TransactionInterface, index) => {
-
-            if (transactionsParYear.year === new Date().getFullYear()) {
-
-                if (oldTransaction.status === "recurring") {
-
-                    transactionsParYear.operationRecurring[oldTransaction.typeOperation] = transactionsParYear.operationRecurring[oldTransaction.
-
-                        typeOperation].filter((transaction: TransactionMonthInterface) => {
-                            return transaction.name !== oldTransaction.name;
-
-                        })
-                }
-
-                if (newTransaction.status === "recurring") {
-                    transactionsParYear.operationRecurring[newTransaction.typeOperation].push(newTransaction);
-                }
-            }
-
-        });
-    }
-
 
 
     const IndexYear = curentCompte.transactions.findIndex((transactionsParYear: TransactionInterface) => {
         return transactionsParYear.year === new Date().getFullYear();
     });
-
     const IndexMonth = curentCompte.transactions[IndexYear].month.findIndex((month: MonthInterface) => {
         return month.nameMonth === curentMonth.nameMonth;
     });
+
+    newTransaction = saveOldOperation(oldTransaction, newTransaction);
+
+
+    const newYearTransaction = UpdateRecurringTransaction(oldTransaction, newTransaction, curentCompte);
+
+    if (newYearTransaction) {
+        curentCompte.transactions[IndexYear] = newYearTransaction;
+    }
 
     curentCompte.transactions[IndexYear].month[IndexMonth] = curentMonth;
 
@@ -309,6 +277,74 @@ export const defineIDTransaction = (currentMonth: MonthInterface, typeOperation:
     const lastTransaction = currentTransaction[currentTransaction.length - 1];
     const id = lastTransaction ? lastTransaction.id + 1 : 1;
     return id;
+
+
+
+
+}
+
+
+function saveOldOperation(oldTransaction: TransactionMonthInterface, newTransaction: TransactionMonthInterface) {
+    /* save old Operation */
+    if (oldTransaction && oldTransaction.transactionType === "Budget" && newTransaction.transactionType === "Budget") {
+
+        newTransaction.transaction = oldTransaction.transaction;
+
+        newTransaction = CalculBudget({
+
+            budget: newTransaction
+        });
+    }
+    return newTransaction;
+}
+
+
+function UpdateRecurringTransaction(oldTransaction: TransactionMonthInterface, newTransaction: TransactionMonthInterface, curentCompte: CompteInterface) {
+
+
+    let newTransactionYear: TransactionInterface | null = null
+
+
+
+
+    /* Mise ajour des opérations récurant si nécessaire */
+    if (newTransaction.status === "recurring" || oldTransaction.status === "recurring") {
+
+        const indexYear = curentCompte.transactions.findIndex((transactionsParYear: TransactionInterface) => {
+            return transactionsParYear.year === new Date().getFullYear();
+        });
+
+        const transactionsParYear = curentCompte.transactions[indexYear];
+
+        if (oldTransaction.status === "recurring") {
+
+            transactionsParYear.operationRecurring[oldTransaction.typeOperation] = transactionsParYear.operationRecurring[oldTransaction.
+
+                typeOperation].filter((transaction: TransactionMonthInterface) => {
+                    return transaction.name !== oldTransaction.name;
+
+                })
+        }
+
+        if (newTransaction.status === "recurring") {
+            transactionsParYear.operationRecurring[newTransaction.typeOperation].push(newTransaction);
+        }
+
+        newTransactionYear = transactionsParYear;
+
+
+
+
+
+        return newTransactionYear;
+    }
+
+
+
+    return newTransactionYear;
+
+
+
 
 
 
