@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import React, { useEffect, useReducer, useState } from "react";
+import { View, StyleSheet, ScrollView, TouchableOpacity, Alert, FlatList } from "react-native";
 import { Button, Icon } from "@rneui/base";
 import { useSelector, useDispatch } from "react-redux";
-
-import { addComptes, CompteInterface } from "../../redux/comptesSlice";
+import { CustomActivityIndicator } from "../../components";
+import { addComptes, CompteInterface, deleteCompteArray } from "../../redux/comptesSlice";
 import { ComptesItem } from "./components/ComptesItem/ComptesItem";
 import { ModalAddCompte } from "./components/ModalAddCompte/ModalAddCompte";
 import { CustomSafeAreaView } from "../../components";
@@ -12,11 +12,44 @@ import { userInterface } from "../../redux/userSlice";
 import NoCompte from "./components/NoCompte/NoCompte";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { RemoveUser } from "../LoginAndRegister/logic";
+import { deleteCompte } from "./components/ComptesItem/logic";
 
 
 
 export default function AllComptes({ navigation }: any) {
-    const [isCompteModalVisible, setIsCompteModalVisible] = React.useState(false);
+
+    const [curentCompte, setCurentCompte] = useState<CompteInterface | null>(null);
+    function ModalAddCompteReducer(state: any, action: { type: string, payload?: CompteInterface }) {
+        switch (action.type) {
+            case 'add':
+                setCurentCompte(null);
+                return {
+                    ...state,
+                    isCompteModalVisible: true
+                };
+
+
+            case 'edit':
+                setCurentCompte(action.payload!);
+                return {
+                    ...state,
+                    isCompteModalVisible: true
+                };
+
+            case 'close':
+                setCurentCompte(null);
+                return {
+                    ...state,
+                    isCompteModalVisible: false
+                };
+            default:
+                return state;
+        }
+    }
+
+    const [isCompteModalVisible, setIsCompteModalVisible] = useReducer(ModalAddCompteReducer, { isCompteModalVisible: false });
+    const [isLoading, setIsLoading] = useState(false);
+
 
     const dispatch = useDispatch();
     const comptes: CompteInterface[] = useSelector((state: any) => state.compte.comptes);
@@ -29,7 +62,7 @@ export default function AllComptes({ navigation }: any) {
         if (comptes.length <= 0) {
 
             getCompteByUser(user.user?.id || 1).then((comptes) => {
-                console.log("COMPTES GET", comptes);
+
                 if (comptes.length <= 0) return;
 
                 dispatch(addComptes(comptes));
@@ -44,12 +77,52 @@ export default function AllComptes({ navigation }: any) {
 
     }, [comptes]);
 
+
+    const handleDelete = (id: number, id_user: number) => {
+
+
+        Alert.alert(
+            "Supprimer le compte",
+            "Voulez vous vraiment supprimer ce compte ?",
+            [
+                {
+                    text: "Annuler",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                },
+                {
+                    text: "Oui", onPress: async () => {
+                        {
+                            setIsLoading(true);
+
+                            await deleteCompte({
+
+                                id_user: id_user,
+                                id_compte: id
+
+                            })
+
+                            setTimeout(() => {
+
+                                setIsLoading(false);
+                                dispatch(deleteCompteArray(id))
+
+                            }, 500);
+                        }
+                    }
+                }
+            ],
+            { cancelable: false }
+        );
+    };
+
     console.log("LIST DES COMPTES", comptes);
     return (
         <CustomSafeAreaView>
             <View style={
                 [{ flexDirection: "row", justifyContent: "flex-end" }, globalStyle.marginVertical]
             }>
+
                 <TouchableOpacity onPress={async () => {
                     Alert.alert("Déconnexion", "Voulez-vous vraiment vous déconnecter ?", [
                         {
@@ -86,20 +159,30 @@ export default function AllComptes({ navigation }: any) {
 
             <View style={globalStyle.containerCenter} >
                 {comptes.length <= 0 ? <NoCompte /> :
-                    <ScrollView>
-                        {
-                            comptes.map((compte, index) => {
-                                return (
-                                    <ComptesItem
-                                        key={index + "-compte"}
-                                        id_user={user.user?.id || 1}
-                                        item={compte}
-                                        navigation={navigation}
-                                    />
-                                )
-                            })
-                        }
-                    </ScrollView>
+                    <FlatList
+                        data={comptes}
+                        renderItem={({ item }) => (
+                            <ComptesItem
+
+                                item={item}
+                                navigation={navigation}
+                                editCallBack={(item) => {
+                                    setIsCompteModalVisible({
+                                        type: "edit",
+                                        payload: item
+                                    });
+                                }}
+                                deleteCallBack={(id) => {
+                                    handleDelete(id, user.user?.id || 1)
+                                }}
+
+                            />
+                        )}
+                        keyExtractor={item => item.id.toString()}
+                    />
+
+
+
                 }
                 <Button
                     title="Ajouter un compte"
@@ -116,14 +199,23 @@ export default function AllComptes({ navigation }: any) {
                 />
             </View>
             <ModalAddCompte
-                visible={isCompteModalVisible}
-                setVisible={setIsCompteModalVisible}
+                visible={isCompteModalVisible.isCompteModalVisible}
+                setVisible={() => setIsCompteModalVisible({
+                    type: "close"
+
+                })}
                 id_user={user.user?.id || 1}
+                allComptes={comptes}
+                curentCompte={curentCompte}
             />
+            {isLoading &&
+                <CustomActivityIndicator />}
         </CustomSafeAreaView>
     );
     function onPress() {
-        setIsCompteModalVisible(true);
+        setIsCompteModalVisible({
+            type: "add"
+        });
     }
 }
 

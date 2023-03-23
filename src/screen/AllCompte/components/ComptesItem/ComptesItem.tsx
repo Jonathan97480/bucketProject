@@ -1,105 +1,113 @@
 
-import { Icon } from '@rneui/base';
+import { Button, Icon, ListItem } from '@rneui/base';
 import React, { useState } from 'react';
 import { Alert, Text, TouchableOpacity, View } from 'react-native';
 import { deleteCompte } from './logic';
 import { styleSheet } from './styleSheet';
 import { useDispatch } from 'react-redux';
 import { CompteInterface, deleteCompteArray, setCurentCompte } from '../../../../redux/comptesSlice';
-import { CustomActivityIndicator } from '../../../../components';
+
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
 
 
 
 interface ComptesItemProps {
     item: CompteInterface;
-    id_user: number;
+
     navigation?: any;
+    editCallBack: (item: CompteInterface) => void;
+    deleteCallBack: (id: number) => void;
 }
 
-export const ComptesItem = ({ item, navigation = undefined, id_user }: ComptesItemProps) => {
+export const ComptesItem = ({ item, navigation = undefined, editCallBack, deleteCallBack }: ComptesItemProps) => {
 
     const dispatch = useDispatch();
     const [isLoading, setIsLoading] = useState(false);
 
-    return (
-        <View style={[{ position: "relative", overflow: "hidden" }]}>
 
-            <TouchableOpacity
-                style={styleSheet.container}
-                onPress={() => {
-                    if (navigation !== undefined) {
-                        dispatch(setCurentCompte(item))
-                        navigation.navigate("Tab");
-                    }
+
+    function onPress() {
+        if (navigation !== undefined) {
+            dispatch(setCurentCompte(item))
+            navigation.navigate("Tab");
+        }
+    }
+
+
+    console.log("COMPTES", item);
+    return (
+        <View
+            style={{ marginBottom: 10 }}
+        >
+            < ListItem.Swipeable
+
+                onPress={() => onPress()}
+                style={{
+                    borderRadius: 20,
+                    overflow: 'hidden',
+
                 }}
-            /* onLongPress={onLongPress} */
+
+                leftContent={(reset) => {
+                    return <Button
+                        containerStyle={{ borderRadius: 20, }}
+                        title={"Éditer"}
+                        onPress={() => {
+                            editCallBack(item);
+                            reset();
+                        }}
+                        icon={{ name: 'edit', color: 'white', }}
+                        buttonStyle={{ minHeight: '100%' }} />;
+                }}
+
+                rightContent={(reset) => {
+
+                    return <Button
+                        containerStyle={{ borderRadius: 20, }}
+                        title={"Supprimer"}
+                        onPress={() => {
+
+                            deleteCallBack(item.id);
+                            reset();
+
+                        }}
+                        icon={{ name: 'delete', color: 'white' }}
+                        buttonStyle={[{ minHeight: '100%', backgroundColor: 'red' }]}
+                        color="#ffffff" />;
+
+                }}
+
             >
 
-                <View style={styleSheet.headerCard}>
+                <Icon
+                    name="account-balance-wallet"
+                    size={54}
+                    color="#817FE5"
 
-                    <Icon
-                        name="account-balance-wallet"
-                        size={54}
-                        color="#817FE5"
+                />
+                <ListItem.Content>
+                    <ListItem.Title style={[
+                        globalStyle.textSizeXLarge,
+                        globalStyle.textBold,
+                        globalStyle.textAlignLeft
+                    ]}>{item.name}</ListItem.Title>
+                    <ListItem.Subtitle style={globalStyle.textSizeSmall}>Solde : {item.pay}€</ListItem.Subtitle>
 
-                    />
+                    {item.discovered ? <ListItem.Subtitle style={globalStyle.textSizeSmall}>Découvert autorisé : {item.discoveredMontant.toFixed(2)}€</ListItem.Subtitle> :
+                        <ListItem.Subtitle style={globalStyle.textSizeSmall}>Découvert non autorisé</ListItem.Subtitle>
+                    }
 
-                    <Text style={[globalStyle.textAlignLeft, globalStyle.textSizeLarge]}>{item.name}</Text>
+                </ListItem.Content>
 
-
-                </View>
-
-
-
-            </TouchableOpacity>
-            {
-                isLoading &&
-                <CustomActivityIndicator
-                    size={30}
-                />}
+            </ListItem.Swipeable >
 
         </View>
+
+
+
     )
 
-    function onLongPress() {
 
-
-        Alert.alert(
-            "Supprimer le compte",
-            "Voulez vous vraiment supprimer ce compte ?",
-            [
-                {
-                    text: "Annuler",
-                    onPress: () => console.log("Cancel Pressed"),
-                    style: "cancel"
-                },
-                {
-                    text: "Oui", onPress: async () => {
-                        {
-                            setIsLoading(true)
-
-                            await deleteCompte({
-
-                                id_user: id_user,
-                                id_compte: item.id
-
-                            })
-
-                            setTimeout(() => {
-
-                                setIsLoading(false)
-                                dispatch(deleteCompteArray(item.id))
-
-                            }, 1000);
-                        }
-                    }
-                }
-            ],
-            { cancelable: false }
-        );
-
-    }
 }
 
 

@@ -1,7 +1,7 @@
 import { resetForm, fixedQuantity } from "./logic";
 
 describe('resetForm function', () => {
-    it('should return a FormAddBudget object with default values', () => {
+    it('Retourne un formulaire vide par default quand on appelle cette function', () => {
         const expectedForm = {
             title: "",
             errorTitle: "",
@@ -21,11 +21,19 @@ describe('resetForm function', () => {
 });
 
 describe('fixedQuantity function', () => {
-    it('fixe la quantité a un si on lui envoi une chaîne de character vide  ou une valeur négatif', () => {
+    it('fixe la quantité a un si on lui envoi une chaîne de character vide ', () => {
         const expectedQuantity = "1";
 
 
         const quantity = fixedQuantity("");
+
+        expect(quantity).toEqual(expectedQuantity);
+    });
+    it('fixe la quantité a un si on lui envoi une valeur négatifs', () => {
+        const expectedQuantity = "1";
+
+
+        const quantity = fixedQuantity("-1");
 
         expect(quantity).toEqual(expectedQuantity);
     });

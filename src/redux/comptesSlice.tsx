@@ -108,6 +108,15 @@ export const comptesSlice = createSlice({
             state.status = 'loading'
         },
 
+        updateCompte: (state, action) => {
+
+            const index = state.comptes.findIndex((compte) => compte.id === action.payload.id)
+
+            state.comptes[index] = action.payload
+            state.status = 'loading'
+
+        },
+
         setCurentMonth: (state, action) => {
             state.currentMonth = action.payload
             state.status = 'loading'
@@ -141,6 +150,7 @@ export const {
     addComptesArray,
     deleteCompteArray,
     setCurentBudget,
+    updateCompte,
     clearBudget
 } = comptesSlice.actions
 

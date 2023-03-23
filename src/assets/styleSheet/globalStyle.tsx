@@ -75,7 +75,10 @@ export default StyleSheet.create({
         alignItems: "center",
         marginTop: 10,
 
-    }
+    },
+    textBold: {
+        fontWeight: "bold",
+    },
 
 
 });

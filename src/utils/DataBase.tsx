@@ -442,28 +442,48 @@ export default class DatabaseManager {
     }
 
 
-    static UpdateCompte = (id: number, name: string, pay: number, withdrawal: number, deposit: number, transactions: TransactionInterface[]): Promise<CompteInterface> => {
+    static UpdateCompte = (id: number, name: string, pay: number, withdrawal: number, deposit: number, transactions: TransactionInterface[], discoveredMontant?: number, discovered?: boolean): Promise<CompteInterface> => {
+
 
         return new Promise((resolve, reject) => {
             db.transaction(tx => {
-                tx.executeSql(
-                    "UPDATE compte SET name = ?, pay = ?, withdrawal = ?, deposit = ?, transactions = ? WHERE id = ?",
-                    [name, pay, withdrawal, deposit, JSON.stringify(transactions), id],
-                    (_, { rows: { _array } }) => {
+                discoveredMontant ?
+                    tx.executeSql(
+                        "UPDATE compte SET name = ?, pay = ?, withdrawal = ?, deposit = ?, transactions = ?, discoveredMontant = ?, discovered = ?  WHERE id = ?",
+                        [name, pay, withdrawal, deposit, JSON.stringify(transactions), discoveredMontant, discovered ? 1 : 0, id],
+                        (_, { rows: { _array } }) => {
 
-                        this.GetCompteByID(id).then((compte) => {
+                            this.GetCompteByID(id).then((compte) => {
 
-                            resolve(compte);
+                                resolve(compte);
 
-                        }).catch((e) => {
+                            }).catch((e) => {
 
-                            console.error("ERREUR + " + e)
-                            reject(e);
+                                console.error("ERREUR + " + e)
+                                reject(e);
 
+                            }
+                            );
                         }
-                        );
-                    }
-                );
+                    ) :
+                    tx.executeSql(
+                        "UPDATE compte SET name = ?, pay = ?, withdrawal = ?, deposit = ?, transactions = ?  WHERE id = ?",
+                        [name, pay, withdrawal, deposit, JSON.stringify(transactions), id],
+                        (_, { rows: { _array } }) => {
+
+                            this.GetCompteByID(id).then((compte) => {
+
+                                resolve(compte);
+
+                            }).catch((e) => {
+
+                                console.error("ERREUR + " + e)
+                                reject(e);
+
+                            }
+                            );
+                        }
+                    )
             }, (e) => {
                 console.error("ERREUR + " + e)
                 reject(e);
