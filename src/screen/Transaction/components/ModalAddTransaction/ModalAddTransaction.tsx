@@ -1,12 +1,11 @@
 
 
 import React, { useEffect, useState } from 'react'
-import { Modal, View, Text, TouchableOpacity } from 'react-native'
+import { Modal, View, Text, TouchableOpacity, Alert } from 'react-native'
 import { Input, Icon, Button, CheckBox } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import styleSheet from './styleSheet';
 import { Picker } from '@react-native-picker/picker';
-import { PoleExpend } from '../../../../redux/expendSlice';
 import { CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, TransactionMonthInterface } from '../../../../redux/comptesSlice';
 import { addCategory, CategoryInterface } from '../../../../redux/categorySlice';
 import { createNewTransaction, defineFormAddBudget, defineIDTransaction, FormAddBudget, getAllCategory, ResetForm, saveTransaction, UpdateTransaction, ValidateForm } from './logic';
@@ -22,11 +21,12 @@ interface ModalAddBudgetProps {
 export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, transaction }: ModalAddBudgetProps) => {
 
     const dispatch = useDispatch();
+
     const categoryRedux: CategoryInterface[] = useSelector((state: any) => state.category.category);
     const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
     const currentCompteRedux: CompteInterface = useSelector((state: any) => state.compte.currentCompte);
-    const [curentEtape, setCurentEtape] = useState<'Etape1' | 'Etape2' | 'Etape3'>('Etape1');
 
+    const [curentEtape, setCurentEtape] = useState<'Etape1' | 'Etape2' | 'Etape3'>('Etape1');
 
     const [formAddBudget, setFormAddBudget] = useState<FormAddBudget>(defineFormAddBudget(transaction));
 
@@ -49,6 +49,140 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
     }, [transaction, categoryRedux])
 
 
+    function handleCloseModal() {
+
+        setFormAddBudget(ResetForm())
+        setCurentEtape('Etape1')
+        setIsViewModalAddBudget(false, null)
+    }
+
+    const handleSaveTransaction = () => {
+
+        /* ADD TRANSACTION  */
+        if (!ValidateForm(formAddBudget, setFormAddBudget)) {
+            setCurentEtape('Etape1')
+            return;
+        }
+
+        const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
+
+        const newTransaction: TransactionMonthInterface = createNewTransaction(newID, formAddBudget)
+
+
+        saveTransaction(currentCompteRedux, currentMonthRedux, newTransaction).then((res) => {
+            if (!res.alert) {
+                dispatch(setCurentCompte(res.compte));
+                dispatch(setCurentMonth(res.month))
+                handleCloseModal()
+                return;
+            }
+
+            handleAlert({
+                message: res.alert.message,
+                action: res.alert.action,
+                callBackValidate: () => {
+                    res.alert.action?.valider.action().then((res) => {
+                        if (!res.alert) {
+                            dispatch(setCurentCompte(res.compte));
+                            dispatch(setCurentMonth(res.month))
+                            handleCloseModal()
+                            return;
+                        }
+                    })
+                },
+                callBackDismiss: () => { },
+                type: res.alert.type
+            });
+
+        }).catch((err) => { console.log(err) })
+    }
+
+    const handleSaveEditTransaction = (transaction: TransactionMonthInterface) => {
+
+        if (ValidateForm(formAddBudget, setFormAddBudget)) {
+
+            let newTransaction: TransactionMonthInterface | null = null;
+            /* prepare Transaction */
+            if (transaction.typeOperation !== formAddBudget.typeOperation) {
+                const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
+                newTransaction = createNewTransaction(newID, formAddBudget)
+
+            } else {
+                newTransaction = createNewTransaction(transaction.id, formAddBudget)
+
+            }
+
+
+
+            UpdateTransaction({
+
+                oldTransaction: transaction,
+                curentCompte: currentCompteRedux,
+                curentMonth: currentMonthRedux,
+                newTransaction: newTransaction
+
+            }).then((res: {
+                compte: CompteInterface,
+                curentMonth: MonthInterface
+            }) => {
+
+                dispatch(setCurentCompte(res.compte));
+                dispatch(setCurentMonth(res.curentMonth))
+                handleCloseModal()
+
+            }).catch((err) => { console.log(err) })
+
+        } else {
+            setCurentEtape('Etape1')
+        }
+    }
+
+    const handleAlert = ({ message, callBackValidate, callBackDismiss, action, type }: {
+        message: string,
+        callBackValidate: () => void,
+        callBackDismiss: () => void,
+        action?: {
+            valider: {
+                text: string,
+                action: () => void
+            },
+            annuler: {
+                text: string,
+                action: () => void
+            }
+
+        } | null,
+        type: string
+
+    }
+    ) => {
+        Alert.alert(
+            type,
+            message,
+            action != null ?
+                [
+                    {
+                        text: action.valider.text,
+                        onPress: () => callBackValidate()
+                    },
+                    {
+                        text: action.annuler.text,
+                        onPress: () => callBackDismiss(),
+                        style: "cancel"
+                    }
+                ]
+                : [
+                    {
+                        text: "Cancel",
+                        onPress: () => callBackDismiss,
+                        style: "cancel"
+                    },
+                    { text: "OK", onPress: () => callBackValidate }
+                ],
+            { cancelable: false }
+        );
+    }
+
 
     return (
         <Modal
@@ -56,7 +190,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
             transparent={true}
             visible={isViewModalAddBudget}
             onRequestClose={() => {
-                closeModal();
+                handleCloseModal();
 
             }}
             style={styleSheet.modal}
@@ -68,40 +202,30 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                 <View style={styleSheet.modalBody}>
                     <Text style={styleSheet.titleModal}>Ajoutez une transaction</Text>
                     <View style={[globalStyle.flexRow, { width: '100%', justifyContent: 'space-between' }, globalStyle.marginVertical]} >
-                        <TouchableOpacity
-                            onPress={() => {
-                                setCurentEtape('Etape1');
+                        <BtnStage
+                            curentStage={curentEtape}
+                            setCurentStage={setCurentEtape}
+                            stage="Etape1"
+                            title="Etape 1"
+                        />
+                        <BtnStage
+                            curentStage={curentEtape}
+                            setCurentStage={setCurentEtape}
+                            stage="Etape2"
+                            title="Etape 2"
+                        />
 
-                            }}
-                        >
-                            <Text style={[styleSheet.modalInputLabel, {
-                                color: curentEtape === 'Etape1' ? '#817FE5' : 'rgba(129, 127, 229, 0.26)'
-                            }]}>Etape 1</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setCurentEtape('Etape2');
-                            }}
-                        >
-                            <Text style={[styleSheet.modalInputLabel, {
-                                color: curentEtape === 'Etape2' ? '#817FE5' : 'rgba(129, 127, 229, 0.26)'
-                            }]}>Etape 2</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => {
-                                setCurentEtape('Etape3');
-                            }}
-                        >
-                            <Text style={[styleSheet.modalInputLabel, {
-                                color: curentEtape === 'Etape3' ? '#817FE5' : 'rgba(129, 127, 229, 0.26)'
-                            }]}>Etape 3</Text>
-                        </TouchableOpacity>
-
+                        <BtnStage
+                            curentStage={curentEtape}
+                            setCurentStage={setCurentEtape}
+                            stage="Etape3"
+                            title="Etape 3"
+                        />
 
                     </View>
                     {
                         curentEtape === 'Etape1' &&
-                        <View>
+                        <View style={styleSheet.stageContainer}>
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>nom :</Text>
                                 <Input placeholder="nom de votre transaction"
@@ -126,7 +250,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                         </View>}
                     {
                         curentEtape === 'Etape2' &&
-                        <View>
+                        <View style={styleSheet.stageContainer}>
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>Type de transaction</Text>
                                 <View style={[globalStyle.flexRow]}>
@@ -151,7 +275,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 </View>
 
 
-                            </View>
+                            </View >
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>Type d'operation</Text>
                                 <View style={[globalStyle.flexRow]}>
@@ -180,7 +304,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                         </View>}
                     {
                         curentEtape === 'Etape3' &&
-                        <View>
+                        <View style={styleSheet.stageContainer}>
                             <View>
                                 <Text style={styleSheet.modalInputLabel}>cette operation est elle unique?</Text>
                                 <View style={[globalStyle.flexRow]}>
@@ -271,147 +395,16 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                     })}
                                 </Picker>
                             </View>
-                            <Button
-                                color={"#817FE5"}
-                                radius={25}
-                                disabledStyle={{ backgroundColor: "rgba(129, 127, 229, 0.26)" }}
-                                style={globalStyle.btnStyle}
-                                title={transaction ? "Enregistrée" : 'Ajouter'}
-                                onPress={() => {
 
-                                    if (!transaction) {
-                                        /* ADD TRANSACTION  */
-                                        if (ValidateForm(formAddBudget, setFormAddBudget)) {
-
-                                            const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
-
-                                            const newTransaction: TransactionMonthInterface = createNewTransaction(newID, formAddBudget)
-
-                                            const newM = { ...currentMonthRedux }
-
-                                            if (newTransaction.typeOperation === 'income') {
-
-                                                newM.transactions = {
-                                                    ...currentMonthRedux.transactions,
-                                                    income: [...currentMonthRedux.transactions.income, newTransaction]
-                                                }
-
-                                            } else if (newTransaction.typeOperation === 'expense') {
-
-                                                newM.transactions = {
-                                                    ...currentMonthRedux.transactions,
-                                                    expense: [...currentMonthRedux.transactions.expense, newTransaction]
-                                                }
-
-                                            } else {
-
-                                                throw new Error('typeOperation not found')
-                                            }
-
-
-
-                                            saveTransaction({ ...currentCompteRedux }, { ...newM }, newTransaction).then((res) => {
-
-                                                dispatch(setCurentCompte(res));
-                                                dispatch(setCurentMonth(newM))
-                                                closeModal()
-                                            })
-                                        } else {
-                                            setCurentEtape('Etape1')
-                                        }
-
-                                    } else {
-                                        /* EDIT TRANSACTION  */
-
-                                        if (ValidateForm(formAddBudget, setFormAddBudget)) {
-
-                                            let newTransaction: TransactionMonthInterface | null = null;
-                                            /* prepare Transaction */
-                                            if (transaction.typeOperation !== formAddBudget.typeOperation) {
-                                                const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
-                                                newTransaction = createNewTransaction(newID, formAddBudget)
-
-                                            } else {
-                                                newTransaction = createNewTransaction(transaction.id, formAddBudget)
-
-                                            }
-
-
-
-                                            UpdateTransaction({
-
-                                                oldTransaction: transaction,
-                                                curentCompte: currentCompteRedux,
-                                                curentMonth: currentMonthRedux,
-                                                newTransaction: newTransaction
-
-                                            }).then((res: {
-                                                compte: CompteInterface,
-                                                curentMonth: MonthInterface
-                                            }) => {
-
-                                                dispatch(setCurentCompte(res.compte));
-                                                dispatch(setCurentMonth(res.curentMonth))
-                                                closeModal()
-
-                                            }).catch((err) => { console.log(err) })
-
-                                        } else {
-                                            setCurentEtape('Etape1')
-                                        }
-                                    }
-                                }
-                                }
-                                icon={
-                                    <Icon
-                                        name="check"
-                                        size={15}
-                                        color="white"
-                                        style={{ marginLeft: 10 }}
-                                        type='font-awesome'
-
-                                    />
-                                }
-                                iconPosition="right"
-
-                            />
                         </View>}
 
-                    {
-                        curentEtape !== 'Etape3' &&
-                        <Button
-                            title="Suivant"
-                            radius={25}
-                            style={globalStyle.btnStyle}
-                            onPress={() => {
-                                switch (curentEtape) {
-                                    case 'Etape1':
-                                        setCurentEtape('Etape2')
-                                        break;
-                                    case 'Etape2':
-                                        setCurentEtape('Etape3')
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }}
-                            icon={
-                                <Icon
-                                    name="arrow-right"
-                                    size={15}
-                                    color="white"
-                                    type='font-awesome'
-                                    style={{ marginLeft: 10 }}
-
-
-                                />
-                            }
-                            iconPosition="right"
-                            color="#841584"
-
-
-                        />
-                    }
+                    <BtnNextStage
+                        curentStage={curentEtape}
+                        setCurentStage={setCurentEtape}
+                        handleSaveEditTransaction={handleSaveEditTransaction}
+                        handleSaveTransaction={() => handleSaveTransaction()}
+                        transaction={transaction}
+                    />
 
                 </View>
             </View>
@@ -421,25 +414,124 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
     );
 
 
-
-
-
-    function closeModal() {
-
-        setFormAddBudget(ResetForm())
-        setCurentEtape('Etape1')
-        setIsViewModalAddBudget(false, null)
-    }
-
-
-
-
-
-
 }
 
 
 
+const BtnStage = React.memo(({ curentStage, setCurentStage, stage, title }: { curentStage: string, setCurentStage: Function, stage: string, title: string }) => {
+
+    const colors = {
+        enabled: '#817FE5',
+        disabled: 'rgba(129, 127, 229, 0.26)'
+    }
+
+
+    return (
+        <TouchableOpacity
+            onPress={() => {
+                setCurentStage(stage);
+
+            }}
+        >
+            <Text style={[styleSheet.modalInputLabel, {
+                color: curentStage === stage ? colors.enabled : colors.disabled
+            }]}>{title}</Text>
+        </TouchableOpacity>
+    )
+
+
+})
+
+
+const BtnNextStage = React.memo(({ curentStage, setCurentStage, handleSaveEditTransaction, handleSaveTransaction, transaction }: { curentStage: string, setCurentStage: Function, handleSaveTransaction: () => void, handleSaveEditTransaction: (value: TransactionMonthInterface) => void, transaction: TransactionMonthInterface | undefined | null }) => {
+
+    return (
+        <>
+            {
+                curentStage !== 'Etape3' ?
+                    <Button
+                        title="Suivant"
+                        radius={25}
+                        style={globalStyle.btnStyle}
+                        onPress={() => {
+                            switch (curentStage) {
+                                case 'Etape1':
+                                    setCurentStage('Etape2')
+                                    break;
+                                case 'Etape2':
+                                    setCurentStage('Etape3')
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }}
+                        icon={
+                            <Icon
+                                name="arrow-right"
+                                size={15}
+                                color="white"
+                                type='font-awesome'
+                                style={{ marginLeft: 10 }}
+
+
+                            />
+                        }
+                        iconPosition="right"
+                        color="#841584"
+
+
+                    /> : <BtnSaveTransaction
+                        handleSaveTransaction={() => handleSaveTransaction()}
+                        handleSaveEditTransaction={(v) => handleSaveEditTransaction(v)}
+                        transaction={transaction}
+                    />
+            }
+        </>
+    )
+
+})
+
+const BtnSaveTransaction = React.memo(({ handleSaveTransaction, handleSaveEditTransaction, transaction }: { handleSaveTransaction: () => void, handleSaveEditTransaction: (value: TransactionMonthInterface) => void, transaction?: TransactionMonthInterface | undefined | null }) => {
+
+
+    return (
+        <Button
+            color={"#817FE5"}
+            radius={25}
+            disabledStyle={{ backgroundColor: "rgba(129, 127, 229, 0.26)" }}
+            style={globalStyle.btnStyle}
+            title={transaction ? "Enregistrée" : 'Ajouter'}
+            onPress={() => {
+
+                if (!transaction) {
+                    /* ADD TRANSACTION  */
+
+                    handleSaveTransaction();
+
+                } else {
+                    /* EDIT TRANSACTION  */
+
+                    handleSaveEditTransaction(transaction)
+                }
+            }
+            }
+            icon={
+                <Icon
+                    name="check"
+                    size={15}
+                    color="white"
+                    style={{ marginLeft: 10 }}
+                    type='font-awesome'
+
+                />
+            }
+            iconPosition="right"
+
+        />
+    )
+
+
+})
 
 
 

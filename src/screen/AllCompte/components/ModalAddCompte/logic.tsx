@@ -116,7 +116,7 @@ export async function UpdateCompte({
         newCompte.discovered
 
     );
-    console.log("index", newAllCompte);
+
 
     if (!result) throw new Error("erreur lors de la mise à jour du compte : compte non trouvé");
     /* get newCompte index in allCompte */

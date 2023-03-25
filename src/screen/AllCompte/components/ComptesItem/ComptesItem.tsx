@@ -1,12 +1,9 @@
 
 import { Button, Icon, ListItem } from '@rneui/base';
-import React, { useState } from 'react';
-import { Alert, Text, TouchableOpacity, View } from 'react-native';
-import { deleteCompte } from './logic';
-import { styleSheet } from './styleSheet';
+import React from 'react';
+import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { CompteInterface, deleteCompteArray, setCurentCompte } from '../../../../redux/comptesSlice';
-
+import { CompteInterface, setCurentCompte } from '../../../../redux/comptesSlice';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
 
 
@@ -22,9 +19,6 @@ interface ComptesItemProps {
 export const ComptesItem = ({ item, navigation = undefined, editCallBack, deleteCallBack }: ComptesItemProps) => {
 
     const dispatch = useDispatch();
-    const [isLoading, setIsLoading] = useState(false);
-
-
 
     function onPress() {
         if (navigation !== undefined) {
@@ -33,8 +27,6 @@ export const ComptesItem = ({ item, navigation = undefined, editCallBack, delete
         }
     }
 
-
-    console.log("COMPTES", item);
     return (
         <View
             style={{ marginBottom: 10 }}
@@ -91,7 +83,7 @@ export const ComptesItem = ({ item, navigation = undefined, editCallBack, delete
                         globalStyle.textBold,
                         globalStyle.textAlignLeft
                     ]}>{item.name}</ListItem.Title>
-                    <ListItem.Subtitle style={globalStyle.textSizeSmall}>Solde : {item.pay}€</ListItem.Subtitle>
+                    <ListItem.Subtitle style={globalStyle.textSizeSmall}>Solde : {item.pay.toFixed(2)}€</ListItem.Subtitle>
 
                     {item.discovered ? <ListItem.Subtitle style={globalStyle.textSizeSmall}>Découvert autorisé : {item.discoveredMontant.toFixed(2)}€</ListItem.Subtitle> :
                         <ListItem.Subtitle style={globalStyle.textSizeSmall}>Découvert non autorisé</ListItem.Subtitle>

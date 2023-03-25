@@ -25,7 +25,13 @@ export default StyleSheet.create({
         padding: 20,
         borderRadius: 10,
         backgroundColor: 'white',
+        height: 340,
 
+    },
+    stageContainer: {
+        height: 180,
+        justifyContent: 'space-between',
+        paddingVertical: 10,
     },
     modalInputLabel: {
         fontSize: 15,

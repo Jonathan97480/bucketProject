@@ -8,15 +8,15 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
     _curentMonth: MonthInterface
 }) => {
 
-    const curentCompte: CompteInterface = { ..._compte, transactions: [..._compte.transactions] };
-    const curentMonth: MonthInterface = { ..._curentMonth, transactions: { ..._curentMonth.transactions } };
+    const curentCompte: CompteInterface = JSON.parse(JSON.stringify(_compte));
+    const curentMonth: MonthInterface = JSON.parse(JSON.stringify(_curentMonth));
 
 
     curentMonth.transactions[_transaction.typeOperation] = curentMonth.transactions[_transaction.typeOperation].filter((transaction: TransactionMonthInterface) => {
         return transaction.id !== _transaction.id;
     })
 
-
+    curentMonth.numberTransactionMonth = curentMonth.numberTransactionMonth - 1;
 
     let indexYear = curentCompte.transactions.findIndex((year) => {
         return year.year === new Date().getFullYear();
@@ -27,24 +27,13 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
     });
 
 
-
-    curentCompte.transactions = [...curentCompte.transactions];
-
-
-    curentCompte.transactions[indexYear] = { ...curentCompte.transactions[indexYear], month: [...curentCompte.transactions[indexYear].month] };
-
     /* delete recurring operation if existe */
     if (_transaction.status !== 'unique') {
-        curentCompte.transactions[indexYear].operationRecurring = {
-            ...curentCompte.transactions[indexYear].operationRecurring
-        };
-        curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation] = [...curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation]];
 
         curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation] = curentCompte.transactions[indexYear].operationRecurring[_transaction.typeOperation].filter((transaction: TransactionMonthInterface) => {
             return transaction.name !== _transaction.name;
         });
     }
-
 
     curentCompte.transactions[indexYear].month[indexMonth] = curentMonth;
 
@@ -53,8 +42,6 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
     curentCompte.pay = newResultCompte.pay;
     curentCompte.withdrawal = newResultCompte.withdrawal;
     curentCompte.deposit = newResultCompte.deposit;
-
-
 
     let result = await DatabaseManager.UpdateCompte(
         curentCompte.id,
@@ -65,14 +52,9 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
         curentCompte.transactions
     )
 
-
-
     return {
-
         compte: result,
         curentMonth: curentMonth
     };
-
-
 
 }

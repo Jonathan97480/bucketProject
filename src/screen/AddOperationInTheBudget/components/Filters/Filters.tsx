@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text } from "react-native";
-import { Icon, Input, CheckBox } from "@rneui/base";
+import { CheckBox } from "@rneui/base";
 import styleSheet from "./styleSheet";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 
@@ -19,15 +19,15 @@ export const Filters = ({ onChanges }: FiltersProps) => {
             globalStyle.textAlignLeft,
             globalStyle.textSizeMedium,
         ]}>Filtres </Text>
-        <View style={styleSheet.containerCheckBox}>
+        <View style={globalStyle.containerCheckBox}>
 
             <CheckBox
 
                 title="Sortie"
                 checkedIcon="dot-circle-o"
                 uncheckedIcon="circle-o"
-                containerStyle={styleSheet.checkBox}
-                textStyle={checked === "Expense" ? styleSheet.checkBoxText : null}
+                containerStyle={globalStyle.checkBox}
+                textStyle={checked === "Expense" ? globalStyle.checkBoxText : null}
                 checked={checked === "Expense" ? true : false}
                 onPress={() => {
                     setChecked("Expense");
@@ -39,8 +39,8 @@ export const Filters = ({ onChanges }: FiltersProps) => {
                 title="Entrée"
                 checkedIcon="dot-circle-o"
                 uncheckedIcon="circle-o"
-                textStyle={checked === "Income" ? styleSheet.checkBoxText : null}
-                containerStyle={styleSheet.checkBox}
+                textStyle={checked === "Income" ? globalStyle.checkBoxText : null}
+                containerStyle={globalStyle.checkBox}
                 checked={checked === "Income" ? true : false}
                 onPress={() => {
                     setChecked("Income");

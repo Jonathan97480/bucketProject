@@ -5,8 +5,9 @@ import { CreateDateCurentString } from "../../utils/TextManipulation";
 
 export async function addTask({ value, list }: { value: string, list: listInterface }) {
 
-    let newItemArray = [...list.steps];
-    newItemArray.push({
+    const newList: listInterface = JSON.parse(JSON.stringify(list));
+
+    newList.steps.push({
         id: 0,
         name: value,
         quantity: 0,
@@ -19,12 +20,13 @@ export async function addTask({ value, list }: { value: string, list: listInterf
 
     const AllList = await UpdateList({
         isChecked: false,
-        id: newItemArray.length - 1,
-        ItemArray: newItemArray,
-        list: list
+        id: newList.steps.length - 1,
+        ItemArray: newList.steps,
+        list: newList
     });
 
     return AllList;
+
 
 }
 

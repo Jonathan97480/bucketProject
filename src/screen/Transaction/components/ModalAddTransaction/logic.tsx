@@ -65,73 +65,172 @@ export const createNewTransaction = (index: number, formAddBudget: FormAddBudget
 
 }
 
-export const saveTransaction = async (currentCompte: CompteInterface, currentMonth: MonthInterface, newTransaction: TransactionMonthInterface) => {
+export const saveTransaction = async (currentCompte: CompteInterface, currentMonth: MonthInterface, newTransaction: TransactionMonthInterface, useOverdraw?: boolean) => {
 
-    currentCompte.transactions.find((transactionsParYear: TransactionInterface, index) => {
 
-        /* Save TRANSACTION RECURRING */
-        if (transactionsParYear.year === new Date().getFullYear()) {
+    const over = getOverdrawn(currentCompte, newTransaction, useOverdraw);
 
-            if (newTransaction.status !== 'unique') {
+    if (over.overdrawn && !useOverdraw) {
 
-                transactionsParYear = { ...transactionsParYear, operationRecurring: { ...transactionsParYear.operationRecurring } }
+        return {
+            compte: currentCompte,
+            month: currentMonth,
+            alert: {
+                type: 'Information',
+                message: currentCompte.discovered && currentCompte.discoveredMontant > 0 ?
+                    `Voulez vous utiliser votre découvert de ${currentCompte.discoveredMontant}€` :
+                    `Vous ne pouvez pas dépenser plus que vous n’avez dans votre compte`,
+                action: currentCompte.discovered && currentCompte.discoveredMontant > 0 ? {
+                    valider: {
+                        text: 'Oui',
+                        action: async () => {
+                            return await saveTransaction(currentCompte, currentMonth, newTransaction, true)
+                        }
 
-                const tIndex = transactionsParYear.operationRecurring[newTransaction.typeOperation].findIndex((transaction: TransactionMonthInterface, index) => {
-
-                    return transaction.name === newTransaction.name;
-
-                });
-                if (tIndex === -1) {
-                    transactionsParYear.operationRecurring[newTransaction.typeOperation] = [...transactionsParYear.operationRecurring[newTransaction.typeOperation], newTransaction];
-                } else {
-                    transactionsParYear.operationRecurring[newTransaction.typeOperation][tIndex] = newTransaction;
-                }
+                    },
+                    annuler: {
+                        text: 'Non',
+                        action: () => {
+                            return {
+                                compte: currentCompte,
+                                month: currentMonth,
+                                alert: null
+                            }
+                        }
+                    }
+                } : null
             }
 
-            /* Save TRANSACTION MONTH */
+        }
 
-            transactionsParYear.month.find((month: MonthInterface, _index) => {
-                if (month.nameMonth === currentMonth.nameMonth) {
-
-                    transactionsParYear = { ...transactionsParYear, month: [...transactionsParYear.month] }
-
-                    transactionsParYear.month[_index] = currentMonth;
-                    transactionsParYear.month[_index].numberTransactionMonth += 1;
-                    transactionsParYear.numberTransactionYear += 1;
-                    currentCompte = { ...currentCompte, transactions: [...currentCompte.transactions] }
-                    currentCompte.transactions[index] = transactionsParYear;
-
-                    const newResultCompte = calculTransactionByCompte(currentCompte, currentMonth);
-                    currentCompte.pay = newResultCompte.pay;
-                    currentCompte.withdrawal = newResultCompte.withdrawal;
-                    currentCompte.deposit = newResultCompte.deposit;
-
-                    DatabaseManager.UpdateCompte(
-                        currentCompte.id,
-                        currentCompte.name,
-                        currentCompte.pay,
-                        currentCompte.withdrawal,
-                        currentCompte.deposit,
-                        currentCompte.transactions
-                    ).then((_compte) => {
-                        currentCompte = _compte;
-                        return true;
-                    });
+    } else if (over.overdrawn && useOverdraw && over.discoveredExceed) {
+        return {
+            compte: currentCompte,
+            month: currentMonth,
+            alert: {
+                type: 'error',
+                message: `Vous ne pouvez pas utiliser votre découvert de ${currentCompte.discoveredMontant}€`,
+                action: null
+            }
+        }
+    }
 
 
+    let newCurrentCompte: CompteInterface = JSON.parse(JSON.stringify(currentCompte));
+    let newCurrentMonth: MonthInterface = JSON.parse(JSON.stringify(currentMonth));
+
+
+    const curentYearTransaction = newCurrentCompte.transactions.find((transactionsParYear: TransactionInterface, index) => {
+        return transactionsParYear.year === new Date().getFullYear();
+    });
+
+    const curentYearIndex = newCurrentCompte.transactions.findIndex((transactionsParYear: TransactionInterface, index) => {
+        return transactionsParYear.year === new Date().getFullYear();
+    });
+
+
+    if (!curentYearTransaction || curentYearIndex === -1) {
+
+        return {
+            compte: newCurrentCompte,
+            month: newCurrentMonth,
+            alert: {
+                type: 'error',
+                message: 'Nous ne parvenons pas a trouver les transactions de l’année en cours',
+                action: null
+            }
+
+        }
+    }
+
+    if (newTransaction.status !== 'unique') {
+
+
+        const transactionIndex = curentYearTransaction.operationRecurring[newTransaction.typeOperation].findIndex((transaction: TransactionMonthInterface, index) => {
+
+            return transaction.name === newTransaction.name;
+
+        });
+        if (transactionIndex === -1) {
+            curentYearTransaction.operationRecurring[newTransaction.typeOperation].push(newTransaction);
+        } else {
+            return {
+                compte: newCurrentCompte,
+                month: newCurrentMonth,
+                alert: {
+                    type: 'error',
+                    message: 'Une Operation avec le même nom existe déjà dans les operation récurrente Veuillez changer le nom de l’operation',
+                    action: null
 
                 }
 
-            })
+            }
         }
+    }
+
+    /*SAVE TRANSACTION MONTH */
+
+    const indexCurrentMonth = curentYearTransaction.month.findIndex((month: MonthInterface, index) => {
+        return month.nameMonth === newCurrentMonth.nameMonth;
+    });
+
+    if (indexCurrentMonth === -1) {
+        return {
+            compte: newCurrentCompte,
+            month: newCurrentMonth,
+            alert: {
+                type: 'error',
+                message: 'Nous ne parvenons pas a trouver le mois en cours',
+                action: null
+            }
+        }
+    }
 
 
+    newCurrentMonth.transactions[newTransaction.typeOperation].push(newTransaction);
+    newCurrentMonth.numberTransactionMonth = newCurrentMonth.transactions.income.length + newCurrentMonth.transactions.expense.length;
 
-    })
+    curentYearTransaction.month[indexCurrentMonth] = newCurrentMonth;
+    curentYearTransaction.numberTransactionYear += 1;
 
-    return currentCompte;
+    newCurrentCompte.transactions[curentYearIndex] = curentYearTransaction;
 
 
+    const newResultCompte = calculTransactionByCompte(newCurrentCompte, newCurrentMonth);
+
+    newCurrentCompte.pay = newResultCompte.pay;
+    newCurrentCompte.withdrawal = newResultCompte.withdrawal;
+    newCurrentCompte.deposit = newResultCompte.deposit;
+
+    let result = await DatabaseManager.UpdateCompte(
+        newCurrentCompte.id,
+        newCurrentCompte.name,
+        newCurrentCompte.pay,
+        newCurrentCompte.withdrawal,
+        newCurrentCompte.deposit,
+        newCurrentCompte.transactions
+    );
+
+
+    if (result) {
+
+
+        return {
+            compte: newCurrentCompte,
+            month: newCurrentMonth,
+            alert: null
+        }
+    }
+
+    return {
+        compte: newCurrentCompte,
+        month: newCurrentMonth,
+        alert: {
+            type: 'error',
+            message: 'Une erreur est survenue lors de la sauvegarde de la transaction',
+            action: null
+        }
+    }
 
 }
 
@@ -332,21 +431,22 @@ function UpdateRecurringTransaction(oldTransaction: TransactionMonthInterface, n
 
         newTransactionYear = transactionsParYear;
 
-
-
-
-
         return newTransactionYear;
     }
 
-
-
     return newTransactionYear;
+}
 
 
+const getOverdrawn = (compte: CompteInterface, newTransaction: TransactionMonthInterface, useOverdraw?: boolean) => {
 
+    const newMontant = compte.pay - newTransaction.montant;
+    const overdrawn = newMontant < 0 ? true : false;
+    const discoveredExceed = (compte.pay + compte.discoveredMontant) - newTransaction.montant < 0 ? true : false;
 
-
-
+    return {
+        overdrawn: overdrawn,
+        discoveredExceed: discoveredExceed
+    };
 
 }

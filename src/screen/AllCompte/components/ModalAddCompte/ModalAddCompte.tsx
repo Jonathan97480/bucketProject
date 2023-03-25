@@ -25,7 +25,7 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
 
     const [Compte, setCompte] = useState(defaultFromState());
     const [isLoading, setIsLoading] = useState(false);
-    console.log("curentCompte", curentCompte);
+
     useEffect(() => {
         if (curentCompte) {
             setCompte({

@@ -1,7 +1,7 @@
 import { Button } from "@rneui/base";
 import { Input } from "@rneui/themed";
 import React, { useEffect, useCallback } from "react";
-import { View, Text, ScrollView, StatusBar, Alert } from "react-native";
+import { View, Text, ScrollView, StatusBar, Alert, FlatList } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { CustomSafeAreaView } from "../../components";
@@ -53,34 +53,36 @@ export const AllList = () => {
                 minHeight: "100%",
 
             }}>
-                <ScrollView contentContainerStyle={{
-                    padding: 10,
-                }}>
 
-                    {
-                        list.length > 0 ?
-                            list.map((item: listInterface, index: number) => {
+
+                {
+                    list.length > 0 ?
+
+                        <FlatList
+                            data={list}
+                            keyExtractor={(item: listInterface, index: number) => index.toString() + "-list"}
+                            renderItem={({ item, index }: { item: listInterface, index: number }) => {
                                 return (
                                     <Task
-                                        key={index + "-list"}
+
                                         index={index}
                                         task={item}
                                         setCurrentIndexList={setCurrentIndexList}
                                         setModalIsVisible={setModalIsVisible}
                                     />
                                 )
-                            })
-                            :
-                            <View >
-                                <Text style={[
-                                    globalStyle.colorTextPrimary,
-                                    globalStyle.textAlignCenter,
-                                    globalStyle.textSizeXLarge,
-                                ]}>Aucune list</Text>
-                            </View>
-                    }
+                            }}
+                        /> :
+                        <View >
+                            <Text style={[
+                                globalStyle.colorTextPrimary,
+                                globalStyle.textAlignCenter,
+                                globalStyle.textSizeXLarge,
+                            ]}>Aucune list</Text>
+                        </View>
+                }
 
-                </ScrollView>
+
 
                 {
                     list.length > 0 && currentIndexList != undefined ?

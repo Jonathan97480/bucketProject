@@ -1,20 +1,23 @@
-import { CompteInterface, MonthInterface } from "../../redux/comptesSlice";
+import { CompteInterface, MonthInterface, TransactionInterface } from "../../redux/comptesSlice";
 import { getMonthByNumber } from "../../utils/DateManipulation";
 
 export const FixeIsYearAndMonthExist = (currentCompte: CompteInterface) => {
 
-    let index = currentCompte.transactions.findIndex((transaction) => {
+    let newCompte = JSON.parse(JSON.stringify(currentCompte));
+
+
+    let indexYear = currentCompte.transactions.findIndex((transaction) => {
         return transaction.year === new Date().getFullYear();
     })
 
 
-    if (index === -1) {
-        const newYear = fixeYear(currentCompte)
-        currentCompte = newYear.newCurent
-        index = newYear.index
+    if (indexYear === -1) {
+        const newYear = fixeYear(newCompte)
+        newCompte = newYear.compte
+        indexYear = newYear.index
     }
 
-    return fixeMonth(currentCompte, index)
+    return fixeMonth(currentCompte, indexYear)
 
 
 }
@@ -22,23 +25,23 @@ export const FixeIsYearAndMonthExist = (currentCompte: CompteInterface) => {
 
 const fixeYear = (currentCompte: CompteInterface) => {
 
-    const curentYearTransaction = {
+    const curentYearTransaction: TransactionInterface = {
 
         year: new Date().getFullYear(),
         month: [],
-        numberTransactionYear: 0
-
+        numberTransactionYear: 0,
+        operationRecurring: {
+            income: currentCompte.transactions[currentCompte.transactions.length - 1].operationRecurring.income,
+            expense: currentCompte.transactions[currentCompte.transactions.length - 1].operationRecurring.expense
+        },
     }
 
+    currentCompte.transactions.push(curentYearTransaction)
 
-    const newCurent = { ...currentCompte };
-
-    newCurent.transactions = [...currentCompte.transactions]
-    newCurent.transactions.push(curentYearTransaction)
-
-
-
-    return { newCurent, index: newCurent.transactions.length - 1 }
+    return {
+        compte: currentCompte,
+        index: currentCompte.transactions.length - 1
+    }
 
 }
 
@@ -61,7 +64,7 @@ const fixeMonth = (currentCompte: CompteInterface, index: number): CompteInterfa
 
     if (Object.keys(curentMonthTransaction).length === 0) {
 
-        const NewMonthTransaction: MonthInterface = {
+        let NewMonthTransaction: MonthInterface = {
 
             nameMonth: curentNameMonth,
             transactions: {
@@ -73,18 +76,44 @@ const fixeMonth = (currentCompte: CompteInterface, index: number): CompteInterfa
 
         }
 
-        curentYearTransaction.month = [...curentYearTransaction.month]
+        NewMonthTransaction = injectRecurringOperationNewMonth(NewMonthTransaction, curentYearTransaction);
+        currentCompte.pay = NewMonthTransaction.AccountBalanceBeginningMonth
+
         curentYearTransaction.month.push(NewMonthTransaction)
 
-        const newCurent = { ...currentCompte };
-        newCurent.transactions = [...currentCompte.transactions]
-
-        newCurent.transactions[index] = curentYearTransaction
-
-        return newCurent
+        currentCompte.transactions[index] = curentYearTransaction
+        return currentCompte
 
     }
 
     return null
+
+}
+
+
+function injectRecurringOperationNewMonth(NewMonthTransaction: MonthInterface, curentYearTransaction: TransactionInterface) {
+
+    NewMonthTransaction.transactions.expense = curentYearTransaction.operationRecurring.expense;
+    NewMonthTransaction.transactions.income = curentYearTransaction.operationRecurring.income;
+    NewMonthTransaction.numberTransactionMonth = curentYearTransaction.operationRecurring.expense.length + curentYearTransaction.operationRecurring.income.length;
+
+    const total = {
+        income: 0,
+        expense: 0
+    }
+
+    curentYearTransaction.operationRecurring.expense.forEach((expense) => {
+        total.expense += expense.montant_real != 0 ? expense.montant_real : expense.montant;
+
+    })
+
+    curentYearTransaction.operationRecurring.income.forEach((income) => {
+        total.income += income.montant_real != 0 ? income.montant_real : income.montant;
+    })
+
+    NewMonthTransaction.AccountBalanceBeginningMonth += (total.income - total.expense);
+
+    return NewMonthTransaction;
+
 
 }

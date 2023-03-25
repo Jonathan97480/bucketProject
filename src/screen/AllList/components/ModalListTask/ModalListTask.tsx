@@ -1,9 +1,9 @@
-import { Button, Icon, Input } from "@rneui/base";
+import { Button, CheckBox, FAB, Icon, Input } from "@rneui/base";
 import React, { useCallback, useEffect } from "react";
-import { Alert, TouchableOpacity, View, Text, Modal, ScrollView } from "react-native";
+import { Alert, TouchableOpacity, View, Text, Modal, ScrollView, FlatList } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { StepTask } from "../stepStack/stepStack";
-import { addList, listInterface } from "../../../../redux/listSlice";
+import { addList, listInterface, stepInterface } from "../../../../redux/listSlice";
 import { ListAlphabetizeOrder } from "../../../../utils/TextManipulation";
 import { addTask, UpdateList } from "../../logic";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
@@ -20,28 +20,32 @@ interface ModalListTaskProps {
 export default function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTaskProps) {
 
     const dispatch = useDispatch();
-    const allList = useSelector((state: any) => state.list.list);
-    let list: listInterface = { ...allList[index_list], steps: [...allList[index_list].steps] };
-    let steps = ListAlphabetizeOrder(list.steps);
-    list.steps = [...steps];
-    const [curentList, setCurentList] = React.useState(list);
-    const [newItem, setNewItem] = React.useState("");
 
+    const allList: listInterface[] = useSelector((state: any) => state.list.list);
+
+    const [modalAddIsVisible, setModalAddIsVisible] = React.useState(false);
+
+    const [steps, setSteps] = React.useState({
+        checked: [] as stepInterface[],
+        unchecked: [] as stepInterface[],
+    });
+
+    const [filter, setFilter] = React.useState("unchecked" as "checked" | "unchecked");
+
+
+
+    const organizedSteps = React.useMemo(() => {
+        setSteps(organizeSteps(allList[index_list].steps))
+    },
+        [allList]);
 
     useEffect(() => {
-        list = { ...allList[index_list], steps: [...allList[index_list].steps] };
-        steps = ListAlphabetizeOrder(list.steps);
-        list.steps = [...steps];
-        setCurentList(list);
+        organizedSteps;
     }, [allList]);
 
 
-    const addListCallBack = useCallback((_data: listInterface[]) => {
 
-        dispatch(addList(_data));
-        setNewItem("");
 
-    }, []);
 
     return (
         <Modal
@@ -80,7 +84,7 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                         }
                     ]}
 
-                >{list.name}</Text>
+                >{allList[index_list].name}</Text>
 
                 <Input
                     label="Rechercher"
@@ -100,33 +104,176 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                     }
                     onChange={(e) => {
                         let text = e.nativeEvent.text;
-                        let newList = list.steps.filter((item) => {
+                        let newList = allList[index_list].steps.filter((item) => {
                             return item.name.toLowerCase().includes(text.toLowerCase());
                         });
 
-                        setCurentList({ ...list, steps: newList });
+                        setSteps(organizeSteps(newList));
                     }}
 
                 />
-                <ScrollView>
-                    {
+                <Filters filter={filter} setFilter={setFilter} />
 
+                <FlatList
+                    data={steps[filter]}
+                    keyExtractor={(item, index) => index + "-step"}
+                    renderItem={({ item, index }) => {
+                        return (
+                            <StepTask
 
-                        curentList.steps.map((item, index) => {
-                            return (
-                                <StepTask
-                                    key={index + "-step"}
-                                    index={index}
-                                    step={item}
-                                    UpdateList={UpdateList}
-                                    task={list}
-                                />
-                            )
-                        })
-
+                                index={index}
+                                step={item}
+                                UpdateList={UpdateList}
+                                task={allList[index_list]}
+                            />
+                        )
+                    }}
+                />
+                <FAB
+                    style={{}}
+                    placement="right"
+                    color="#9c68dd"
+                    icon={
+                        <Icon
+                            name="plus"
+                            type="font-awesome-5"
+                            size={20}
+                            color="#fff"
+                        />
                     }
-                </ScrollView>
-                <View>
+                    onPress={() => {
+                        setModalAddIsVisible(true);
+                    }}
+                />
+
+            </View>
+
+            <ModalAddTaskList
+                isVisible={modalAddIsVisible}
+                setModalIsVisible={() => {
+                    setModalAddIsVisible(false);
+                }}
+                index_list={index_list}
+                allList={allList}
+
+            />
+
+
+        </Modal >
+    )
+
+}
+
+
+const Filters = React.memo(function ({ filter, setFilter }: { filter: string, setFilter: (value: "checked" | "unchecked") => void }) {
+
+    return (
+        <View style={[
+            globalStyle.containerCheckBox,
+            { marginBottom: 20 }
+        ]}>
+            <CheckBox
+
+                textStyle={globalStyle.checkBoxText}
+                containerStyle={globalStyle.checkBox}
+                disabledStyle={globalStyle.checkBoxDisabled}
+
+                title="tache non terminer"
+                checked={filter === "unchecked"}
+                onPress={() => {
+                    setFilter("unchecked");
+                }}
+
+            />
+
+            <CheckBox
+
+                textStyle={globalStyle.checkBoxText}
+                containerStyle={globalStyle.checkBox}
+                disabledStyle={globalStyle.checkBoxDisabled}
+                title="tache terminer"
+                checked={filter === "checked"}
+                onPress={() => {
+                    setFilter("checked");
+                }}
+
+            />
+
+        </View>
+    )
+
+});
+
+function organizeSteps(list: stepInterface[]) {
+
+    let steps = {
+        checked: [] as stepInterface[],
+        unchecked: [] as stepInterface[],
+    }
+
+    list.forEach((item) => {
+        if (item.isChecked) {
+            steps.checked.push(item);
+        } else {
+            steps.unchecked.push(item);
+        }
+    });
+
+    steps.checked = ListAlphabetizeOrder(steps.checked);
+    steps.unchecked = ListAlphabetizeOrder(steps.unchecked);
+
+    return steps;
+
+}
+
+
+interface ModalAddTaskListProps {
+    isVisible: boolean,
+    setModalIsVisible: (value: boolean) => void,
+    index_list: number,
+    allList: listInterface[],
+}
+
+const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list, allList }: ModalAddTaskListProps) => {
+
+    const dispatch = useDispatch();
+    const [newItem, setNewItem] = React.useState("");
+
+    const addListCallBack = useCallback((_data: listInterface[]) => {
+
+        dispatch(addList(_data));
+        setNewItem("");
+        setModalIsVisible(false);
+
+    }, []);
+    return (
+        <Modal
+            visible={isVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => {
+                setModalIsVisible(false);
+            }}
+        >
+
+            <View style={
+                {
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+
+                }
+            }>
+
+                <View style={[
+                    {
+                        backgroundColor: "#fff",
+                        padding: 15,
+                        borderRadius: 10,
+                        width: "90%",
+                    },
+                ]}>
                     <Text
                         style={[
                             globalStyle.textAlignLeft,
@@ -137,7 +284,7 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                     <Input
                         placeholder="Nom de la nouvelle tache"
                         keyboardType="default"
-                        style={globalStyle.colorTextPrimary}
+                        style={{ color: "#000" }}
                         value={newItem}
                         onChange={(e) => {
 
@@ -164,7 +311,7 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                             if (newItem.length > 0) {
                                 const AllList = await addTask({
                                     value: newItem,
-                                    list: list
+                                    list: allList[index_list]
                                 });
 
                                 addListCallBack(AllList);
@@ -177,8 +324,9 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
             </View>
 
 
+        </Modal>)
 
-        </Modal >
-    )
+});
 
-}
+
+
