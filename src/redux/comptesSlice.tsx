@@ -19,6 +19,7 @@ export interface TransactionMonthInterface {
     start_montant: number,
     montant_real: number,
     date: string,
+    isClosed?: boolean,
     status: "unique" | "recurring",
     typeOperation: "income" | "expense",
     categoryID: number,

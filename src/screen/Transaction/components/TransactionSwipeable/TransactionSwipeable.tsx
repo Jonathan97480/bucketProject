@@ -7,6 +7,7 @@ import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { IconsCategory } from "../../../../components";
 import { deleteTransaction } from "./logic";
 import { useSelector, useDispatch } from "react-redux";
+import { View } from "react-native";
 
 interface BudgetSwipeableProps {
     transaction: TransactionMonthInterface;
@@ -24,7 +25,12 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
     const dispatch = useDispatch();
     return (
         <ListItem.Swipeable
-
+            style={
+                {
+                    minWidth: 310,
+                    maxWidth: 400,
+                }
+            }
             containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20, }]}
             onPress={() => {
                 if (transaction.transactionType === "Budget") {
@@ -89,7 +95,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             >
                 <ListItem.Title
                     style={{ color: colorList.primary, fontWeight: 'bold' }}
-                >{transaction.name}</ListItem.Title>
+                >{transaction.name.slice(0, 30)}</ListItem.Title>
                 {
                     transaction.transactionType === "Budget" ?
                         <>
@@ -99,7 +105,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
-                            >Budget restant : {transaction.montant}€</ListItem.Subtitle>
+                            >Budget restant : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
                         </>
                         :
                         <>
@@ -110,7 +116,24 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         </>
                 }
             </ListItem.Content>
-            <IconsCategory id_category={transaction.categoryID} />
+            <View
+
+                style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+
+                }}
+            >
+                <IconsCategory id_category={transaction.categoryID} />
+                {
+                    transaction.isClosed &&
+                    <Icon
+
+                        name="lock"
+                        type='material-community'
+                        color={colorList.primary}
+                    />}
+            </View>
         </ListItem.Swipeable>
     )
 

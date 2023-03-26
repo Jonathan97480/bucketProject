@@ -4,6 +4,7 @@ import styleSheet from "./styleSheet";
 import { useSelector } from "react-redux";
 import { IconAlimentation, IconAutres, IconLogement, IconLoisir, IconSanté, IconVetement } from "../../utils/IconCustom";
 import { CategoryInterface } from "../../redux/categorySlice";
+import { Icon } from "@rneui/base";
 
 interface Props {
     id_category: number,
@@ -42,6 +43,7 @@ export default function IconsCategory({ id_category }: Props) {
             })
 
             }
+
         </View>
     )
 

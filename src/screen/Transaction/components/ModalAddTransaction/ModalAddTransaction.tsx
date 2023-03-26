@@ -99,13 +99,24 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
     const handleSaveEditTransaction = (transaction: TransactionMonthInterface) => {
 
+        if (transaction.isClosed) {
+
+            handleAlert({
+                message: 'Vous ne pouvez pas modifier une transaction clôturée',
+                callBackValidate: () => { },
+                callBackDismiss: () => { },
+                type: 'Attention'
+            });
+            return;
+        }
+
         if (ValidateForm(formAddBudget, setFormAddBudget)) {
 
             let newTransaction: TransactionMonthInterface | null = null;
             /* prepare Transaction */
             if (transaction.typeOperation !== formAddBudget.typeOperation) {
                 const newID = defineIDTransaction(currentMonthRedux, formAddBudget.typeOperation);
-                newTransaction = createNewTransaction(newID, formAddBudget)
+                newTransaction = createNewTransaction(newID, formAddBudget, transaction)
 
             } else {
                 newTransaction = createNewTransaction(transaction.id, formAddBudget)

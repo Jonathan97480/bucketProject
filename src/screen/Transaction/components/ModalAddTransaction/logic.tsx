@@ -1,7 +1,7 @@
 import { CategoryInterface } from "../../../../redux/categorySlice";
-import { CompteInterface, MonthInterface, SimpleTransactionInterface, TransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
+import { CompteInterface, MonthInterface, TransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase"
-import { calculateTotalExpend, CalculBudget } from "../../../AddOperationInTheBudget/components/ModalAddExpend/logic";
+import { CalculBudget } from "../../../AddOperationInTheBudget/components/ModalAddExpend/logic";
 
 
 export interface FormAddBudget {
@@ -59,6 +59,7 @@ export const createNewTransaction = (index: number, formAddBudget: FormAddBudget
         categoryID: formAddBudget.categoryTransaction,
         period: formAddBudget.isUnique ? null : formAddBudget.period,
         transactionType: formAddBudget.typeTransaction,
+        isClosed: oldOperation ? oldOperation.isClosed : false,
         transaction: formAddBudget.typeTransaction === "Spent" ? null : { income: [], expense: [] }
 
     }
@@ -70,7 +71,7 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
 
     const over = getOverdrawn(currentCompte, newTransaction, useOverdraw);
 
-    if (over.overdrawn && !useOverdraw) {
+    if (over.overdrawn && !useOverdraw && newTransaction.typeOperation === 'expense') {
 
         return {
             compte: currentCompte,
@@ -103,7 +104,7 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
 
         }
 
-    } else if (over.overdrawn && useOverdraw && over.discoveredExceed) {
+    } else if (over.overdrawn && useOverdraw && over.discoveredExceed && newTransaction.typeOperation === 'expense') {
         return {
             compte: currentCompte,
             month: currentMonth,
@@ -450,3 +451,4 @@ const getOverdrawn = (compte: CompteInterface, newTransaction: TransactionMonthI
     };
 
 }
+

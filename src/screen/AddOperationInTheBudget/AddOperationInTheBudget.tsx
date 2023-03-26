@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useState, useReducer } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, Modal } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
-import { Icon } from "@rneui/base";
-import { textSizeFixe } from "../../utils/TextManipulation";
-import { setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface, setCurentBudget } from "../../redux/comptesSlice";
+import { Button, FAB, Icon } from "@rneui/base";
+
+import { setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface, setCurentBudget, CompteInterface, MonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { getColorBudget } from "../../utils/ColorCollection";
 import { ModalAddExpend } from "./components/ModalAddExpend/ModalAddOperation";
@@ -16,6 +16,7 @@ import ModalCreateListe from "./components/ModalCreateListe/ModalCreateListe";
 import { deleteOperation } from "./components/OperationItems/logic";
 import { OperationInfoModal } from "./components/OperationInfoModal/OperationInfoModal";
 import styleSheet from "./styleSheet";
+import { CLoseBudget } from "./logic";
 
 
 
@@ -34,9 +35,9 @@ export const AddOperationInTheBudget = () => {
 
 
     const reducerModal = (
-        state: "close" | "addOperation" | "createListe" | "infoOperation",
-        action: { type: "close" | "addOperation" | "createListe" | "infoOperation", operation?: SimpleTransactionInterface }
-    ) => {
+        state: "close" | "addOperation" | "createListe" | "infoOperation" | "closeBudget",
+        action: { type: "close" | "addOperation" | "createListe" | "infoOperation" | "closeBudget", operation?: SimpleTransactionInterface }
+    ): "close" | "addOperation" | "createListe" | "infoOperation" | "closeBudget" => {
 
         switch (action.type) {
             case "close":
@@ -50,6 +51,9 @@ export const AddOperationInTheBudget = () => {
             case "infoOperation":
                 setCurentOperation(action.operation!);
                 return "infoOperation";
+            case "closeBudget":
+
+                return "closeBudget";
             default:
                 throw new Error("la modal " + action.type + " nexists  pas ");
         }
@@ -99,6 +103,8 @@ export const AddOperationInTheBudget = () => {
         });
 
     }, [budget]);
+
+
 
 
 
@@ -216,6 +222,39 @@ export const AddOperationInTheBudget = () => {
 
 
             />
+
+            <ModalCloreBudget
+                budget={budget}
+                compte={CurentCompte}
+                month={CurentMonth}
+                isVisible={modalVisible === "closeBudget"}
+                setIsVisible={
+                    () => {
+                        dispatchModalVisible({ type: "close" });
+                    }
+
+                }
+
+            />
+
+
+            <FAB
+
+                disabled={budget.isClosed}
+                icon={
+                    <Icon
+                        name="plus"
+                        type="font-awesome-5"
+                        size={25}
+                        color="white"
+                    />
+                }
+                onPress={() => {
+                    dispatchModalVisible({ type: "addOperation" });
+                }}
+                placement="right"
+
+            />
         </CustomSafeAreaView >
 
     );
@@ -225,11 +264,12 @@ export const AddOperationInTheBudget = () => {
 
 const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
     localCurentBudget: TransactionMonthInterface,
-    dispatchModalVisible: React.Dispatch<{ type: "close" | "addOperation" | "createListe" | "infoOperation", operation?: SimpleTransactionInterface }>
+    dispatchModalVisible: React.Dispatch<{ type: "close" | "addOperation" | "createListe" | "infoOperation" | "closeBudget", operation?: SimpleTransactionInterface }>
 }) => {
 
-    const textSize = 20;
+    const textSize = 17;
 
+    const isNullTransaction: boolean = localCurentBudget.transaction?.expense?.length! > 0 || localCurentBudget.transaction?.income.length! > 0;
     return (
         <View style={
             [
@@ -250,10 +290,12 @@ const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
                 style={styleSheet.containerIcon}
             >
                 <Icon
-                    name="plus"
+                    disabled={localCurentBudget.isClosed || !isNullTransaction}
+
+                    name="check"
                     type="font-awesome"
                     style={{
-                        backgroundColor: "#4F94BB",
+                        backgroundColor: localCurentBudget.isClosed || !isNullTransaction ? '#d1d5d8' : "#4F94BB",
                         padding: 8,
                         borderRadius: 25,
                         width: 30,
@@ -263,17 +305,18 @@ const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
                     color="#fff"
                     onPress={() => {
 
-                        dispatchModalVisible({ type: "addOperation" });
+                        dispatchModalVisible({ type: "closeBudget" });
                     }}
 
 
 
                 />
                 <Icon
+                    disabled={localCurentBudget.isClosed || !isNullTransaction}
                     name="list"
                     type="font-awesome"
                     style={{
-                        backgroundColor: "#4F94BB",
+                        backgroundColor: localCurentBudget.isClosed || !isNullTransaction ? '#d1d5d8' : "#4F94BB",
                         padding: 8,
                         borderRadius: 25,
                         width: 30,
@@ -300,6 +343,137 @@ const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
 
 
 
+
+const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: () => void, budget: TransactionMonthInterface, compte: CompteInterface, month: MonthInterface }) => {
+
+    const dispatch = useDispatch();
+
+    return (
+        <Modal
+            visible={props.isVisible}
+            animationType="slide"
+            transparent={true}
+            onRequestClose={() => {
+                props.setIsVisible();
+            }}
+        >
+            <View
+                style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                }}
+            >
+                <View
+                    style={{
+                        backgroundColor: "#fff",
+                        padding: 20,
+                        margin: 20,
+                        borderRadius: 10,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "90%",
+                    }}
+                >
+                    <Text
+                        style={[
+                            globalStyle.textSizeLarge,
+                            globalStyle.textAlignCenter,
+                            { marginBottom: 10 }
+                        ]}
+                    >
+                        Fermeture du budget
+                    </Text>
+                    <Text
+                        style={[
+                            globalStyle.textSizeMedium,
+                            globalStyle.textAlignCenter,
+                            { marginBottom: 10 }
+                        ]}
+                    >Voulez vous vraiment fermer ce budget ?</Text>
+                    <Text
+                        style={[
+                            globalStyle.textSizeSmall,
+                            globalStyle.textAlignCenter,
+                            { marginBottom: 10 }
+                        ]}
+                    >La somme restante sera ajouté a votre compte et le montant du budget sera réévaluer en fonction de vos dépenses.</Text>
+                    <Text
+                        style={[
+                            globalStyle.textSizeSmall,
+                            globalStyle.textAlignCenter,
+                            { marginBottom: 10, color: "#FF0000" }
+                        ]}
+                    >Vous ne pourrez plus modifier ce budget après sa fermeture.</Text>
+                    <View>
+                        <Button
+                            radius={25}
+                            buttonStyle={globalStyle.btnStyle}
+                            title="Clôturer le budget"
+                            onPress={() => {
+                                CLoseBudget({
+                                    budget: props.budget,
+                                    compte: props.compte,
+                                    month: props.month
+                                }).then((res) => {
+
+                                    if (res) {
+                                        dispatch(setCurentCompte(res.compte));
+                                        dispatch(setCurentBudget(res.budget));
+                                        dispatch(setCurentMonth(res.month));
+                                        props.setIsVisible();
+                                    }
+                                })
+
+                            }}
+                            iconPosition="right"
+                            icon={
+
+                                <Icon
+                                    style={{ marginLeft: 10 }}
+                                    name="check"
+                                    type="font-awesome"
+                                    size={15}
+                                    color="#fff"
+                                />
+                            }
+                        />
+
+                        <Button
+                            radius={25}
+                            buttonStyle={[globalStyle.btnStyle, { backgroundColor: "#FF0000" }]}
+                            title="Annuler"
+                            onPress={() => {
+
+                                props.setIsVisible();
+
+
+                            }}
+                            iconPosition="right"
+                            icon={
+                                <Icon
+                                    style={{ marginLeft: 10 }}
+                                    name="times"
+                                    type="font-awesome"
+                                    size={15}
+                                    color="#fff"
+                                />
+
+                            }
+                        />
+
+                    </View>
+                </View>
+            </View>
+        </Modal>
+
+
+    )
+
+
+
+})
 
 
 
