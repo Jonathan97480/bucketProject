@@ -17,14 +17,14 @@ export const FixeIsYearAndMonthExist = (currentCompte: CompteInterface) => {
         indexYear = newYear.index
     }
 
-    return fixeMonth(currentCompte, indexYear)
+    return fixeMonth(newCompte, indexYear)
 
 
 }
 
 
 const fixeYear = (currentCompte: CompteInterface) => {
-
+    console.log("fixeYear", currentCompte)
     const curentYearTransaction: TransactionInterface = {
 
         year: new Date().getFullYear(),
@@ -50,17 +50,15 @@ const fixeMonth = (currentCompte: CompteInterface, index: number): CompteInterfa
 
     const curentNameMonth: string = getMonthByNumber(new Date().getMonth() + 1);
 
-    let curentYearTransaction = { ...currentCompte.transactions[index] };
+    let curentYearTransaction = currentCompte.transactions[index];
 
-    let curentMonthTransaction = {
+    let curentMonthTransaction = curentYearTransaction.month.filter((transaction) => {
 
-        ...curentYearTransaction.month.filter((transaction) => {
+        return transaction.nameMonth === curentNameMonth;
 
-            return transaction.nameMonth === curentNameMonth;
+    })
 
-        })
 
-    }
 
     if (Object.keys(curentMonthTransaction).length === 0) {
 
@@ -76,12 +74,15 @@ const fixeMonth = (currentCompte: CompteInterface, index: number): CompteInterfa
 
         }
 
+
+
         NewMonthTransaction = injectRecurringOperationNewMonth(NewMonthTransaction, curentYearTransaction);
         currentCompte.pay = NewMonthTransaction.AccountBalanceBeginningMonth
 
         curentYearTransaction.month.push(NewMonthTransaction)
 
         currentCompte.transactions[index] = curentYearTransaction
+
         return currentCompte
 
     }
@@ -97,7 +98,7 @@ function injectRecurringOperationNewMonth(NewMonthTransaction: MonthInterface, c
     NewMonthTransaction.transactions.income = curentYearTransaction.operationRecurring.income;
     NewMonthTransaction.numberTransactionMonth = curentYearTransaction.operationRecurring.expense.length + curentYearTransaction.operationRecurring.income.length;
 
-    const total = {
+    let total = {
         income: 0,
         expense: 0
     }
@@ -112,6 +113,7 @@ function injectRecurringOperationNewMonth(NewMonthTransaction: MonthInterface, c
     })
 
     NewMonthTransaction.AccountBalanceBeginningMonth += (total.income - total.expense);
+
 
     return NewMonthTransaction;
 

@@ -25,11 +25,11 @@ export default StyleSheet.create({
         padding: 20,
         borderRadius: 10,
         backgroundColor: 'white',
-        height: 340,
+        minHeight: 340,
 
     },
     stageContainer: {
-        height: 180,
+        minHeight: 180,
         justifyContent: 'space-between',
         paddingVertical: 10,
     },

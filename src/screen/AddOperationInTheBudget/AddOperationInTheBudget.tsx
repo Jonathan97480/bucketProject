@@ -16,7 +16,7 @@ import ModalCreateListe from "./components/ModalCreateListe/ModalCreateListe";
 import { deleteOperation } from "./components/OperationItems/logic";
 import { OperationInfoModal } from "./components/OperationInfoModal/OperationInfoModal";
 import styleSheet from "./styleSheet";
-import { CLoseBudget } from "./logic";
+import { CloseBudget } from "./logic";
 
 
 
@@ -187,6 +187,7 @@ export const AddOperationInTheBudget = () => {
             <OperationInfoModal
                 isModalVisible={curentOperation !== null && modalVisible === "infoOperation"}
                 setIsModalVisible={() => setCurentOperation(null)}
+                isClosedBudget={budget.isClosed}
                 operation={curentOperation!}
                 budget={budget}
                 callbackDeleteBtn={() => {
@@ -412,7 +413,7 @@ const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: 
                             buttonStyle={globalStyle.btnStyle}
                             title="Clôturer le budget"
                             onPress={() => {
-                                CLoseBudget({
+                                CloseBudget({
                                     budget: props.budget,
                                     compte: props.compte,
                                     month: props.month

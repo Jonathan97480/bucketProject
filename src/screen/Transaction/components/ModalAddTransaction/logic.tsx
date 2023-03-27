@@ -11,7 +11,7 @@ export interface FormAddBudget {
     errorName: string,
     typeTransaction: 'Spent' | 'Budget',
     typeOperation: 'income' | 'expense',
-    period: "day" | "week" | "month" | "year",
+    period: "month" | "year",
     categoryTransaction: number
     isUnique: boolean
 }
@@ -29,7 +29,7 @@ export const getAllCategory = async () => {
 
 
 export function ResetForm(): FormAddBudget {
-    return { name: '', montant: '', errorMontant: '', errorName: '', typeTransaction: 'Spent', typeOperation: 'expense', categoryTransaction: 1, isUnique: true, period: "day" };
+    return { name: '', montant: '', errorMontant: '', errorName: '', typeTransaction: 'Spent', typeOperation: 'expense', categoryTransaction: 1, isUnique: true, period: "month" };
 }
 
 export function ValidateForm(formAddBudget: FormAddBudget, setFormAddBudget: (value: FormAddBudget) => void) {
@@ -363,7 +363,7 @@ export const defineFormAddBudget = (transaction: TransactionMonthInterface | und
         typeOperation: transaction.typeOperation,
         categoryTransaction: transaction.categoryID,
         isUnique: transaction.status === 'unique' ? true : false,
-        period: transaction.period ? transaction.period : "day"
+        period: transaction.period ? transaction.period : "month",
 
 
     } as FormAddBudget : ResetForm()

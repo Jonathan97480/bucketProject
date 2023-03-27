@@ -269,7 +269,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                         onPress={() => {
                                             setFormAddBudget({ ...formAddBudget, typeTransaction: 'Spent' });
                                         }}
-                                        title='Dépense'
+                                        title='Opération'
                                         checkedIcon='dot-circle-o'
                                         uncheckedIcon='circle-o'
                                         checked={formAddBudget.typeTransaction === 'Spent' ? true : false}
@@ -344,27 +344,6 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 !formAddBudget.isUnique &&
                                 <View>
                                     <Text style={styleSheet.modalInputLabel}>l’opération ce répète tous les </Text>
-                                    <View style={[globalStyle.flexRow]}>
-
-                                        <CheckBox
-                                            onPress={() => {
-                                                setFormAddBudget({ ...formAddBudget, period: 'day' });
-                                            }}
-                                            title='jours'
-                                            checkedIcon='dot-circle-o'
-                                            uncheckedIcon='circle-o'
-                                            checked={formAddBudget.period == "day" ? true : false}
-                                        />
-                                        <CheckBox
-                                            onPress={() => {
-                                                setFormAddBudget({ ...formAddBudget, period: "week" });
-                                            }}
-                                            title='weekends'
-                                            checkedIcon='dot-circle-o'
-                                            uncheckedIcon='circle-o'
-                                            checked={formAddBudget.period == "week" ? true : false}
-                                        />
-                                    </View>
                                     <View style={[globalStyle.flexRow]}>
 
                                         <CheckBox

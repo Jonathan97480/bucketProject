@@ -14,10 +14,11 @@ interface ItemBudgetProps {
     budget: TransactionMonthInterface
     callbackDeleteBtn: () => void
     callbackEditBtn: () => void
+    isClosedBudget: boolean | undefined
 
 }
 
-export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, callbackDeleteBtn, callbackEditBtn }: ItemBudgetProps) {
+export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, callbackDeleteBtn, callbackEditBtn, isClosedBudget }: ItemBudgetProps) {
 
     return (
 
@@ -97,10 +98,14 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                     ]}
                                 >
                                     <Icon
+                                        disabled={isClosedBudget}
                                         name="delete"
                                         type="material-community"
                                         size={40}
-                                        style={styleSheet.iconDeleteStyle}
+
+                                        style={[styleSheet.iconDeleteStyle, {
+                                            backgroundColor: isClosedBudget ? "#d1d5d8" : "red"
+                                        }]}
                                         color={"#fff"}
                                         onPress={() => {
                                             Alert.alert(
@@ -125,10 +130,13 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
 
                                     />
                                     <Icon
+                                        disabled={isClosedBudget}
                                         name="pencil"
                                         type="material-community"
                                         size={40}
-                                        style={styleSheet.iconEditStyle}
+                                        style={[styleSheet.iconEditStyle, {
+                                            backgroundColor: isClosedBudget ? "#d1d5d8" : "#203EAA"
+                                        }]}
                                         color={"#fff"}
                                         onPress={() => {
 

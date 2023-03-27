@@ -7,7 +7,7 @@ interface Props {
     month: MonthInterface
 }
 
-export async function CLoseBudget({ budget, compte, month }: Props) {
+export async function CloseBudget({ budget, compte, month }: Props) {
 
     let newBudget: TransactionMonthInterface = JSON.parse(JSON.stringify(budget));
     let newCompte: CompteInterface = JSON.parse(JSON.stringify(compte));
@@ -26,9 +26,17 @@ export async function CLoseBudget({ budget, compte, month }: Props) {
     }
 
 
-    newCompte.pay = newCompte.deposit - newCompte.withdrawal;
+    newCompte.pay = newCurentMonth.AccountBalanceBeginningMonth + (newCompte.deposit - newCompte.withdrawal);
     newBudget.start_montant -= newBudget.montant;
     newBudget.montant = 0;
+
+    /* fixed float */
+    newCompte.pay = parseFloat(newCompte.pay.toFixed(2));
+    newBudget.start_montant = parseFloat(newBudget.start_montant.toFixed(2));
+
+
+
+
 
 
 
@@ -46,7 +54,6 @@ export async function CLoseBudget({ budget, compte, month }: Props) {
 
     newCompte.transactions[indexYear].month[indexMonth] = newCurentMonth;
 
-    console.log("newCompte", newCompte);
 
 
     const result = await DatabaseManager.UpdateCompte(
