@@ -14,10 +14,11 @@ export interface TaskProps {
     setModalIsVisible: (isVisible: boolean) => void;
     index: number;
     task: listInterface;
+    trad: any;
 }
 
 
-export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task }: TaskProps) => {
+export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, trad }: TaskProps) => {
 
     const dispatch = useDispatch();
 
@@ -36,15 +37,18 @@ export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task }: Ta
             onLongPress={() => {
 
                 Alert.alert(
-                    "Supprimer",
-                    "Voulez vous supprimer cette liste ?",
+                    trad.delete,
+                    trad.DoYouWantDeleteList,
                     [
                         {
-                            text: "Annuler",
+                            text: trad.cancel,
                             onPress: () => console.log("Cancel Pressed"),
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => DeleteListe(task.id) }
+                        {
+                            text: trad.yes
+                            , onPress: () => DeleteListe(task.id)
+                        }
                     ],)
 
             }}
@@ -91,7 +95,7 @@ export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task }: Ta
                                 globalStyle.textAlignLeft
                             ]
                         }
-                    >{textSizeFixe(task.name, 18)} Tache terminer : {task.taskTerminer} / {task.task}</Text>
+                    >{textSizeFixe(task.name, 18)} {trad.TaskComplete} : {task.taskTerminer} / {task.task}</Text>
 
                 </View>
             </View>

@@ -11,18 +11,18 @@ interface SearchProps {
     budget: TransactionMonthInterface;
 
     onSearch: (value: { income: SimpleTransactionInterface[], expense: SimpleTransactionInterface[] }) => void;
-
+    trad: any;
 }
 
 
-export const Search = ({ budget, onSearch }: SearchProps) => {
+export const Search = ({ budget, onSearch, trad }: SearchProps) => {
 
     return <View>
         <Input
             style={[
                 globalStyle.colorTextPrimary,
             ]}
-            placeholder="Rechercher"
+            placeholder={trad.ToResearch}
             onChangeText={(text) => {
                 if (text.length >= 3 && budget.transaction) {
 

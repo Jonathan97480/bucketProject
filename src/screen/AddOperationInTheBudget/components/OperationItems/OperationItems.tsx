@@ -12,12 +12,12 @@ interface OperationItemsProps {
 
     deleteCallBack: (operation: SimpleTransactionInterface) => void
     infoPanelOpen: (operation: SimpleTransactionInterface) => void
-
+    trad: any
 
 }
 
 
-export default function OperationItems({ listeExpend, deleteCallBack, infoPanelOpen }: OperationItemsProps) {
+export default function OperationItems({ listeExpend, deleteCallBack, infoPanelOpen, trad }: OperationItemsProps) {
 
     const [NewListeExpend, setNewListeExpend] = React.useState<SimpleTransactionInterface[]>(listeExpend);
 
@@ -36,11 +36,23 @@ export default function OperationItems({ listeExpend, deleteCallBack, infoPanelO
                     <FlatList
 
                         data={NewListeExpend}
-                        renderItem={({ item, index }) => <ItemList operation={item} index={index} deleteCallBack={deleteCallBack} infoPanelOpen={infoPanelOpen} />}
+                        renderItem={({ item, index }) => <ItemList
+                            operation={item}
+                            index={index}
+                            deleteCallBack={deleteCallBack}
+                            infoPanelOpen={infoPanelOpen}
+                            trad={trad}
+                        />
+
+                        }
                         keyExtractor={(item, index) => index.toString() + item.id.toString() + -"operation"}
 
                     />
-                    : <EmptyList />
+                    : <EmptyList
+
+                        trad={trad}
+
+                    />
 
             }
 
@@ -52,23 +64,24 @@ export default function OperationItems({ listeExpend, deleteCallBack, infoPanelO
 
 }
 
-const EmptyList = React.memo(() => {
+const EmptyList = React.memo((props: any) => {
     return (
         <Text style={[
             globalStyle.colorTextPrimary,
             globalStyle.textAlignCenter,
             globalStyle.textSizeSmall
-        ]}>Vous n'avez pas encore d'opération pour cette section</Text>
+        ]}>{props.trad.YouDontHaveOperationsThisSection}</Text>
     )
 
 
 })
 
-const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen }: {
+const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen, trad }: {
     operation: SimpleTransactionInterface
     index: number
     deleteCallBack: (operation: SimpleTransactionInterface) => void
     infoPanelOpen: (operation: SimpleTransactionInterface) => void
+    trad: any
 }) => {
 
     const operationMemo = React.useMemo(() => {
@@ -79,16 +92,17 @@ const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen }
 
     const handleLongPress = () => {
         Alert.alert(
-            "Supprimer",
-            "Voulez-vous supprimer cette opération ?",
+            trad.delete,
+            trad.DoYouWantDeleteOperation,
             [
                 {
-                    text: "Annuler",
+                    text: trad.cancel,
                     onPress: () => console.log("Cancel Pressed"),
                     style: "cancel"
                 },
                 {
-                    text: "OK", onPress: () => {
+                    text: trad.yes,
+                    onPress: () => {
                         deleteCallBack(operation);
                     }
                 }
@@ -114,7 +128,7 @@ const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen }
                 <Text style={[globalStyle.colorTextPrimary]} >{operationMemo.total_real !== 0 ? operationMemo.total_real.toFixed(2) : operationMemo.total.toFixed(2)}€</Text>
 
                 <View style={[{ backgroundColor: operationMemo.type === "income" ? "#203EAA" : "#E1424B", }, styleSheet.pastille]}>
-                    <Text style={{ color: "#fff" }} >{operationMemo.type === "income" ? "Depot" : "Retrait"}</Text>
+                    <Text style={{ color: "#fff" }} >{operationMemo.type === "income" ? trad.Deposit : trad.Withdrawal}</Text>
                 </View>
 
 

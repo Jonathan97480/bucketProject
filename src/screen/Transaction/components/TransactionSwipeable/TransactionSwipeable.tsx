@@ -12,13 +12,13 @@ import { View } from "react-native";
 interface BudgetSwipeableProps {
     transaction: TransactionMonthInterface;
     indexBudget: number;
-
+    trad: any;
     setModalEdit: (value: boolean, transaction: TransactionMonthInterface) => void;
     navigation: any;
 }
 
 
-export default function TransactionSwipeable({ transaction, indexBudget, setModalEdit, navigation }: BudgetSwipeableProps) {
+export default function TransactionSwipeable({ transaction, indexBudget, setModalEdit, navigation, trad }: BudgetSwipeableProps) {
 
     const curentCompte = useSelector((state: any) => state.compte.currentCompte);
     const curentMonth = useSelector((state: any) => state.compte.currentMonth);
@@ -45,20 +45,20 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             leftContent={(reset) => (
                 <Button
                     containerStyle={{ borderRadius: 20, }}
-                    title={`Editer ${transaction.transactionType === "Spent" ? "Transaction" : "Budget"}`}
+                    title={trad.Edit + ` ${transaction.transactionType === "Spent" ? trad.Transaction : trad.Budget} `}
                     onPress={() => {
 
                         setModalEdit(true, transaction);
                         reset()
                     }}
-                    icon={{ name: 'edit', color: 'white', }}
+
                     buttonStyle={{ minHeight: '100%' }}
                 />
             )}
             rightContent={(reset) => (
                 <Button
                     containerStyle={{ borderRadius: 20, }}
-                    title={`Supprimer ${transaction.transactionType === "Spent" ? "Transaction" : "Budget"}`}
+                    title={trad.delete + ` ${transaction.transactionType === "Spent" ? "Transaction" : "Budget"} `}
                     onPress={() => {
 
                         deleteTransaction({
@@ -79,7 +79,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
                     }
                     }
-                    icon={{ name: 'delete', color: 'white' }}
+
                     buttonStyle={[{ minHeight: '100%', backgroundColor: 'red' }]}
                     color="#ffffff"
                 />
@@ -101,18 +101,18 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         <>
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
-                            >Montant de départ : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
+                            >{trad.AmountStart} : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
-                            >Budget restant : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
+                            >{trad.RemainingBudget} : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
                         </>
                         :
                         <>
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: 12 }}
-                            >Montant : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
+                            >{trad.Amount} : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
                         </>
                 }
             </ListItem.Content>

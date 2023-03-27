@@ -7,10 +7,11 @@ interface ArchiveItemProps {
 
     months: MonthInterface[] | null;
     year: number;
+    trad: any;
 
 }
 
-export default function ArchiveItem({ months, year }: ArchiveItemProps) {
+export default function ArchiveItem({ months, year, trad }: ArchiveItemProps) {
 
     if (months === null) {
         months = []
@@ -25,8 +26,8 @@ export default function ArchiveItem({ months, year }: ArchiveItemProps) {
                         key={'archive-' + index}
                     >
 
-                        <Text style={[styleSheet.blockCurentMonthText, globalStyle.colorTextPrimary]}>{month.nameMonth} {year}</Text>
-                        <Text style={[globalStyle.textSizeSmall, globalStyle.colorTextPrimary]} >{numberTransaction} transactions</Text>
+                        <Text style={[styleSheet.blockCurentMonthText, globalStyle.colorTextPrimary]}>{trad[month.nameMonth]} {year}</Text>
+                        <Text style={[globalStyle.textSizeSmall, globalStyle.colorTextPrimary]} >{numberTransaction} {trad.transactions}</Text>
                     </View>
                     )
                 })

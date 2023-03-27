@@ -15,9 +15,10 @@ interface ModalListTaskProps {
     isVisible: boolean,
     setModalIsVisible: (value: boolean) => void,
     index_list: number,
+    trad: any,
 }
 
-export default function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTaskProps) {
+export default function ModalListTask({ isVisible, setModalIsVisible, index_list, trad }: ModalListTaskProps) {
 
     const dispatch = useDispatch();
 
@@ -87,8 +88,8 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                 >{allList[index_list].name}</Text>
 
                 <Input
-                    label="Rechercher"
-                    placeholder="rechercher une element dans la liste"
+                    label={trad.ToResearch}
+                    placeholder={trad.SearchForItemInList}
                     keyboardType="default"
                     style={globalStyle.colorTextPrimary}
                     labelStyle={{
@@ -112,7 +113,11 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                     }}
 
                 />
-                <Filters filter={filter} setFilter={setFilter} />
+                <Filters
+                    filter={filter}
+                    setFilter={setFilter}
+                    trad={trad}
+                />
 
                 <FlatList
                     data={steps[filter]}
@@ -125,6 +130,7 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                                 step={item}
                                 UpdateList={UpdateList}
                                 task={allList[index_list]}
+                                trad={trad}
                             />
                         )
                     }}
@@ -155,6 +161,7 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                 }}
                 index_list={index_list}
                 allList={allList}
+                trad={trad}
 
             />
 
@@ -165,7 +172,7 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
 }
 
 
-const Filters = React.memo(function ({ filter, setFilter }: { filter: string, setFilter: (value: "checked" | "unchecked") => void }) {
+const Filters = React.memo(function ({ filter, setFilter, trad }: { filter: string, setFilter: (value: "checked" | "unchecked") => void, trad: any }) {
 
     return (
         <View style={[
@@ -178,7 +185,7 @@ const Filters = React.memo(function ({ filter, setFilter }: { filter: string, se
                 containerStyle={globalStyle.checkBox}
                 disabledStyle={globalStyle.checkBoxDisabled}
 
-                title="tache non terminer"
+                title={trad.UnfinishedTask}
                 checked={filter === "unchecked"}
                 onPress={() => {
                     setFilter("unchecked");
@@ -191,7 +198,7 @@ const Filters = React.memo(function ({ filter, setFilter }: { filter: string, se
                 textStyle={globalStyle.checkBoxText}
                 containerStyle={globalStyle.checkBox}
                 disabledStyle={globalStyle.checkBoxDisabled}
-                title="tache terminer"
+                title={trad.TaskComplete}
                 checked={filter === "checked"}
                 onPress={() => {
                     setFilter("checked");
@@ -232,9 +239,10 @@ interface ModalAddTaskListProps {
     setModalIsVisible: (value: boolean) => void,
     index_list: number,
     allList: listInterface[],
+    trad: any
 }
 
-const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list, allList }: ModalAddTaskListProps) => {
+const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list, allList, trad }: ModalAddTaskListProps) => {
 
     const dispatch = useDispatch();
     const [newItem, setNewItem] = React.useState("");
@@ -280,9 +288,9 @@ const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list,
                             globalStyle.textSizeMedium,
                             globalStyle.colorTextPrimary,
                         ]}
-                    >Ajouter une tache à la liste</Text>
+                    >{trad.AddTaskToList}</Text>
                     <Input
-                        placeholder="Nom de la nouvelle tache"
+                        placeholder={trad.NewTaskName}
                         keyboardType="default"
                         style={{ color: "#000" }}
                         value={newItem}
@@ -306,7 +314,7 @@ const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list,
                         disabledStyle={{
                             backgroundColor: "rgba(156, 104, 221, 0.42)",
                         }}
-                        title="Ajouter une tache"
+                        title={trad.AddTask}
                         onPress={async () => {
                             if (newItem.length > 0) {
                                 const AllList = await addTask({

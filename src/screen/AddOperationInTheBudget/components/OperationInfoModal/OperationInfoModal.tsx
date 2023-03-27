@@ -15,10 +15,11 @@ interface ItemBudgetProps {
     callbackDeleteBtn: () => void
     callbackEditBtn: () => void
     isClosedBudget: boolean | undefined
+    trad: any
 
 }
 
-export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, callbackDeleteBtn, callbackEditBtn, isClosedBudget }: ItemBudgetProps) {
+export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, operation, callbackDeleteBtn, callbackEditBtn, isClosedBudget, trad }: ItemBudgetProps) {
 
     return (
 
@@ -48,7 +49,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                 { backgroundColor: operation.type === "income" ? "#203EAA" : "#E1424B" },
                                 styleSheet.viewTypeOperation
                             ]}>
-                                <Text style={globalStyle.colorTextPrimary} >{operation.type === "income" ? "Entrée" : "Sortie"}</Text>
+                                <Text style={globalStyle.colorTextPrimary} >{operation.type === "income" ? trad.Entrance : trad.Output}</Text>
                             </View>
 
                             <View style={{ alignItems: "center", }}>
@@ -60,7 +61,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                         globalStyle.textSizeMedium,
                                         styleSheet.textInfo
                                     ]}>
-                                    Prix unitaire : {operation.montant_real === 0 ? operation.montant : operation.montant_real}€
+                                    {trad.UnitPrice} : {operation.montant_real === 0 ? operation.montant : operation.montant_real}€
                                 </Text>
                                 <Text
                                     style={[
@@ -69,7 +70,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                         styleSheet.textInfo
                                     ]}
                                 >
-                                    Quantité : {operation.quantity}
+                                    {trad.Quantity} : {operation.quantity}
                                 </Text>
                                 <Text
                                     style={[
@@ -78,7 +79,7 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                         styleSheet.textInfo
                                     ]}
                                 >
-                                    TOTAL : {operation.total_real === 0 ? operation.total.toFixed(2) : operation.montant_real}€
+                                    {trad.Total} : {operation.total_real === 0 ? operation.total.toFixed(2) : operation.montant_real}€
                                 </Text>
 
                             </View>
@@ -109,16 +110,16 @@ export function OperationInfoModal({ budget, isModalVisible, setIsModalVisible, 
                                         color={"#fff"}
                                         onPress={() => {
                                             Alert.alert(
-                                                "Suppression",
-                                                `Voulez-vous vraiment supprimer ${operation.type === "income" ? "ce dépôt" : "cette dépense"} ?`,
+                                                trad.Deletion,
+                                                trad.AreYouSureWantToDelete + ` ${operation.type === "income" ? trad.ThisDeposit : trad.ThisExpense} ?`,
                                                 [
                                                     {
-                                                        text: "Annuler",
+                                                        text: trad.cancel,
                                                         onPress: () => { },
                                                         style: "cancel"
                                                     },
                                                     {
-                                                        text: "Oui", onPress: () => {
+                                                        text: trad.yes, onPress: () => {
 
                                                             callbackDeleteBtn();
 

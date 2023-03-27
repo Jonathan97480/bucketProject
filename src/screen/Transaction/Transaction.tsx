@@ -11,13 +11,14 @@ import TransactionSwipeable from "./components/TransactionSwipeable/TransactionS
 import { MonthInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { CustomSafeAreaView } from "../../components";
-
+import { getLocales } from 'expo-localization';
+import { trad } from "../../lang/internationalization";
 
 
 
 
 export const Transaction = () => {
-
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
     const navigation = useNavigation();
 
     const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
@@ -50,6 +51,7 @@ export const Transaction = () => {
                     <EmptyTransaction
 
                         setIsViewModalAddBudget={setIsViewModalAddBudget}
+                        trad={trad[local]}
 
                     />
                 </View>
@@ -70,9 +72,9 @@ export const Transaction = () => {
                                 style={styleSheet.scrollViewContainer}
                             >
                                 <Text style={[styleSheet.title, globalStyle.colorTextPrimary]} >
-                                    Liste Des transactions
+                                    {trad[local].TransactionList}
                                 </Text>
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]} >Dépôt sur le compte</Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]} >{trad[local].DepositToAccount}</Text>
                                 {
                                     curentMonth.transactions.income.length > 0 ?
                                         curentMonth.transactions.income.map((item, indexBudget) => {
@@ -91,6 +93,7 @@ export const Transaction = () => {
                                                         indexBudget={indexBudget}
                                                         setModalEdit={editTransactionCallBack}
                                                         navigation={navigation}
+                                                        trad={trad[local]}
                                                     />
                                                 </View>
 
@@ -100,7 +103,7 @@ export const Transaction = () => {
                                         : null
 
                                 }
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]}>Retrait sur le compte</Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]}>{trad[local].WithdrawalAccount}</Text>
                                 {
                                     curentMonth.transactions.expense.length > 0 ?
                                         curentMonth.transactions.expense.map((item, indexBudget) => {
@@ -118,6 +121,7 @@ export const Transaction = () => {
                                                         indexBudget={indexBudget}
                                                         setModalEdit={editTransactionCallBack}
                                                         navigation={navigation}
+                                                        trad={trad[local]}
                                                     />
                                                 </View>
 
@@ -132,7 +136,9 @@ export const Transaction = () => {
 
                         </ScrollView>
 
-                        : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget} />
+                        : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget}
+                            trad={trad[local]}
+                        />
 
                 }
 
@@ -141,6 +147,7 @@ export const Transaction = () => {
                     isViewModalAddBudget={isViewModalAddBudget}
                     setIsViewModalAddBudget={editTransactionCallBack}
                     transaction={curentTransaction}
+                    trad={trad[local]}
                 />
                 {curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
                     <FAB

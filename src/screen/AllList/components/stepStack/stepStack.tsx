@@ -23,11 +23,12 @@ export interface StepTaskProps {
     index: number;
     step: stepInterface;
     task: listInterface;
+    trad: any;
 
 }
 
 
-export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
+export const StepTask = ({ UpdateList, index, step, task, trad }: StepTaskProps) => {
 
     const dispatch = useDispatch();
     return (
@@ -35,15 +36,15 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
 
             onLongPress={() => {
                 Alert.alert(
-                    "Supprimer",
-                    "Voulez vous supprimer cette tache ?",
+                    trad.delete,
+                    trad.DoYouWantDeleteThisTask,
                     [
                         {
-                            text: "Annuler",
+                            text: trad.cancel,
                             onPress: () => console.log("Cancel Pressed"),
                             style: "cancel"
                         },
-                        { text: "OK", onPress: () => deleteTask(index) }
+                        { text: trad.yes, onPress: () => deleteTask(index) }
                     ],)
 
             }}
@@ -77,7 +78,6 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
                 <CheckBox
                     containerStyle={{ backgroundColor: "transparent", borderWidth: 0 }}
                     center
-
                     checkedIcon="dot-circle-o"
                     uncheckedIcon="circle-o"
                     checked={step.isChecked}
@@ -102,7 +102,7 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
                             color: "#fff",
                             textDecorationLine: step.isChecked ? "line-through" : "none",
                         }}
-                    >{step.quantity > 0 ? `quantité :${step.quantity}` : ""}</Text>
+                    >{step.quantity > 0 ? `${trad.Quantity} :${step.quantity}` : ""}</Text>
                 </View>
 
             </View>

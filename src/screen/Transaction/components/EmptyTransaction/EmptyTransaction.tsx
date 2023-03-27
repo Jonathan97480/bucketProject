@@ -9,9 +9,10 @@ import { IconBudgetAdd_image } from "../../../../utils/IconCustom";
 
 interface EmptyBudgetProps {
     setIsViewModalAddBudget: (value: boolean) => void
+    trad: any
 }
 
-export const EmptyTransaction = ({ setIsViewModalAddBudget }: EmptyBudgetProps) => {
+export const EmptyTransaction = ({ setIsViewModalAddBudget, trad }: EmptyBudgetProps) => {
 
     return (
         <View style={styleSheet.container}>
@@ -20,12 +21,13 @@ export const EmptyTransaction = ({ setIsViewModalAddBudget }: EmptyBudgetProps) 
                 source={IconBudgetAdd_image}
                 style={styleSheet.image}
             />
-            <Text style={[styleSheet.title, globalStyle.colorTextPrimary, globalStyle.textAlignCenter]}>Vous n'avez pas encore de Transaction Pour le mois de {getMonthByNumber(new Date().getMonth() + 1)}</Text>
+            <Text style={[styleSheet.title, globalStyle.colorTextPrimary, globalStyle.textAlignCenter]}>{trad.YouDoNotTransactionMonth} {getMonthByNumber(new Date().getMonth() + 1)}</Text>
             <Button
 
                 color='#817FE5'
                 radius={5}
-                title="Ajouter une Transaction" onPress={() => {
+                title={trad.AddTransaction}
+                onPress={() => {
                     setIsViewModalAddBudget(true);
                 }} />
 

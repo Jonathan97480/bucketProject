@@ -9,11 +9,15 @@ import DatabaseManager from "../../utils/DataBase";
 import { setUser, userInterface } from "../../redux/userSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
-
+import { getLocales } from 'expo-localization';
+import { trad } from "../../lang/internationalization";
 
 export default function LoginAndRegister({ navigation }: any) {
 
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
     const dispatch = useDispatch()
+
     const [isAsUser, setIsAsUser] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [isError, setIsError] = useState(false)
@@ -68,7 +72,7 @@ export default function LoginAndRegister({ navigation }: any) {
     return (
         <CustomSafeAreaView>
 
-            <Title title={isAsUser ? "Ce connectée" : "Crée un compte"} />
+            <Title title={isAsUser ? trad[local].ToLogIn : trad[local].CreateAccount} />
 
             <View style={globalStyle.containerCenter} >
                 {
@@ -88,8 +92,8 @@ export default function LoginAndRegister({ navigation }: any) {
                     <Input
                         style={globalStyle.marginVertical}
                         inputStyle={globalStyle.inputStyle}
-                        placeholder="Votre identifiant"
-                        label="Identifiant"
+                        placeholder={trad[local].YourUsername}
+                        label={trad[local].Username}
                         errorMessage={form.identifiantError}
                         value={form.identifiant}
                         onChangeText={(text) => setForm({ ...form, identifiant: text })}
@@ -99,8 +103,8 @@ export default function LoginAndRegister({ navigation }: any) {
                     <Input
                         style={globalStyle.marginVertical}
                         inputStyle={globalStyle.inputStyle}
-                        placeholder="Votre mot de passe"
-                        label="Mot de passe"
+                        placeholder={trad[local].YourPassword}
+                        label={trad[local].Password}
                         errorMessage={form.passwordError}
                         value={form.password}
                         secureTextEntry={true}
@@ -112,7 +116,7 @@ export default function LoginAndRegister({ navigation }: any) {
                         style={globalStyle.marginVertical}
                         radius={25}
                         buttonStyle={globalStyle.btnStyle}
-                        title={isAsUser ? "Se connecter" : "Crée mon compte"}
+                        title={isAsUser ? trad[local].ToLogIn : trad[local].CreateAccount}
                         onPress={() => {
                             setIsLoading(true)
                             const formError = FormValidate({
@@ -157,7 +161,7 @@ export default function LoginAndRegister({ navigation }: any) {
                                             setIsError(false)
                                             setForm({
                                                 ...form,
-                                                errorGlobal: "Vous êtes connecté avec succès vous allez être redirigé vers la page des comptes"
+                                                errorGlobal: trad[local].logInOk
                                             })
                                             setTimeout(() => {
                                                 setIsLoading(false)
@@ -213,7 +217,7 @@ export default function LoginAndRegister({ navigation }: any) {
                                             setIsError(false)
                                             setForm({
                                                 ...form,
-                                                errorGlobal: "Vous êtes connecté avec succès vous allez être redirigé vers la page des comptes"
+                                                errorGlobal: trad[local].registerOk
                                             })
                                             setTimeout(() => {
                                                 setIsLoading(false)

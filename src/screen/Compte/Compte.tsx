@@ -10,8 +10,11 @@ import { CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, Trans
 import { getMonthByNumber } from "../../utils/DateManipulation";
 import { FixeIsYearAndMonthExist } from "./logic";
 import DatabaseManager from "../../utils/DataBase";
-
+import { getLocales } from 'expo-localization';
+import { trad } from "../../lang/internationalization";
 export default function Compte() {
+
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
 
     const dispatch = useDispatch();
 
@@ -68,6 +71,7 @@ export default function Compte() {
 
             <InfoCompte
                 compte={currentCompte}
+                trad={trad[local]}
             />
 
             <View style={styleSheet.container}>
@@ -85,6 +89,7 @@ export default function Compte() {
                                         <ArchiveItem
                                             months={YearTransaction.month}
                                             year={YearTransaction.year}
+                                            trad={trad[local]}
                                         />
                                     </View>
 

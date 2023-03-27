@@ -12,12 +12,12 @@ interface ModalCreateListeProps {
     budget: TransactionMonthInterface;
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
-
+    trad: any
 }
 
 
 
-export default function ModalCreateListe({ budget, isVisible, setIsVisible }: ModalCreateListeProps) {
+export default function ModalCreateListe({ budget, isVisible, setIsVisible, trad }: ModalCreateListeProps) {
 
     const [selectorElements, setSelectorElements] = useState<'All' | 'Income' | 'Expense'>('All');
     const dispatch = useDispatch();
@@ -51,31 +51,31 @@ export default function ModalCreateListe({ budget, isVisible, setIsVisible }: Mo
                             globalStyle.textSizeLarge,
                             globalStyle.marginVertical
                         ]}
-                    >Crée une liste Avec un Budget</Text>
+                    >{trad.CreateListOnBudget}</Text>
 
                     <CheckBox
-                        title='Toutes les opérations'
+                        title={trad.AllOperations}
                         checked={selectorElements === 'All' ? true : false}
                         onPress={() => setSelectorElements('All')}
 
 
                     />
                     <CheckBox
-                        title='Que les sorties'
+                        title={trad.ThatTheOutputs}
                         checked={selectorElements === 'Expense' ? true : false}
                         onPress={() => setSelectorElements('Expense')}
 
 
                     />
                     <CheckBox
-                        title='Que les entrées'
+                        title={trad.ThatTheEntries}
                         checked={selectorElements === 'Income' ? true : false}
                         onPress={() => setSelectorElements('Income')}
 
                     />
 
                     <Button
-                        title="Créer la liste"
+                        title={trad.CreateList}
                         radius={25}
                         buttonStyle={{
                             backgroundColor: "#9C68DD",
@@ -89,7 +89,7 @@ export default function ModalCreateListe({ budget, isVisible, setIsVisible }: Mo
 
                             const newLIst = await CreateListe({ budget, selectorElements: selectorElements });
 
-                            console.log("NEW LIST", newLIst);
+
 
                             dispatch(addListArray(newLIst));
 

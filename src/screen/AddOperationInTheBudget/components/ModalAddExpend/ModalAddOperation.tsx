@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, Modal } from "react-native";
 import styleSheet from "./styleSheet";
 import { Input, Button } from "@rneui/themed/";
-import { Picker } from '@react-native-picker/picker';
+
 import { useSelector, useDispatch } from 'react-redux';
 import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth, SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import { checkForm, createNewOperation, FormAddOperationInterface, resetForm, returnDefaultValueForm, saveOperation } from "./logic";
@@ -15,12 +15,12 @@ interface ModalAddExpendProps {
     budget: TransactionMonthInterface,
     setIsVisible: (value: boolean) => void,
     CurrentOperation?: SimpleTransactionInterface | null | undefined,
-
+    trad: any
 }
 
 
 
-export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperation }: ModalAddExpendProps) => {
+export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperation, trad }: ModalAddExpendProps) => {
 
 
     const [actionType, setActionType] = useState<"income" | "expense">("expense");
@@ -84,7 +84,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
 
 
                             }}
-                        >Sortie</Text>
+                        >{trad.Output}</Text>
                         <Text style={actionType === "expense" ? styleSheet.title : styleSheet.titleActive}
                             onPress={() => {
                                 setActionType("income");
@@ -93,12 +93,12 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                                     setFormOperation: setFormOperation,
                                 })
                             }}
-                        >Entrée</Text>
+                        >{trad.Entrance}</Text>
 
                     </View>
 
                     <Input
-                        placeholder={`Nom de  ${actionType === "income" ? "l'entrée" : "la sortie"}`}
+                        placeholder={trad.NameOf + ` ${actionType === "income" ? trad.TheEntrance : trad.TheOutput}`}
                         value={formOperation.title}
                         onChangeText={(value) => {
                             checkForm({
@@ -112,7 +112,8 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                     />
                     <Input
                         keyboardType="numeric"
-                        placeholder={`Montant de  ${actionType === "income" ? "l'entrée" : "la sortie"}`}
+                        placeholder={trad.AmountOf + ` ${actionType === "income" ? trad.TheEntrance : trad.TheOutput
+                            }`}
                         value={formOperation.montant}
                         onChangeText={(value) => {
                             checkForm({
@@ -136,31 +137,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                             });
                         }}
                     />
-                    {/*             < View >
 
-                        <Picker
-
-                            selectedValue={formOperation.category}
-                            style={{ height: 50, width: "100%", marginBottom: 20 }}
-                            onValueChange={(itemValue, itemIndex) => {
-                                checkForm({
-                                    form: { ...formOperation, category: itemValue },
-                                    setFormOperation: setFormOperation,
-
-                                });
-                            }}
-                        >
-                            {
-                                curentCategory.map((item, index) => {
-
-                                    return (
-                                        <Picker.Item label={item.name} value={item.id} key={`indexKey-cat-${index}`} />
-                                    )
-                                })
-                            }
-
-                        </Picker>
-                    </View> */}
                     <Button
                         radius={25}
                         disabledStyle={{
@@ -175,7 +152,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                             marginTop: 10,
                         }}
                         disabled={formOperation.btnEnabled}
-                        title={CurrentOperation ? "Sauvegarder les modifications" : "Ajouter l'operation"}
+                        title={CurrentOperation ? trad.SaveChanges : trad.AddOperation}
                         onPress={() => {
 
                             /* Add operation */

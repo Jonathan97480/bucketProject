@@ -17,14 +17,15 @@ import { deleteOperation } from "./components/OperationItems/logic";
 import { OperationInfoModal } from "./components/OperationInfoModal/OperationInfoModal";
 import styleSheet from "./styleSheet";
 import { CloseBudget } from "./logic";
-
+import { getLocales } from 'expo-localization';
+import { trad } from "../../lang/internationalization";
 
 
 
 export const AddOperationInTheBudget = () => {
 
     const dispatch = useDispatch();
-
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
 
     const budget: TransactionMonthInterface = useSelector((state: any) => state.compte.curentBudget);
     const CurentCompte = useSelector((state: any) => state.compte.currentCompte);
@@ -114,7 +115,7 @@ export const AddOperationInTheBudget = () => {
             <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text
                     style={[globalStyle.colorTextPrimary, globalStyle.textAlignCenter, globalStyle.textSizeLarge]}
-                >Aucune Operation est attribuiez à ce budget </Text>
+                >{trad[local].NoOperationAllocatedBudget}</Text>
             </View>)
     }
 
@@ -125,6 +126,7 @@ export const AddOperationInTheBudget = () => {
             <Header
                 localCurentBudget={budget}
                 dispatchModalVisible={dispatchModalVisible}
+
             />
             <Search
                 budget={budget}
@@ -133,6 +135,7 @@ export const AddOperationInTheBudget = () => {
                     setCurentOperations({ income, expense });
 
                 }}
+                trad={trad[local]}
 
             />
             <Filters
@@ -149,7 +152,7 @@ export const AddOperationInTheBudget = () => {
                         filters == "Expense" ?
                             <View>
                                 <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
-                                    Nombre de sortie :   {budget.transaction?.expense.length}
+                                    {trad[local].NumberOutputs} : {budget.transaction?.expense.length}
                                 </Text>
                                 <OperationItems listeExpend={curentOperations.expense}
                                     deleteCallBack={deleteOperationCallBack}
@@ -158,6 +161,7 @@ export const AddOperationInTheBudget = () => {
                                         dispatchModalVisible({ type: "infoOperation", operation: operation });
 
                                     }}
+                                    trad={trad[local]}
                                 />
                             </View> : null}
 
@@ -165,7 +169,7 @@ export const AddOperationInTheBudget = () => {
                         filters == "Income" ?
                             <View>
                                 <Text style={[globalStyle.colorTextPrimary, globalStyle.textAlignLeft, globalStyle.textSizeMedium, globalStyle.marginVertical]}>
-                                    Nombre de entrées :   {budget.transaction?.income.length}
+                                    {trad[local].NumberEntries} :   {budget.transaction?.income.length}
                                 </Text>
                                 <OperationItems listeExpend={curentOperations.income}
 
@@ -174,6 +178,7 @@ export const AddOperationInTheBudget = () => {
                                         setCurentOperation(operation);
 
                                     }}
+                                    trad={trad[local]}
                                 />
                             </View> : null}
                 </>
@@ -201,6 +206,8 @@ export const AddOperationInTheBudget = () => {
 
                 }}
 
+                trad={trad[local]}
+
 
             />
             <ModalAddExpend
@@ -210,6 +217,7 @@ export const AddOperationInTheBudget = () => {
                     dispatchModalVisible({ type: "close" });
                 }}
                 CurrentOperation={curentOperation}
+                trad={trad[local]}
 
             />
             <ModalCreateListe
@@ -220,6 +228,7 @@ export const AddOperationInTheBudget = () => {
                         dispatchModalVisible({ type: "close" });
                     }
                 }
+                trad={trad[local]}
 
 
             />
@@ -235,6 +244,7 @@ export const AddOperationInTheBudget = () => {
                     }
 
                 }
+                trad={trad[local]}
 
             />
 
@@ -265,7 +275,11 @@ export const AddOperationInTheBudget = () => {
 
 const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
     localCurentBudget: TransactionMonthInterface,
-    dispatchModalVisible: React.Dispatch<{ type: "close" | "addOperation" | "createListe" | "infoOperation" | "closeBudget", operation?: SimpleTransactionInterface }>
+    dispatchModalVisible: React.Dispatch<{
+        type: "close" | "addOperation" | "createListe" | "infoOperation" | "closeBudget",
+        operation?: SimpleTransactionInterface,
+
+    }>
 }) => {
 
     const textSize = 17;
@@ -345,7 +359,7 @@ const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
 
 
 
-const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: () => void, budget: TransactionMonthInterface, compte: CompteInterface, month: MonthInterface }) => {
+const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: () => void, budget: TransactionMonthInterface, compte: CompteInterface, month: MonthInterface, trad: any }) => {
 
     const dispatch = useDispatch();
 
@@ -384,7 +398,7 @@ const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: 
                             { marginBottom: 10 }
                         ]}
                     >
-                        Fermeture du budget
+                        {props.trad.closeBudget}
                     </Text>
                     <Text
                         style={[
@@ -399,19 +413,19 @@ const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: 
                             globalStyle.textAlignCenter,
                             { marginBottom: 10 }
                         ]}
-                    >La somme restante sera ajouté a votre compte et le montant du budget sera réévaluer en fonction de vos dépenses.</Text>
+                    >{props.trad.closeBudgetMessage}</Text>
                     <Text
                         style={[
                             globalStyle.textSizeSmall,
                             globalStyle.textAlignCenter,
                             { marginBottom: 10, color: "#FF0000" }
                         ]}
-                    >Vous ne pourrez plus modifier ce budget après sa fermeture.</Text>
+                    >{props.trad.closeBudgetWarning}</Text>
                     <View>
                         <Button
                             radius={25}
                             buttonStyle={globalStyle.btnStyle}
-                            title="Clôturer le budget"
+                            title={props.trad.CloseTheBudget}
                             onPress={() => {
                                 CloseBudget({
                                     budget: props.budget,
@@ -444,7 +458,7 @@ const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: 
                         <Button
                             radius={25}
                             buttonStyle={[globalStyle.btnStyle, { backgroundColor: "#FF0000" }]}
-                            title="Annuler"
+                            title={props.trad.cancel}
                             onPress={() => {
 
                                 props.setIsVisible();

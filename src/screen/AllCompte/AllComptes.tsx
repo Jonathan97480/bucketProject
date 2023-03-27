@@ -13,10 +13,13 @@ import NoCompte from "./components/NoCompte/NoCompte";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { RemoveUser } from "../LoginAndRegister/logic";
 import { deleteCompte } from "./components/ComptesItem/logic";
-
+import { getLocales, getCalendars } from 'expo-localization';
+import { trad } from "../../lang/internationalization";
 
 
 export default function AllComptes({ navigation }: any) {
+
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
 
     const [curentCompte, setCurentCompte] = useState<CompteInterface | null>(null);
     function ModalAddCompteReducer(state: any, action: { type: string, payload?: CompteInterface }) {
@@ -82,16 +85,17 @@ export default function AllComptes({ navigation }: any) {
 
 
         Alert.alert(
-            "Supprimer le compte",
-            "Voulez vous vraiment supprimer ce compte ?",
+            trad[local].deleteCompte,
+            trad[local].deleteCompteMessage,
             [
                 {
-                    text: "Annuler",
+                    text: trad[local].cancel,
                     onPress: () => console.log("Cancel Pressed"),
                     style: "cancel"
                 },
                 {
-                    text: "Oui", onPress: async () => {
+                    text: trad[local].yes,
+                    onPress: async () => {
                         {
                             setIsLoading(true);
 
@@ -116,7 +120,7 @@ export default function AllComptes({ navigation }: any) {
         );
     };
 
-    console.log("LIST DES COMPTES", comptes);
+
     return (
         <CustomSafeAreaView>
             <View style={
@@ -124,13 +128,14 @@ export default function AllComptes({ navigation }: any) {
             }>
 
                 <TouchableOpacity onPress={async () => {
-                    Alert.alert("Déconnexion", "Voulez-vous vraiment vous déconnecter ?", [
+                    Alert.alert(trad[local].logout,
+                        trad[local].logoutUser, [
                         {
-                            text: "Annuler",
+                            text: trad[local].cancel,
                             style: "cancel"
                         },
                         {
-                            text: "Oui",
+                            text: trad[local].yes,
                             onPress: async () => {
 
                                 await RemoveUser()
@@ -185,7 +190,7 @@ export default function AllComptes({ navigation }: any) {
 
                 }
                 <Button
-                    title="Ajouter un compte"
+                    title={trad[local].AddAnAccount}
                     onPress={onPress}
                     buttonStyle={globalStyle.btnStyle}
                     radius={25}

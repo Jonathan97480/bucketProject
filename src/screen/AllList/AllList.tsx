@@ -9,13 +9,14 @@ import { Task } from "./components/Task/Task";
 import { addList, addListArray, listInterface } from "../../redux/listSlice";
 import DatabaseManager from "../../utils/DataBase";
 import ModalListTask from "./components/ModalListTask/ModalListTask";
-
+import { getLocales } from 'expo-localization';
+import { trad } from "../../lang/internationalization";
 
 
 
 
 export const AllList = () => {
-
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
     const dispatch = useDispatch();
     const list: listInterface[] = useSelector((state: any) => state.list.list);
     const [modalIsVisible, setModalIsVisible] = React.useState(false);
@@ -69,6 +70,7 @@ export const AllList = () => {
                                         task={item}
                                         setCurrentIndexList={setCurrentIndexList}
                                         setModalIsVisible={setModalIsVisible}
+                                        trad={trad[local]}
                                     />
                                 )
                             }}
@@ -78,7 +80,7 @@ export const AllList = () => {
                                 globalStyle.colorTextPrimary,
                                 globalStyle.textAlignCenter,
                                 globalStyle.textSizeXLarge,
-                            ]}>Aucune list</Text>
+                            ]}>{trad[local].NoList}</Text>
                         </View>
                 }
 
@@ -90,13 +92,14 @@ export const AllList = () => {
                             isVisible={modalIsVisible}
                             index_list={currentIndexList}
                             setModalIsVisible={resetModal}
+                            trad={trad[local]}
 
                         />
                         : null
                 }
                 <View>
                     <Input
-                        placeholder="nom de la nouvelle liste"
+                        placeholder={trad[local].NewListName}
                         value={newList}
                         style={{
                             color: "#fff",
@@ -107,7 +110,7 @@ export const AllList = () => {
 
                     />
                     <Button
-                        title={"Ajouter une liste"}
+                        title={trad[local].AddList}
                         radius={25}
                         buttonStyle={{
                             backgroundColor: "#9C68DD",
@@ -120,7 +123,7 @@ export const AllList = () => {
 
                         onPress={() => {
                             if (newList.length === 0) {
-                                Alert.alert("Erreur", "Veuillez entrer un nom pour la liste");
+                                Alert.alert("Erreur", trad[local].PleaseEnterNameForList);
                                 return;
                             }
 
