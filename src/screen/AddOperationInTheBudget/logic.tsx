@@ -13,31 +13,27 @@ export async function CloseBudget({ budget, compte, month }: Props) {
     let newCompte: CompteInterface = JSON.parse(JSON.stringify(compte));
     let newCurentMonth: MonthInterface = JSON.parse(JSON.stringify(month));
 
-
-
     newBudget.isClosed = true;
-    if (newBudget.typeOperation === "expense") {
-        newCompte.withdrawal -= newBudget.start_montant;
-        newCompte.withdrawal += (newBudget.start_montant - newBudget.montant);
-    }
-    if (newBudget.typeOperation === "income") {
-        newCompte.deposit -= newBudget.start_montant;
-        newCompte.deposit += (newBudget.start_montant - newBudget.montant);
+
+    switch (newBudget.typeOperation) {
+        case "expense":
+            newCompte.withdrawal -= newBudget.start_montant;
+            newCompte.withdrawal += (newBudget.start_montant - newBudget.montant);
+            break;
+        case "income":
+            newCompte.deposit -= newBudget.start_montant;
+            newCompte.deposit += (newBudget.start_montant - newBudget.montant);
+            break;
+        default:
+            throw new Error("Une erreur est survenue lors de la fermeture du budget: Type d'opération introuvable");
+
     }
 
 
-    newCompte.pay = newCurentMonth.AccountBalanceBeginningMonth + (newCompte.deposit - newCompte.withdrawal);
-    newBudget.start_montant -= newBudget.montant;
+    /* calcul and fixe new value compte and budget */
+    newCompte.pay = parseFloat((newCurentMonth.AccountBalanceBeginningMonth + (newCompte.deposit - newCompte.withdrawal)).toFixed(2));
+    newBudget.start_montant -= parseFloat(newBudget.montant.toFixed(2));
     newBudget.montant = 0;
-
-    /* fixed float */
-    newCompte.pay = parseFloat(newCompte.pay.toFixed(2));
-    newBudget.start_montant = parseFloat(newBudget.start_montant.toFixed(2));
-
-
-
-
-
 
 
     const indexBudgetInTheMonth = newCurentMonth.transactions[budget.typeOperation].findIndex((item) => item.id === newBudget.id);
@@ -65,9 +61,6 @@ export async function CloseBudget({ budget, compte, month }: Props) {
         newCompte.transactions
 
     );
-
-    console.log("result", result);
-
 
     if (!result) throw new Error("Une erreur est survenue lors de la fermeture du budget: Mise à jour du compte impossible");
 
