@@ -11,7 +11,10 @@ interface InfoCompteProps {
     compte: CompteInterface;
 }
 
+
 export default function InfoCompte({ compte, }: InfoCompteProps) {
+
+
 
     const dispatch = useDispatch();
     const navigation = useNavigation();
@@ -31,6 +34,7 @@ export default function InfoCompte({ compte, }: InfoCompteProps) {
 
         dispatch(setCurentMonth(null));
         dispatch(setCurentBudget(null));
+
         navigation.navigate("AllComptes");
 
     }

@@ -147,7 +147,7 @@ export const Transaction = () => {
                     isViewModalAddBudget={isViewModalAddBudget}
                     setIsViewModalAddBudget={editTransactionCallBack}
                     transaction={curentTransaction}
-                    trad={trad[local]}
+
                 />
                 {curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
                     <FAB

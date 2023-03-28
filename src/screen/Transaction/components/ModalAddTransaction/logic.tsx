@@ -335,17 +335,17 @@ export const calculTransactionByCompte = (compte: CompteInterface, currentMonth:
 
     currentMonth.transactions.income.forEach((transaction: TransactionMonthInterface) => {
         const curentMontant = transaction.transactionType === "Spent" ? transaction.montant : transaction.start_montant;
-        result.deposit += curentMontant;
-        result.pay += curentMontant;
+        result.deposit += parseFloat(curentMontant.toFixed(2));
+        result.pay += parseFloat(curentMontant.toFixed(2));
     })
 
     currentMonth.transactions.expense.forEach((transaction: TransactionMonthInterface) => {
         const curentMontant = transaction.transactionType === "Spent" ? transaction.montant : transaction.start_montant;
-        result.withdrawal += curentMontant;
-        result.pay -= curentMontant;
+        result.withdrawal += parseFloat(curentMontant.toFixed(2));
+        result.pay -= parseFloat(curentMontant.toFixed(2));
     })
 
-    console.log("RESULT", result);
+
 
     return result;
 
