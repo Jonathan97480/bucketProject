@@ -24,7 +24,7 @@ export default function InfoCompte({ compte, }: InfoCompteProps) {
             "hardwareBackPress",
             () => {
                 handleBackAllCompte();
-                return true;
+                return true;    // return true to prevent default behavior (exit app)
             }
         );
         return () => backHandler.remove();
@@ -32,11 +32,19 @@ export default function InfoCompte({ compte, }: InfoCompteProps) {
 
     const handleBackAllCompte = () => {
 
-        dispatch(setCurentMonth(null));
-        dispatch(setCurentBudget(null));
+        switch (navigation.getState().routeNames[navigation.getState().index]) {
+            case "Compte":
 
-        navigation.navigate("AllComptes");
+                dispatch(setCurentMonth(null));
+                dispatch(setCurentBudget(null));
+                navigation.navigate("AllComptes");
+                break
 
+            default:
+                navigation.navigate(navigation.getState().routeNames[navigation.getState().index]);
+                break
+
+        }
     }
 
     return (
