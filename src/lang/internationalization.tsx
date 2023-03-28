@@ -1,3 +1,6 @@
+import { getLocales } from 'expo-localization';
+
+
 
 export const trad = {
     FR: {
@@ -12,9 +15,13 @@ export const trad = {
         pay: "Solde",
         Overdraft: "Découvert autorisé",
         UnauthorizedOverdraft: "Découvert non autorisé",
+        AuthorizeOverdraft: "Autoriser le découvert",
+        OverdraftAmount: "Montant du découvert",
         AddAnAccount: "Ajouter un compte",
         Insights: "Aperçu",
         income: "Revenus",
+        NoMonthData: "Aucun mois trouvé pour ce compte ou cette année",
+        ToGetStartedAccount: "Pour commencer, ajoutez un compte",
         expense: "Dépenses",
         transactions: "Transactions",
         Janvier: "Janvier",
@@ -112,7 +119,7 @@ export const trad = {
         Username: "Nom d'utilisateur",
         logInOk: "Vous êtes connecté avec succès vous allez être redirigé vers la page des comptes",
         registerOk: "Vous êtes enregistré avec succès vous allez être redirigé vers la page des comptes",
-
+        AccountName: "Nom du compte",
 
 
     },
@@ -128,9 +135,13 @@ export const trad = {
         pay: "Balance",
         Overdraft: "Authorized overdraft",
         UnauthorizedOverdraft: "Unauthorized overdraft",
+        AuthorizeOverdraft: "Authorize overdraft",
+        OverdraftAmount: "Overdraft amount",
+        ToGetStartedAccount: "To get started we will start by creating an account",
         AddAnAccount: "Add an account",
         Insights: "Insights",
         income: "Income",
+        NoMonthData: "No month found for this account or this year",
         expense: "Expense",
         transactions: "Transactions",
         Janvier: "January",
@@ -228,6 +239,13 @@ export const trad = {
         YourPassword: "Your password",
         Password: "Password",
         registerOk: "You are successfully registered you will be redirected to the accounts page",
+        AccountName: "Account name",
+
 
     }
+}
+
+export function getTrad(key: keyof typeof trad["FR"]) {
+    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+    return trad[local][key] ? trad[local][key] : key;
 }

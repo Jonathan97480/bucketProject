@@ -13,8 +13,8 @@ import NoCompte from "./components/NoCompte/NoCompte";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { RemoveUser } from "../LoginAndRegister/logic";
 import { deleteCompte } from "./components/ComptesItem/logic";
-import { getLocales, getCalendars } from 'expo-localization';
-import { trad } from "../../lang/internationalization";
+import { getLocales } from 'expo-localization';
+import { trad, getTrad } from "../../lang/internationalization";
 
 
 export default function AllComptes({ navigation }: any) {
@@ -163,7 +163,9 @@ export default function AllComptes({ navigation }: any) {
             </View>
 
             <View style={globalStyle.containerCenter} >
-                {comptes.length <= 0 ? <NoCompte /> :
+                {comptes.length <= 0 ? <NoCompte
+                    trad={trad[local]}
+                /> :
                     <FlatList
                         data={comptes}
                         renderItem={({ item }) => (
@@ -190,7 +192,7 @@ export default function AllComptes({ navigation }: any) {
 
                 }
                 <Button
-                    title={trad[local].AddAnAccount}
+                    title={getTrad("AddAnAccount")}
                     onPress={onPress}
                     buttonStyle={globalStyle.btnStyle}
                     radius={25}
@@ -212,6 +214,7 @@ export default function AllComptes({ navigation }: any) {
                 id_user={user.user?.id || 1}
                 allComptes={comptes}
                 curentCompte={curentCompte}
+                trad={trad[local]}
             />
             {isLoading &&
                 <CustomActivityIndicator />}

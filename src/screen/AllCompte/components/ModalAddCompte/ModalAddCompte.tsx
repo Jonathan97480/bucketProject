@@ -17,9 +17,10 @@ interface ModalAddCompteProps {
     setVisible: (visible: boolean) => void;
     curentCompte?: CompteInterface | null;
     allComptes: CompteInterface[];
+    trad: any;
 }
 
-export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, allComptes }: ModalAddCompteProps) => {
+export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, allComptes, trad }: ModalAddCompteProps) => {
 
     const dispatch = useDispatch();
 
@@ -122,10 +123,10 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                 >
 
                     <Input
-                        placeholder="Nom du compte"
+                        placeholder={trad.AccountName}
                         value={Compte.name}
                         errorMessage={Compte.errorName}
-                        label="Nom du compte"
+                        label={trad.AccountName}
                         onChangeText={text => setCompte((prevState) => {
                             return {
                                 ...prevState,
@@ -150,9 +151,10 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                         }}
                         isOverdrawn={Compte.isOverdrawn}
                         overdrawn={Compte.Overdrawn}
+                        trad={trad}
                     />
                     <Button
-                        title={curentCompte ? "Sauvegarder" : "Ajouter"}
+                        title={curentCompte ? trad.Save : trad.Add}
                         disabled={Compte.name.length <= 0 || Compte.errorName.length > 0}
                         onPress={onPress}
                     />
@@ -173,10 +175,12 @@ const Overdrawn = ({
     onChange,
     isOverdrawn,
     overdrawn,
+    trad
 }: {
     onChange: (text: string, isOverdrawn: boolean) => void;
     isOverdrawn: boolean;
     overdrawn: string;
+    trad: any;
 }) => {
 
     const [checked, setChecked] = useState(isOverdrawn);
@@ -191,7 +195,7 @@ const Overdrawn = ({
         <View >
 
             <CheckBox
-                title="Autoriser le découvert"
+                title={trad.AuthorizeOverdraft}
                 checked={checked}
                 onPress={() => {
                     onChange(value, !checked);
@@ -204,9 +208,9 @@ const Overdrawn = ({
             {
                 checked &&
                 <Input
-                    placeholder="Montant du découvert"
+                    placeholder={trad.OverdraftAmount}
                     value={value}
-                    label="Montant du découvert"
+                    label={trad.OverdraftAmount}
                     keyboardType="numeric"
                     onChangeText={text => {
                         onChange(text, checked)
