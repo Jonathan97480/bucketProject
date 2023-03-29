@@ -65,6 +65,7 @@ export default StyleSheet.create({
     flexRow: {
         flexDirection: "row",
         alignItems: "center",
+        flexWrap: "wrap",
     },
     btnStyle: {
 

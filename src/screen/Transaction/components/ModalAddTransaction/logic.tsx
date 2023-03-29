@@ -2,18 +2,21 @@ import { CategoryInterface } from "../../../../redux/categorySlice";
 import { CompteInterface, MonthInterface, TransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase"
 import { CalculBudget } from "../../../AddOperationInTheBudget/components/ModalAddExpend/logic";
-
+import { getTrad } from "../../../../lang/internationalization";
+import { getMonthByNumber } from "../../../../utils/DateManipulation";
 
 export interface FormAddBudget {
     name: string,
     montant: string,
     errorMontant: string,
     errorName: string,
-    typeTransaction: 'Spent' | 'Budget',
-    typeOperation: 'income' | 'expense',
+    typeTransaction: "Spent" | "Budget" | "BankTransfers",
+    typeOperation: "income" | "expense",
     period: "month" | "year",
-    categoryTransaction: number
-    isUnique: boolean
+    categoryTransaction: number,
+    isUnique: boolean,
+    idTransfert: number
+    nameCompteTransfer: string | null
 }
 
 export const getAllCategory = async () => {
@@ -29,7 +32,7 @@ export const getAllCategory = async () => {
 
 
 export function ResetForm(): FormAddBudget {
-    return { name: '', montant: '', errorMontant: '', errorName: '', typeTransaction: 'Spent', typeOperation: 'expense', categoryTransaction: 1, isUnique: true, period: "month" };
+    return { name: '', montant: '', errorMontant: '', errorName: '', typeTransaction: 'Spent', typeOperation: 'expense', categoryTransaction: 1, isUnique: true, period: "month", idTransfert: 1, nameCompteTransfer: "" };
 }
 
 export function ValidateForm(formAddBudget: FormAddBudget, setFormAddBudget: (value: FormAddBudget) => void) {
@@ -60,61 +63,77 @@ export const createNewTransaction = (index: number, formAddBudget: FormAddBudget
         period: formAddBudget.isUnique ? null : formAddBudget.period,
         transactionType: formAddBudget.typeTransaction,
         isClosed: oldOperation ? oldOperation.isClosed : false,
-        transaction: formAddBudget.typeTransaction === "Spent" ? null : { income: [], expense: [] }
+        transaction: formAddBudget.typeTransaction === "Spent" ? null : { income: [], expense: [] },
+        idTransfer: formAddBudget.typeTransaction === "BankTransfers" ? formAddBudget.idTransfert : null,
+        nameCompteTransfer: formAddBudget.typeTransaction === "BankTransfers" ? formAddBudget.nameCompteTransfer : null
 
     }
 
 }
 
-export const saveTransaction = async (currentCompte: CompteInterface, currentMonth: MonthInterface, newTransaction: TransactionMonthInterface, useOverdraw?: boolean) => {
+
+interface SaveTransactionInterface {
+    currentCompte: CompteInterface,
+    currentMonth: MonthInterface,
+    newTransaction: TransactionMonthInterface,
+    useOverdraw?: boolean,
+    AllComptes: CompteInterface[]
+}
+
+export const saveTransaction = async ({ currentCompte, currentMonth, newTransaction, useOverdraw, AllComptes }: SaveTransactionInterface) => {
 
 
     const over = getOverdrawn(currentCompte, newTransaction, useOverdraw);
 
     if (over.overdrawn && !useOverdraw && newTransaction.typeOperation === 'expense') {
 
-        return {
-            compte: currentCompte,
-            month: currentMonth,
-            alert: {
-                type: 'Information',
-                message: currentCompte.discovered && currentCompte.discoveredMontant > 0 ?
-                    `Voulez vous utiliser votre découvert de ${currentCompte.discoveredMontant}€` :
-                    `Vous ne pouvez pas dépenser plus que vous n’avez dans votre compte`,
-                action: currentCompte.discovered && currentCompte.discoveredMontant > 0 ? {
-                    valider: {
-                        text: 'Oui',
-                        action: async () => {
-                            return await saveTransaction(currentCompte, currentMonth, newTransaction, true)
-                        }
+        const _message = currentCompte.discovered && currentCompte.discoveredMontant > 0 ?
+            `${getTrad("DoYouWantUseYourOverdraft")} ${currentCompte.discoveredMontant}€ ?` :
+            getTrad("YouCannotSpendMoreYouHaveInAccount");
 
-                    },
-                    annuler: {
-                        text: 'Non',
-                        action: () => {
-                            return {
-                                compte: currentCompte,
-                                month: currentMonth,
-                                alert: null
-                            }
+        const alert = generateAlert({
+            currentCompte: currentCompte,
+            currentMonth: currentMonth,
+            type: getTrad('Information'),
+            message: _message,
+            action: {
+                valider: {
+                    text: getTrad('yes'),
+                    action: async () => {
+                        return await saveTransaction({
+                            currentCompte, currentMonth, newTransaction,
+                            useOverdraw: true,
+                            AllComptes
+                        })
+                    }
+                },
+                annuler: {
+                    text: getTrad('no'),
+                    action: () => {
+                        return {
+                            compte: currentCompte,
+                            month: currentMonth,
+                            alert: null
                         }
                     }
-                } : null
+                }
             }
+        });
+        return alert;
 
-        }
 
     } else if (over.overdrawn && useOverdraw && over.discoveredExceed && newTransaction.typeOperation === 'expense') {
-        return {
-            compte: currentCompte,
-            month: currentMonth,
-            alert: {
-                type: 'error',
-                message: `Vous ne pouvez pas utiliser votre découvert de ${currentCompte.discoveredMontant}€`,
-                action: null
-            }
-        }
+        const alert = generateAlert({
+            currentCompte: currentCompte,
+            currentMonth: currentMonth,
+            type: getTrad('error'),
+            message: `${getTrad("YouCannotUseOverdraft")} ${currentCompte.discoveredMontant}€`,
+
+        });
+        return alert;
     }
+
+
 
 
     let newCurrentCompte: CompteInterface = JSON.parse(JSON.stringify(currentCompte));
@@ -132,16 +151,13 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
 
     if (!curentYearTransaction || curentYearIndex === -1) {
 
-        return {
-            compte: newCurrentCompte,
-            month: newCurrentMonth,
-            alert: {
-                type: 'error',
-                message: 'Nous ne parvenons pas a trouver les transactions de l’année en cours',
-                action: null
-            }
+        return generateAlert({
+            currentCompte: currentCompte,
+            currentMonth: currentMonth,
+            type: getTrad('error'),
+            message: getTrad("WeAreUnableFindTransactionsForCurrentYear"),
+        });
 
-        }
     }
 
     if (newTransaction.status !== 'unique') {
@@ -155,19 +171,19 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
         if (transactionIndex === -1) {
             curentYearTransaction.operationRecurring[newTransaction.typeOperation].push(newTransaction);
         } else {
-            return {
-                compte: newCurrentCompte,
-                month: newCurrentMonth,
-                alert: {
-                    type: 'error',
-                    message: 'Une Operation avec le même nom existe déjà dans les operation récurrente Veuillez changer le nom de l’operation',
-                    action: null
 
-                }
+            return generateAlert({
+                currentCompte: currentCompte,
+                currentMonth: currentMonth,
+                type: getTrad('error'),
+                message: getTrad("YouAlreadyHaveARecurringTransactionWithThisName"),
+            });
 
-            }
+
         }
     }
+
+
 
     /*SAVE TRANSACTION MONTH */
 
@@ -176,15 +192,15 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
     });
 
     if (indexCurrentMonth === -1) {
-        return {
-            compte: newCurrentCompte,
-            month: newCurrentMonth,
-            alert: {
-                type: 'error',
-                message: 'Nous ne parvenons pas a trouver le mois en cours',
-                action: null
-            }
-        }
+
+        return generateAlert({
+            currentCompte: currentCompte,
+            currentMonth: currentMonth,
+            type: getTrad('error'),
+            message: getTrad("WeAreUnableFindTransactionsForCurrentMonth"),
+        });
+
+
     }
 
 
@@ -215,37 +231,50 @@ export const saveTransaction = async (currentCompte: CompteInterface, currentMon
 
     if (result) {
 
+        if (newTransaction.transactionType === "BankTransfers") {
 
-        return {
-            compte: newCurrentCompte,
-            month: newCurrentMonth,
-            alert: null
+            const _result = await Transfer({
+                newTransaction: newTransaction,
+                AllComptes: AllComptes
+            });
+
+            if (_result) {
+                return {
+                    compte: newCurrentCompte,
+                    month: newCurrentMonth,
+                    AllComptes: _result,
+                    alert: null
+                }
+            }
+
+        } else {
+            return {
+                compte: newCurrentCompte,
+                month: newCurrentMonth,
+                AllComptes: [],
+                alert: null
+            }
         }
+
     }
 
-    return {
-        compte: newCurrentCompte,
-        month: newCurrentMonth,
-        alert: {
-            type: 'error',
-            message: 'Une erreur est survenue lors de la sauvegarde de la transaction',
-            action: null
-        }
-    }
-
+    return generateAlert({
+        currentCompte: currentCompte,
+        currentMonth: currentMonth,
+        type: getTrad('error'),
+        message: getTrad("WeAreUnableSaveTransaction"),
+    });
 }
 
 
-export const UpdateTransaction = async ({ oldTransaction, curentCompte, curentMonth, newTransaction }:
+export const UpdateTransaction = async ({ oldTransaction, curentCompte, curentMonth, newTransaction, AllComptes }:
     {
         oldTransaction: TransactionMonthInterface,
         curentCompte: CompteInterface,
         curentMonth: MonthInterface,
-        newTransaction: TransactionMonthInterface
-    }): Promise<{
-        compte: CompteInterface,
-        curentMonth: MonthInterface
-    }> => {
+        newTransaction: TransactionMonthInterface,
+        AllComptes: CompteInterface[]
+    }) => {
 
     curentCompte = JSON.parse(JSON.stringify(curentCompte));
     curentMonth = JSON.parse(JSON.stringify(curentMonth));
@@ -299,25 +328,51 @@ export const UpdateTransaction = async ({ oldTransaction, curentCompte, curentMo
 
 
 
-    DatabaseManager.UpdateCompte(
+    const result = await DatabaseManager.UpdateCompte(
         curentCompte.id,
         curentCompte.name,
         curentCompte.pay,
         curentCompte.withdrawal,
         curentCompte.deposit,
         curentCompte.transactions
-    ).then((_compte) => {
-        curentCompte = _compte;
-        return true;
+    );
+
+    if (result) {
+
+        if (newTransaction.transactionType === "BankTransfers") {
+
+            const newAllComptes = await Transfer({
+                newTransaction: newTransaction,
+                AllComptes: AllComptes,
+                oldTransaction: oldTransaction
+            });
+
+            if (newAllComptes) {
+                return {
+                    compte: result,
+                    month: curentMonth,
+                    AllComptes: newAllComptes,
+                    alert: null
+                }
+            }
+        } else {
+
+            return {
+
+                compte: result,
+                month: curentMonth,
+                AllComptes: [],
+                alert: null
+            };
+        }
+    }
+
+    return generateAlert({
+        currentCompte: curentCompte,
+        currentMonth: curentMonth,
+        type: getTrad('error'),
+        message: getTrad("WeAreUnableSaveTransaction"),
     });
-
-    return {
-
-        compte: curentCompte,
-        curentMonth: curentMonth
-    };
-
-
 }
 
 
@@ -364,6 +419,8 @@ export const defineFormAddBudget = (transaction: TransactionMonthInterface | und
         categoryTransaction: transaction.categoryID,
         isUnique: transaction.status === 'unique' ? true : false,
         period: transaction.period ? transaction.period : "month",
+        idTransfert: transaction.idTransfer ? transaction.idTransfer : 0,
+        nameCompteTransfer: transaction.nameCompteTransfer ? transaction.nameCompteTransfer : "",
 
 
     } as FormAddBudget : ResetForm()
@@ -452,3 +509,148 @@ const getOverdrawn = (compte: CompteInterface, newTransaction: TransactionMonthI
 
 }
 
+
+interface GenerateAlertInterface {
+    currentCompte: CompteInterface,
+    currentMonth: MonthInterface,
+    type: any,
+    message?: string,
+    action?: {
+        valider: {
+            text: string,
+            action: any
+        },
+        annuler: {
+            text: string,
+            action: any
+
+        }
+    }
+
+}
+
+function generateAlert({
+    currentCompte,
+    currentMonth,
+    type,
+    message,
+    action,
+}: GenerateAlertInterface) {
+
+    return {
+        compte: currentCompte,
+        month: currentMonth,
+        AllComptes: [],
+        alert: message ? {
+            type: getTrad(type),
+            message: message,
+            action: action ? {
+                valider: {
+                    text: action.valider.text,
+                    action: action.valider.action
+                },
+                annuler: {
+                    text: action.annuler.text,
+                    action: action.annuler.action
+                }
+
+            } : null
+        } : null
+
+    }
+
+
+}
+
+
+interface TransferInterface {
+    AllComptes: CompteInterface[],
+
+    newTransaction: TransactionMonthInterface,
+    oldTransaction?: TransactionMonthInterface | null,
+}
+
+async function Transfer({ AllComptes, newTransaction, oldTransaction,
+
+}: TransferInterface) {
+    const newAllCOmptes: CompteInterface[] = JSON.parse(JSON.stringify(AllComptes));
+
+    const indexCompte = newAllCOmptes.findIndex((compte: CompteInterface) => {
+        return compte.id === newTransaction.idTransfer;
+    });
+
+    if (indexCompte == -1) throw new Error("Compte Receveur introuvable");
+
+    const compteReceveur = newAllCOmptes[indexCompte];
+    const indexYear = compteReceveur.transactions.findIndex((transactionsParYear: TransactionInterface) => {
+        return transactionsParYear.year === new Date().getFullYear();
+    });
+
+    const transactionsParYear = compteReceveur.transactions[indexYear];
+
+    const indexMonth = transactionsParYear.month.findIndex((month: MonthInterface) => {
+        return month.nameMonth === getMonthByNumber(new Date().getMonth() + 1)
+    });
+
+    if (indexMonth == -1) throw new Error("Mois introuvable");
+
+    const month = transactionsParYear.month[indexMonth];
+
+    const IDTransactionTransfer = defineIDTransaction(month, "income");
+
+    if (oldTransaction) {
+        month.transactions.income = month.transactions.income.filter((transaction: TransactionMonthInterface) => {
+            return transaction.name !== oldTransaction.name;
+        })
+
+    }
+    const newTransactionTransfer = createNewTransaction(
+        IDTransactionTransfer,
+        {
+            name: newTransaction.name,
+            montant: newTransaction.montant.toString(),
+            typeOperation: "income",
+            typeTransaction: newTransaction.transactionType,
+            categoryTransaction: newTransaction.categoryID,
+            isUnique: true,
+            idTransfert: newTransaction.id,
+            nameCompteTransfer: newTransaction.nameCompteTransfer,
+            period: newTransaction.period ? newTransaction.period : "month",
+            errorMontant: '',
+            errorName: '',
+        });
+
+    newTransactionTransfer.isClosed = true;
+
+    month.transactions.income.push(newTransactionTransfer);
+
+
+
+
+
+    compteReceveur.transactions[indexYear].month[indexMonth] = month;
+
+    const newResult = calculTransactionByCompte(compteReceveur, month);
+
+    compteReceveur.pay = newResult.pay;
+    compteReceveur.withdrawal = newResult.withdrawal;
+    compteReceveur.deposit = newResult.deposit;
+
+    newAllCOmptes[indexCompte] = compteReceveur;
+
+
+
+    const result = await DatabaseManager.UpdateCompte(
+        compteReceveur.id,
+        compteReceveur.name,
+        compteReceveur.pay,
+        compteReceveur.withdrawal,
+        compteReceveur.deposit,
+        compteReceveur.transactions
+    );
+
+    if (!result) throw new Error("Erreur lors de la mise à jour du compte receveur");
+
+    return newAllCOmptes;
+
+}

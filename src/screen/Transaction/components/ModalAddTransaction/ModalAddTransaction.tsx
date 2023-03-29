@@ -1,16 +1,18 @@
 
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Modal, View, Text, TouchableOpacity, Alert } from 'react-native'
-import { Input, Icon, Button, CheckBox } from '@rneui/base';
+import { Input, Icon, Button, CheckBox, } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import styleSheet from './styleSheet';
 import { Picker } from '@react-native-picker/picker';
-import { CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, TransactionMonthInterface } from '../../../../redux/comptesSlice';
+import { addComptes, CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, TransactionMonthInterface } from '../../../../redux/comptesSlice';
 import { addCategory, CategoryInterface } from '../../../../redux/categorySlice';
 import { createNewTransaction, defineFormAddBudget, defineIDTransaction, FormAddBudget, getAllCategory, ResetForm, saveTransaction, UpdateTransaction, ValidateForm } from './logic';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
 import { getTrad } from '../../../../lang/internationalization';
+import DatabaseManager from '../../../../utils/DataBase';
+import { userInterface } from '../../../../redux/userSlice';
 
 interface ModalAddBudgetProps {
     isViewModalAddBudget: boolean,
@@ -23,6 +25,7 @@ interface ModalAddBudgetProps {
 export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, transaction }: ModalAddBudgetProps) => {
 
     const dispatch = useDispatch();
+    const comptes: CompteInterface[] = useSelector((state: any) => state.compte.comptes);
 
     const categoryRedux: CategoryInterface[] = useSelector((state: any) => state.category.category);
     const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
@@ -71,10 +74,20 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
         const newTransaction: TransactionMonthInterface = createNewTransaction(newID, formAddBudget)
 
 
-        saveTransaction(currentCompteRedux, currentMonthRedux, newTransaction).then((res) => {
+        saveTransaction({
+            currentCompte: currentCompteRedux,
+            currentMonth: currentMonthRedux,
+            newTransaction,
+            AllComptes: comptes
+        }).then((res) => {
             if (!res.alert) {
                 dispatch(setCurentCompte(res.compte));
                 dispatch(setCurentMonth(res.month))
+
+                if (res.AllComptes.length > 0) {
+                    dispatch(addComptes(res.AllComptes))
+                }
+
                 handleCloseModal()
                 return;
             }
@@ -83,7 +96,8 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                 message: res.alert.message,
                 action: res.alert.action,
                 callBackValidate: () => {
-                    res.alert.action?.valider.action().then((res) => {
+                    if (!res.alert) return;
+                    res.alert.action?.valider.action().then((res: { alert: any; compte: CompteInterface; month: MonthInterface; }) => {
                         if (!res.alert) {
                             dispatch(setCurentCompte(res.compte));
                             dispatch(setCurentMonth(res.month))
@@ -132,15 +146,16 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                 oldTransaction: transaction,
                 curentCompte: currentCompteRedux,
                 curentMonth: currentMonthRedux,
-                newTransaction: newTransaction
+                newTransaction: newTransaction,
+                AllComptes: comptes
 
-            }).then((res: {
-                compte: CompteInterface,
-                curentMonth: MonthInterface
-            }) => {
+            }).then((res) => {
 
                 dispatch(setCurentCompte(res.compte));
-                dispatch(setCurentMonth(res.curentMonth))
+                dispatch(setCurentMonth(res.month))
+                if (res.AllComptes.length > 0) {
+                    dispatch(addComptes(res.AllComptes))
+                }
                 handleCloseModal()
 
             }).catch((err) => { console.log(err) })
@@ -285,11 +300,27 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                         uncheckedIcon='circle-o'
                                         checked={formAddBudget.typeTransaction === 'Budget' ? true : false}
                                     />
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({
+                                                ...formAddBudget, typeTransaction: 'BankTransfers',
+                                                typeOperation: 'expense'
+                                            });
+                                        }}
+                                        title={getTrad("BankTransfers")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.typeTransaction === 'BankTransfers' ? true : false}
+                                    />
+                                </View>
+                                <View>
+
+                                    <ComptePIcker formAddBudget={formAddBudget} setFormAddBudget={setFormAddBudget} />
+
                                 </View>
 
-
                             </View >
-                            <View>
+                            {formAddBudget.typeTransaction != "BankTransfers" && < View >
                                 <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionType")}</Text>
                                 <View style={[globalStyle.flexRow]}>
                                     <CheckBox
@@ -313,7 +344,7 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 </View>
 
 
-                            </View>
+                            </View>}
                         </View>}
                     {
                         curentEtape === 'Etape3' &&
@@ -528,4 +559,35 @@ const BtnSaveTransaction = React.memo(({ handleSaveTransaction, handleSaveEditTr
 })
 
 
+const ComptePIcker = React.memo((props: { formAddBudget: FormAddBudget, setFormAddBudget: Function }) => {
 
+    const { formAddBudget, setFormAddBudget } = props;
+    const comptes: CompteInterface[] = useSelector((state: any) => state.compte.comptes);
+
+    const user: userInterface = useSelector((state: any) => state.user);
+
+
+    return (
+
+        <>
+            {formAddBudget.typeTransaction === "BankTransfers" && <Picker
+                selectedValue={formAddBudget.idTransfert}
+                onValueChange={(itemValue, itemIndex) => setFormAddBudget({
+                    ...formAddBudget,
+                    idTransfert: itemValue,
+                    nameCompteTransfer: comptes[itemIndex].name,
+                })}
+            >
+                {
+                    comptes.map((compte, index) => {
+                        return (
+                            <Picker.Item key={'pickCompte-' + index} label={compte.name} value={compte.id} />
+                        )
+                    }
+                    )
+                }
+            </Picker>}
+        </>
+    )
+
+},)

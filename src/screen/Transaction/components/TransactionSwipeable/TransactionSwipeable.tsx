@@ -2,7 +2,7 @@
 
 import { colorList } from "../../../../utils/ColorCollection";
 import { Button, ListItem, Icon } from "@rneui/base";
-import { setCurentBudget, setCurentCompte, setCurentMonth, TransactionMonthInterface } from "../../../../redux/comptesSlice";
+import { addComptes, setCurentBudget, setCurentCompte, setCurentMonth, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { IconsCategory } from "../../../../components";
 import { deleteTransaction } from "./logic";
@@ -22,7 +22,9 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
     const curentCompte = useSelector((state: any) => state.compte.currentCompte);
     const curentMonth = useSelector((state: any) => state.compte.currentMonth);
+    const comptes = useSelector((state: any) => state.compte.comptes);
     const dispatch = useDispatch();
+
     return (
         <ListItem.Swipeable
             style={
@@ -65,16 +67,16 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                             _transaction: transaction,
                             _compte: curentCompte,
                             _curentMonth: curentMonth,
+                            _AllComptes: comptes
                         }).then((res) => {
 
                             dispatch(setCurentCompte(res.compte));
                             dispatch(setCurentMonth(res.curentMonth));
-
-
-
+                            if (res.allComptes.length > 0) {
+                                dispatch(addComptes(res.allComptes));
+                            }
                             reset()
                         })
-
                         reset()
 
                     }

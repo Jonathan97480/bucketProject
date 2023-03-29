@@ -594,7 +594,7 @@ export default class DatabaseManager {
                     (_, { rows: { _array } }) => {
 
                         if (_array.length > 0) {
-                            console.log("ARRAY LOGIN USER : ", _array)
+
                             resolve({
                                 id: _array[0].id,
                                 identifiant: _array[0].identifiant,

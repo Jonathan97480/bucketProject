@@ -23,8 +23,10 @@ export interface TransactionMonthInterface {
     status: "unique" | "recurring",
     typeOperation: "income" | "expense",
     categoryID: number,
-    period: "day" | "week" | "month" | "year" | null,
-    transactionType: "Spent" | "Budget",
+    period: "month" | "year" | null,
+    transactionType: "Spent" | "Budget" | "BankTransfers",
+    idTransfer: number | null,
+    nameCompteTransfer: string | null,
     transaction: {
         income: SimpleTransactionInterface[],
         expense: SimpleTransactionInterface[],

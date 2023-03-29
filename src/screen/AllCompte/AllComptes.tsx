@@ -64,11 +64,11 @@ export default function AllComptes({ navigation }: any) {
 
         if (comptes.length <= 0) {
 
-            getCompteByUser(user.user?.id || 1).then((comptes) => {
+            getCompteByUser(user.user?.id || 1).then((_comptes) => {
 
-                if (comptes.length <= 0) return;
+                if (_comptes.length <= 0) return;
 
-                dispatch(addComptes(comptes));
+                dispatch(addComptes(_comptes));
 
             }).catch((error) => {
 

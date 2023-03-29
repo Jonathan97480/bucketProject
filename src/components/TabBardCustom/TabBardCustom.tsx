@@ -1,6 +1,7 @@
 import { TouchableOpacity, View, Text, Image } from "react-native";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
+import { getTrad } from "../../lang/internationalization";
 export default function TabBardCustom({ state, descriptors, navigation }: { state: any, descriptors: any, navigation: any }) {
 
 
@@ -56,7 +57,7 @@ export default function TabBardCustom({ state, descriptors, navigation }: { stat
                             style={[{
                                 color: isFocused ? '#9747FF' : '#fff',
                             }, globalStyle.textSizeSmall]}>
-                            {label}
+                            {getTrad(label)}
                         </Text>
                     </TouchableOpacity>
                 );
@@ -68,7 +69,7 @@ function getIconByRouteName(name: string, isFocused: boolean): React.ReactNode {
 
 
     switch (name) {
-        case "Compte":
+        case "Account":
             return <Image source={require("../../assets/images/Wallet.png")} style={[styleSheet.icon, {
                 tintColor: isFocused ? '#9747FF' : '#fff',
             }]} />;
@@ -76,7 +77,7 @@ function getIconByRouteName(name: string, isFocused: boolean): React.ReactNode {
             return <Image source={require("../../assets/images/piggy_bank.png")} style={[styleSheet.icon, {
                 tintColor: isFocused ? '#9747FF' : '#fff',
             }]} />;
-        case "Liste":
+        case "List":
             return <Image source={require("../../assets/images/list.png")} style={[styleSheet.icon, {
                 tintColor: isFocused ? '#9747FF' : '#fff',
             }]} />;

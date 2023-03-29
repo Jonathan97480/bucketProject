@@ -47,7 +47,7 @@ export const AllList = () => {
 
         <CustomSafeAreaView>
 
-            <StatusBar barStyle="default" />
+
             <View style={{
 
                 maxHeight: "100%",

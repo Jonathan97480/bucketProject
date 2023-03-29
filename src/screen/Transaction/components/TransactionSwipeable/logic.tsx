@@ -1,11 +1,13 @@
 import { CompteInterface, MonthInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase";
+import { getMonthByNumber } from "../../../../utils/DateManipulation";
 import { calculTransactionByCompte } from "../ModalAddTransaction/logic";
 
-export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }: {
+export const deleteTransaction = async ({ _transaction, _compte, _curentMonth, _AllComptes }: {
     _transaction: TransactionMonthInterface
     _compte: CompteInterface,
     _curentMonth: MonthInterface
+    _AllComptes: CompteInterface[]
 }) => {
 
     const curentCompte: CompteInterface = JSON.parse(JSON.stringify(_compte));
@@ -52,9 +54,87 @@ export const deleteTransaction = async ({ _transaction, _compte, _curentMonth }:
         curentCompte.transactions
     )
 
+    if (result) {
+
+        if (_transaction.transactionType === "BankTransfers") {
+
+            const newAllComptes = await deleteTransfer(_transaction, _AllComptes);
+
+            return {
+                compte: result,
+                curentMonth: curentMonth,
+                allComptes: newAllComptes
+            };
+
+        }
+
+        return {
+            compte: result,
+            curentMonth: curentMonth,
+            allComptes: []
+        };
+
+
+
+
+    }
+
     return {
-        compte: result,
-        curentMonth: curentMonth
-    };
+        compte: curentCompte,
+        curentMonth: curentMonth,
+        allComptes: []
+    }
+}
+
+
+async function deleteTransfer(transaction: TransactionMonthInterface, _AllComptes: CompteInterface[]) {
+
+    const newAllComptes: CompteInterface[] = JSON.parse(JSON.stringify(_AllComptes));
+
+    let indexCompte = newAllComptes.findIndex((compte) => {
+        return compte.id === transaction.idTransfer;
+    });
+
+    let indexYear = newAllComptes[indexCompte].transactions.findIndex((year) => {
+        return year.year === new Date().getFullYear();
+    });
+
+    let indexMonth = newAllComptes[indexCompte].transactions[indexYear].month.findIndex((month) => {
+        return month.nameMonth === getMonthByNumber(new Date().getMonth() + 1);
+    });
+
+    const month = newAllComptes[indexCompte].transactions[indexYear].month[indexMonth];
+
+
+    month.transactions.income = month.transactions.income.filter((transactionMonth) => {
+        return transactionMonth.name !== transaction.name;
+    });
+
+    newAllComptes[indexCompte].transactions[indexYear].month[indexMonth] = month;
+
+
+
+    let newResultCompte = calculTransactionByCompte(newAllComptes[indexCompte], month);
+
+    newAllComptes[indexCompte].pay = newResultCompte.pay;
+    newAllComptes[indexCompte].withdrawal = newResultCompte.withdrawal;
+    newAllComptes[indexCompte].deposit = newResultCompte.deposit;
+
+    const result = await DatabaseManager.UpdateCompte(
+        newAllComptes[indexCompte].id,
+        newAllComptes[indexCompte].name,
+        newAllComptes[indexCompte].pay,
+        newAllComptes[indexCompte].withdrawal,
+        newAllComptes[indexCompte].deposit,
+        newAllComptes[indexCompte].transactions
+    )
+
+
+    if (result) {
+        return newAllComptes;
+    } else {
+        throw new Error("Une erreur est survenue lors de la suppression de la transaction sur le compte de destination");
+    }
+
 
 }

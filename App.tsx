@@ -61,7 +61,7 @@ export default function App() {
 export const TabButton = () => {
   return (
     <Tab.Navigator
-      initialRouteName='compte'
+      initialRouteName='Account'
 
       tabBar={props => <TabBardCustom {...props} />}
       screenOptions={{
@@ -71,9 +71,9 @@ export const TabButton = () => {
       }}
     >
 
-      <Tab.Screen name="Compte" component={Compte} />
+      <Tab.Screen name="Account" component={Compte} />
       <Tab.Screen name="transactions" component={Transaction} />
-      <Tab.Screen name="Liste" component={AllList} />
+      <Tab.Screen name="List" component={AllList} />
     </Tab.Navigator>
   );
 }
