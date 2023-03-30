@@ -8,18 +8,15 @@ export const deleteOperation = async ({ compte, budget, operation, month }: {
     operation: SimpleTransactionInterface,
 }) => {
 
-    console.log("B", budget);
-
 
     const _budget: TransactionMonthInterface = {
-
         categoryID: budget.categoryID,
         id: budget.id,
         montant: budget.montant,
         start_montant: budget.start_montant,
         transaction: {
-            expense: [...budget.transaction.expense],
-            income: [...budget.transaction.income]
+            expense: [...budget.transaction!.expense],
+            income: [...budget.transaction!.income]
         },
         transactionType: budget.transactionType,
         typeOperation: budget.typeOperation,
@@ -28,19 +25,21 @@ export const deleteOperation = async ({ compte, budget, operation, month }: {
         status: budget.status,
         period: budget.period,
         montant_real: budget.montant_real,
+        idTransfer: budget.idTransfer,
+        nameCompteTransfer: budget.nameCompteTransfer,
     };
 
 
 
-    let indexOperation = _budget.transaction[operation.type].findIndex((item) => {
+    let indexOperation = _budget.transaction![operation.type].findIndex((item) => {
         return item.id === operation.id
     });
-    console.log("DELETE OPERATION", operation, _budget.transaction[operation.type], indexOperation, "BUDGET", _budget);
+    console.log("DELETE OPERATION", operation, _budget.transaction![operation.type], indexOperation, "BUDGET", _budget);
     if (indexOperation !== -1) {
 
 
-        _budget.transaction[operation.type] = [
-            ..._budget.transaction[operation.type].filter((item) => { return item.id !== operation.id })
+        _budget.transaction![operation.type] = [
+            ..._budget.transaction![operation.type].filter((item) => { return item.id !== operation.id })
         ];
 
 
@@ -52,11 +51,11 @@ export const deleteOperation = async ({ compte, budget, operation, month }: {
         };
 
 
-        _budget.transaction.income.forEach((income) => {
+        _budget.transaction!.income.forEach((income) => {
             total.income += income.montant_real == 0 ? income.total : income.total_real;
         });
 
-        _budget.transaction.expense.forEach((expend) => {
+        _budget.transaction!.expense.forEach((expend) => {
             total.expense += expend.montant_real == 0 ? expend.total : expend.total_real;
         });
 

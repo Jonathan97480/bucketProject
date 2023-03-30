@@ -3,7 +3,7 @@ import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native'
 import styleSheet from './styleSheet'
 import { SimpleTransactionInterface } from '../../../../redux/comptesSlice'
 import globalStyle from '../../../../assets/styleSheet/globalStyle'
-import { textSizeFixe } from '../../../../utils/TextManipulation'
+
 
 
 
@@ -123,7 +123,7 @@ const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen, 
                 <Text
                     style={[{ width: "45%", }, globalStyle.colorTextPrimary]}
 
-                >{textSizeFixe(operationMemo.name, 17)}</Text>
+                >{operationMemo.name.substring(0, 18)}</Text>
 
                 <Text style={[globalStyle.colorTextPrimary]} >{operationMemo.total_real !== 0 ? operationMemo.total_real.toFixed(2) : operationMemo.total.toFixed(2)}€</Text>
 

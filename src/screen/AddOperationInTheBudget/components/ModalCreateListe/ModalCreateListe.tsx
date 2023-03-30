@@ -6,6 +6,7 @@ import { TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import { CreateListe } from "./logic";
 import { useDispatch } from "react-redux";
 import { addListArray } from "../../../../redux/listSlice";
+import { CustomModal } from "../../../../components";
 
 
 interface ModalCreateListeProps {
@@ -24,82 +25,72 @@ export default function ModalCreateListe({ budget, isVisible, setIsVisible, trad
 
 
     return (
-        <Modal
+        <CustomModal
             animationType="slide"
             visible={isVisible}
             transparent={true}
-            onRequestClose={() => {
-                setIsVisible(!isVisible);
-            }}
+            setIsVisible={() => setIsVisible(!isVisible)}
         >
+
+
             <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgba(0,0,0,0.5)"
-                }}
-
+                style={{ width: "100%" }}
             >
+                <Text
+                    style={[
+                        globalStyle.textAlignCenter,
+                        globalStyle.textSizeLarge,
+                        globalStyle.marginVertical
+                    ]}
+                >{trad.CreateListOnBudget}</Text>
 
-                <View
-                    style={{ backgroundColor: "#fff", width: "90%", borderRadius: 10, padding: 10 }}
-                >
-                    <Text
-                        style={[
-                            globalStyle.textAlignCenter,
-                            globalStyle.textSizeLarge,
-                            globalStyle.marginVertical
-                        ]}
-                    >{trad.CreateListOnBudget}</Text>
-
-                    <CheckBox
-                        title={trad.AllOperations}
-                        checked={selectorElements === 'All' ? true : false}
-                        onPress={() => setSelectorElements('All')}
+                <CheckBox
+                    title={trad.AllOperations}
+                    checked={selectorElements === 'All' ? true : false}
+                    onPress={() => setSelectorElements('All')}
 
 
-                    />
-                    <CheckBox
-                        title={trad.ThatTheOutputs}
-                        checked={selectorElements === 'Expense' ? true : false}
-                        onPress={() => setSelectorElements('Expense')}
+                />
+                <CheckBox
+                    title={trad.ThatTheOutputs}
+                    checked={selectorElements === 'Expense' ? true : false}
+                    onPress={() => setSelectorElements('Expense')}
 
 
-                    />
-                    <CheckBox
-                        title={trad.ThatTheEntries}
-                        checked={selectorElements === 'Income' ? true : false}
-                        onPress={() => setSelectorElements('Income')}
+                />
+                <CheckBox
+                    title={trad.ThatTheEntries}
+                    checked={selectorElements === 'Income' ? true : false}
+                    onPress={() => setSelectorElements('Income')}
 
-                    />
+                />
 
-                    <Button
-                        title={trad.CreateList}
-                        radius={25}
-                        buttonStyle={{
-                            backgroundColor: "#9C68DD",
-                            width: "100%",
-                            height: 50,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            marginTop: 10,
-                        }}
-                        onPress={async () => {
+                <Button
+                    title={trad.CreateList}
+                    radius={25}
+                    buttonStyle={{
+                        backgroundColor: "#9C68DD",
+                        width: "100%",
+                        height: 50,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: 10,
+                    }}
+                    onPress={async () => {
 
-                            const newLIst = await CreateListe({ budget, selectorElements: selectorElements });
+                        const newLIst = await CreateListe({ budget, selectorElements: selectorElements });
 
 
 
-                            dispatch(addListArray(newLIst));
+                        dispatch(addListArray(newLIst));
 
 
-                            setIsVisible(!isVisible);
-                        }}
-                    />
-                </View>
+                        setIsVisible(!isVisible);
+                    }}
+                />
             </View>
-        </Modal>
+
+        </CustomModal>
     )
 
 

@@ -22,9 +22,8 @@ export default StyleSheet.create({
     },
     modalHeader: {},
     modalBody: {
-        padding: 20,
-        borderRadius: 10,
-        backgroundColor: 'white',
+
+        width: '100%',
         minHeight: 340,
 
     },

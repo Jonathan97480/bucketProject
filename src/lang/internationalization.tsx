@@ -9,6 +9,7 @@ export const trad = {
         cancel: "Annuler",
         yes: "Oui",
         no: "Non",
+        listAlreadyExist: "Cette liste existe déjà avec ce nom",
         ok: "Ok",
         Information: "Information",
         logout: "Déconnexion",
@@ -43,6 +44,7 @@ export const trad = {
         AddTransaction: "Ajouter une transaction",
         TransactionList: "Liste des transactions",
         DepositToAccount: "Dépôt sur le compte",
+        errorAddList: "Une erreur est survenue lors de l'ajout de la liste",
         Edit: "Modifier",
         Budget: "Budget",
         delete: "Supprimer",
@@ -132,6 +134,8 @@ export const trad = {
         WeAreUnableFindTransactionsForCurrentMonth: "Nous ne sommes pas en mesure de trouver des transactions pour le mois en cours",
         WeAreUnableSaveTransaction: "Nous ne sommes pas en mesure d'enregistrer la transaction",
         Account: "Compte",
+        compteNameExist: "Ce nom de compte existe déjà",
+        NameTransactionAlreadyUsed: "Ce nom de transaction est déjà utilisé",
     },
     EN: {
         deleteCompte: "Delete account",
@@ -141,9 +145,11 @@ export const trad = {
         yes: "Yes",
         no: "No",
         ok: "Ok",
+        listAlreadyExist: "This list already exist please choose another name",
         List: "List",
         logout: "Logout",
         logoutUser: "Do you really want to log out?",
+        errorAddList: "An error occurred while adding the list",
         pay: "Balance",
         Information: "Information",
         DoYouWantUseYourOverdraft: "Do you want to use your overdraft",
@@ -262,6 +268,9 @@ export const trad = {
         YouAlreadyHaveARecurringTransactionWithThisName: "You already have a recurring transaction with this name",
         WeAreUnableFindTransactionsForCurrentMonth: "We are unable to find transactions for the current month",
         WeAreUnableSaveTransaction: "We are unable to save the transaction",
+        compteNameExist: "This account name already exists",
+        NameTransactionAlreadyUsed: "This name is already used for a transaction",
+
     }
 }
 

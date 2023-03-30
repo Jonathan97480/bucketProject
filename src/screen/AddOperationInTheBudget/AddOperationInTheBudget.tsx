@@ -7,7 +7,7 @@ import { setCurentCompte, setCurentMonth, SimpleTransactionInterface, Transactio
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { getColorBudget } from "../../utils/ColorCollection";
 import { ModalAddExpend } from "./components/ModalAddExpend/ModalAddOperation";
-import { CustomSafeAreaView } from "../../components";
+import { CustomModal, CustomSafeAreaView } from "../../components";
 import { OperationArrayAlphabetizeOrder } from "./components/Search/logic";
 import { Search } from "./components/Search/Search";
 import { Filters } from "./components/Filters/Filters";
@@ -364,124 +364,107 @@ const ModalCloreBudget = React.memo((props: { isVisible: boolean, setIsVisible: 
     const dispatch = useDispatch();
 
     return (
-        <Modal
+        <CustomModal
             visible={props.isVisible}
             animationType="slide"
             transparent={true}
-            onRequestClose={() => {
-                props.setIsVisible();
-            }}
+            setIsVisible={() => props.setIsVisible()}
         >
+
             <View
-                style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgba(0,0,0,0.5)",
-                }}
+                style={{ width: "100%", }}
             >
-                <View
-                    style={{
-                        backgroundColor: "#fff",
-                        padding: 20,
-                        margin: 20,
-                        borderRadius: 10,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: "90%",
-                    }}
+                <Text
+                    style={[
+                        globalStyle.textSizeLarge,
+                        globalStyle.textAlignCenter,
+                        { marginBottom: 10 }
+                    ]}
                 >
-                    <Text
-                        style={[
-                            globalStyle.textSizeLarge,
-                            globalStyle.textAlignCenter,
-                            { marginBottom: 10 }
-                        ]}
-                    >
-                        {props.trad.closeBudget}
-                    </Text>
-                    <Text
-                        style={[
-                            globalStyle.textSizeMedium,
-                            globalStyle.textAlignCenter,
-                            { marginBottom: 10 }
-                        ]}
-                    >Voulez vous vraiment fermer ce budget ?</Text>
-                    <Text
-                        style={[
-                            globalStyle.textSizeSmall,
-                            globalStyle.textAlignCenter,
-                            { marginBottom: 10 }
-                        ]}
-                    >{props.trad.closeBudgetMessage}</Text>
-                    <Text
-                        style={[
-                            globalStyle.textSizeSmall,
-                            globalStyle.textAlignCenter,
-                            { marginBottom: 10, color: "#FF0000" }
-                        ]}
-                    >{props.trad.closeBudgetWarning}</Text>
-                    <View>
-                        <Button
-                            radius={25}
-                            buttonStyle={globalStyle.btnStyle}
-                            title={props.trad.CloseTheBudget}
-                            onPress={() => {
-                                CloseBudget({
-                                    budget: props.budget,
-                                    compte: props.compte,
-                                    month: props.month
-                                }).then((res) => {
+                    {props.trad.closeBudget}
+                </Text>
+                <Text
+                    style={[
+                        globalStyle.textSizeMedium,
+                        globalStyle.textAlignCenter,
+                        { marginBottom: 10 }
+                    ]}
+                >Voulez vous vraiment fermer ce budget ?</Text>
+                <Text
+                    style={[
+                        globalStyle.textSizeSmall,
+                        globalStyle.textAlignCenter,
+                        { marginBottom: 10 }
+                    ]}
+                >{props.trad.closeBudgetMessage}</Text>
+                <Text
+                    style={[
+                        globalStyle.textSizeSmall,
+                        globalStyle.textAlignCenter,
+                        { marginBottom: 10, color: "#FF0000" }
+                    ]}
+                >{props.trad.closeBudgetWarning}</Text>
+                <View>
+                    <Button
+                        radius={25}
+                        buttonStyle={globalStyle.btnStyle}
+                        title={props.trad.CloseTheBudget}
+                        onPress={() => {
+                            CloseBudget({
+                                budget: props.budget,
+                                compte: props.compte,
+                                month: props.month
+                            }).then((res) => {
 
-                                    if (res) {
-                                        dispatch(setCurentCompte(res.compte));
-                                        dispatch(setCurentBudget(res.budget));
-                                        dispatch(setCurentMonth(res.month));
-                                        props.setIsVisible();
-                                    }
-                                })
+                                if (res) {
+                                    dispatch(setCurentCompte(res.compte));
+                                    dispatch(setCurentBudget(res.budget));
+                                    dispatch(setCurentMonth(res.month));
+                                    props.setIsVisible();
+                                }
+                            })
 
-                            }}
-                            iconPosition="right"
-                            icon={
+                        }}
+                        iconPosition="right"
+                        icon={
 
-                                <Icon
-                                    style={{ marginLeft: 10 }}
-                                    name="check"
-                                    type="font-awesome"
-                                    size={15}
-                                    color="#fff"
-                                />
-                            }
-                        />
+                            <Icon
+                                style={{ marginLeft: 10 }}
+                                name="check"
+                                type="font-awesome"
+                                size={15}
+                                color="#fff"
+                            />
+                        }
+                    />
 
-                        <Button
-                            radius={25}
-                            buttonStyle={[globalStyle.btnStyle, { backgroundColor: "#FF0000" }]}
-                            title={props.trad.cancel}
-                            onPress={() => {
+                    <Button
+                        radius={25}
+                        buttonStyle={[globalStyle.btnStyle, { backgroundColor: "#FF0000" }]}
+                        title={props.trad.cancel}
+                        onPress={() => {
 
-                                props.setIsVisible();
+                            props.setIsVisible();
 
 
-                            }}
-                            iconPosition="right"
-                            icon={
-                                <Icon
-                                    style={{ marginLeft: 10 }}
-                                    name="times"
-                                    type="font-awesome"
-                                    size={15}
-                                    color="#fff"
-                                />
+                        }}
+                        iconPosition="right"
+                        icon={
+                            <Icon
+                                style={{ marginLeft: 10 }}
+                                name="times"
+                                type="font-awesome"
+                                size={15}
+                                color="#fff"
+                            />
 
-                            }
-                        />
+                        }
+                    />
 
-                    </View>
                 </View>
             </View>
-        </Modal>
+
+        </CustomModal >
 
 
     )

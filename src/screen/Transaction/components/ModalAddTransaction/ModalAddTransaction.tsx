@@ -1,7 +1,7 @@
 
 
-import React, { useCallback, useEffect, useState } from 'react'
-import { Modal, View, Text, TouchableOpacity, Alert } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { Input, Icon, Button, CheckBox, } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import styleSheet from './styleSheet';
@@ -11,8 +11,8 @@ import { addCategory, CategoryInterface } from '../../../../redux/categorySlice'
 import { createNewTransaction, defineFormAddBudget, defineIDTransaction, FormAddBudget, getAllCategory, ResetForm, saveTransaction, UpdateTransaction, ValidateForm } from './logic';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
 import { getTrad } from '../../../../lang/internationalization';
-import DatabaseManager from '../../../../utils/DataBase';
 import { userInterface } from '../../../../redux/userSlice';
+import { CustomModal } from '../../../../components';
 
 interface ModalAddBudgetProps {
     isViewModalAddBudget: boolean,
@@ -213,228 +213,228 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
 
     return (
-        <Modal
+        <CustomModal
             animationType="slide"
             transparent={true}
             visible={isViewModalAddBudget}
-            onRequestClose={() => {
+            setIsVisible={() => {
                 handleCloseModal();
 
             }}
-            style={styleSheet.modal}
+
         >
-
-            <View style={styleSheet.modalContainer}>
-
-
-                <View style={styleSheet.modalBody}>
-                    <Text style={styleSheet.titleModal}>{getTrad("AddTransaction")}</Text>
-                    <View style={[globalStyle.flexRow, { width: '100%', justifyContent: 'space-between' }, globalStyle.marginVertical]} >
-                        <BtnStage
-                            curentStage={curentEtape}
-                            setCurentStage={setCurentEtape}
-                            stage="Etape1"
-                            title={getTrad("Stage") + " 1"}
-                        />
-                        <BtnStage
-                            curentStage={curentEtape}
-                            setCurentStage={setCurentEtape}
-                            stage="Etape2"
-                            title={getTrad("Stage") + " 2"}
-                        />
-
-                        <BtnStage
-                            curentStage={curentEtape}
-                            setCurentStage={setCurentEtape}
-                            stage="Etape3"
-                            title={getTrad("Stage") + " 3"}
-                        />
-
-                    </View>
-                    {
-                        curentEtape === 'Etape1' &&
-                        <View style={styleSheet.stageContainer}>
-                            <View>
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("name")} :</Text>
-                                <Input placeholder={getTrad("NameYourTransaction")}
-                                    errorMessage={formAddBudget.errorName}
-                                    value={formAddBudget.name}
-                                    onChangeText={(value) => {
-                                        setFormAddBudget({ ...formAddBudget, name: value });
-                                    }}
-                                />
-                            </View>
-                            <View>
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("Amount")} :</Text>
-                                <Input placeholder={getTrad("AmountYourTransaction")}
-                                    keyboardType="numeric"
-                                    errorMessage={formAddBudget.errorMontant}
-                                    value={formAddBudget.montant}
-                                    onChangeText={(value) => {
-                                        setFormAddBudget({ ...formAddBudget, montant: value });
-                                    }}
-                                />
-                            </View>
-                        </View>}
-                    {
-                        curentEtape === 'Etape2' &&
-                        <View style={styleSheet.stageContainer}>
-                            <View>
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionType")}</Text>
-                                <View style={[globalStyle.flexRow]}>
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({ ...formAddBudget, typeTransaction: 'Spent' });
-                                        }}
-                                        title={getTrad("Operation")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={formAddBudget.typeTransaction === 'Spent' ? true : false}
-                                    />
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({ ...formAddBudget, typeTransaction: 'Budget' });
-                                        }}
-                                        title={getTrad("Budget")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={formAddBudget.typeTransaction === 'Budget' ? true : false}
-                                    />
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({
-                                                ...formAddBudget, typeTransaction: 'BankTransfers',
-                                                typeOperation: 'expense'
-                                            });
-                                        }}
-                                        title={getTrad("BankTransfers")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={formAddBudget.typeTransaction === 'BankTransfers' ? true : false}
-                                    />
-                                </View>
-                                <View>
-
-                                    <ComptePIcker formAddBudget={formAddBudget} setFormAddBudget={setFormAddBudget} />
-
-                                </View>
-
-                            </View >
-                            {formAddBudget.typeTransaction != "BankTransfers" && < View >
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionType")}</Text>
-                                <View style={[globalStyle.flexRow]}>
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({ ...formAddBudget, typeOperation: 'income' });
-                                        }}
-                                        title={getTrad("Deposit")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={formAddBudget.typeOperation === 'income' ? true : false}
-                                    />
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({ ...formAddBudget, typeOperation: 'expense' });
-                                        }}
-                                        title={getTrad("Withdrawal")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={formAddBudget.typeOperation === 'expense' ? true : false}
-                                    />
-                                </View>
-
-
-                            </View>}
-                        </View>}
-                    {
-                        curentEtape === 'Etape3' &&
-                        <View style={styleSheet.stageContainer}>
-                            <View>
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("IsOperationUnique")}</Text>
-                                <View style={[globalStyle.flexRow]}>
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({ ...formAddBudget, isUnique: true });
-                                        }}
-                                        title={getTrad("yes")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={formAddBudget.isUnique ? true : false}
-                                    />
-                                    <CheckBox
-                                        onPress={() => {
-                                            setFormAddBudget({ ...formAddBudget, isUnique: false });
-                                        }}
-                                        title={getTrad("no")}
-                                        checkedIcon='dot-circle-o'
-                                        uncheckedIcon='circle-o'
-                                        checked={!formAddBudget.isUnique ? true : false}
-                                    />
-                                </View>
-                            </View>
-
-                            {
-                                !formAddBudget.isUnique &&
-                                <View>
-                                    <Text style={styleSheet.modalInputLabel}>{getTrad("theOperationRepeatedEvery")}</Text>
-                                    <View style={[globalStyle.flexRow]}>
-
-                                        <CheckBox
-                                            onPress={() => {
-                                                setFormAddBudget({ ...formAddBudget, period: 'month' });
-                                            }}
-                                            title={getTrad("months")}
-                                            checkedIcon='dot-circle-o'
-                                            uncheckedIcon='circle-o'
-                                            checked={formAddBudget.period == "month" ? true : false}
-                                        />
-                                        <CheckBox
-                                            onPress={() => {
-                                                setFormAddBudget({ ...formAddBudget, period: 'year' });
-                                            }}
-                                            title={getTrad("years")}
-                                            checkedIcon='dot-circle-o'
-                                            uncheckedIcon='circle-o'
-                                            checked={formAddBudget.period == "year" ? true : false}
-                                        />
-                                    </View>
-                                </View>
-                            }
-
-
-                            <View>
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionCategory")}</Text>
-                                <Picker
-                                    selectedValue={formAddBudget.categoryTransaction}
-                                    onValueChange={(itemValue: number, itemIndex: number) => {
-                                        setFormAddBudget({ ...formAddBudget, categoryTransaction: itemValue });
-                                    }}
-                                >
-                                    {categoryRedux.map((category, index) => {
-
-                                        return (
-                                            <Picker.Item key={'pickCategory-' + index} label={category.name} value={category.id} />
-                                        )
-                                    })}
-                                </Picker>
-                            </View>
-
-                        </View>}
-
-                    <BtnNextStage
+            <View style={styleSheet.modalBody}>
+                <Text style={styleSheet.titleModal}>{getTrad("AddTransaction")}</Text>
+                <View style={[
+                    globalStyle.flexRow,
+                    { width: '100%', justifyContent: 'space-between' },
+                    globalStyle.marginVertical]}
+                >
+                    <BtnStage
                         curentStage={curentEtape}
                         setCurentStage={setCurentEtape}
-                        handleSaveEditTransaction={handleSaveEditTransaction}
-                        handleSaveTransaction={() => handleSaveTransaction()}
-                        transaction={transaction}
+                        stage="Etape1"
+                        title={getTrad("Stage") + " 1"}
+                    />
+                    <BtnStage
+                        curentStage={curentEtape}
+                        setCurentStage={setCurentEtape}
+                        stage="Etape2"
+                        title={getTrad("Stage") + " 2"}
+                    />
 
+                    <BtnStage
+                        curentStage={curentEtape}
+                        setCurentStage={setCurentEtape}
+                        stage="Etape3"
+                        title={getTrad("Stage") + " 3"}
                     />
 
                 </View>
+                {
+                    curentEtape === 'Etape1' &&
+                    <View style={styleSheet.stageContainer}>
+                        <View>
+                            <Text style={styleSheet.modalInputLabel}>{getTrad("name")} :</Text>
+                            <Input placeholder={getTrad("NameYourTransaction")}
+                                errorMessage={formAddBudget.errorName}
+                                value={formAddBudget.name}
+                                onChangeText={(value) => {
+                                    setFormAddBudget({ ...formAddBudget, name: value });
+                                }}
+                            />
+                        </View>
+                        <View>
+                            <Text style={styleSheet.modalInputLabel}>{getTrad("Amount")} :</Text>
+                            <Input placeholder={getTrad("AmountYourTransaction")}
+                                keyboardType="numeric"
+                                errorMessage={formAddBudget.errorMontant}
+                                value={formAddBudget.montant}
+                                onChangeText={(value) => {
+                                    setFormAddBudget({ ...formAddBudget, montant: value });
+                                }}
+                            />
+                        </View>
+                    </View>}
+                {
+                    curentEtape === 'Etape2' &&
+                    <View style={styleSheet.stageContainer}>
+                        <View>
+                            <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionType")}</Text>
+                            <View style={[globalStyle.flexRow]}>
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({ ...formAddBudget, typeTransaction: 'Spent' });
+                                    }}
+                                    title={getTrad("Operation")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={formAddBudget.typeTransaction === 'Spent' ? true : false}
+                                />
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({ ...formAddBudget, typeTransaction: 'Budget' });
+                                    }}
+                                    title={getTrad("Budget")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={formAddBudget.typeTransaction === 'Budget' ? true : false}
+                                />
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({
+                                            ...formAddBudget, typeTransaction: 'BankTransfers',
+                                            typeOperation: 'expense'
+                                        });
+                                    }}
+                                    title={getTrad("BankTransfers")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={formAddBudget.typeTransaction === 'BankTransfers' ? true : false}
+                                />
+                            </View>
+                            <View>
+
+                                <ComptePIcker formAddBudget={formAddBudget} setFormAddBudget={setFormAddBudget} />
+
+                            </View>
+
+                        </View >
+                        {formAddBudget.typeTransaction != "BankTransfers" && < View >
+                            <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionType")}</Text>
+                            <View style={[globalStyle.flexRow]}>
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({ ...formAddBudget, typeOperation: 'income' });
+                                    }}
+                                    title={getTrad("Deposit")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={formAddBudget.typeOperation === 'income' ? true : false}
+                                />
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({ ...formAddBudget, typeOperation: 'expense' });
+                                    }}
+                                    title={getTrad("Withdrawal")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={formAddBudget.typeOperation === 'expense' ? true : false}
+                                />
+                            </View>
+
+
+                        </View>}
+                    </View>}
+                {
+                    curentEtape === 'Etape3' &&
+                    <View style={styleSheet.stageContainer}>
+                        <View>
+                            <Text style={styleSheet.modalInputLabel}>{getTrad("IsOperationUnique")}</Text>
+                            <View style={[globalStyle.flexRow]}>
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({ ...formAddBudget, isUnique: true });
+                                    }}
+                                    title={getTrad("yes")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={formAddBudget.isUnique ? true : false}
+                                />
+                                <CheckBox
+                                    onPress={() => {
+                                        setFormAddBudget({ ...formAddBudget, isUnique: false });
+                                    }}
+                                    title={getTrad("no")}
+                                    checkedIcon='dot-circle-o'
+                                    uncheckedIcon='circle-o'
+                                    checked={!formAddBudget.isUnique ? true : false}
+                                />
+                            </View>
+                        </View>
+
+                        {
+                            !formAddBudget.isUnique &&
+                            <View>
+                                <Text style={styleSheet.modalInputLabel}>{getTrad("theOperationRepeatedEvery")}</Text>
+                                <View style={[globalStyle.flexRow]}>
+
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({ ...formAddBudget, period: 'month' });
+                                        }}
+                                        title={getTrad("months")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.period == "month" ? true : false}
+                                    />
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({ ...formAddBudget, period: 'year' });
+                                        }}
+                                        title={getTrad("years")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.period == "year" ? true : false}
+                                    />
+                                </View>
+                            </View>
+                        }
+
+
+                        <View>
+                            <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionCategory")}</Text>
+                            <Picker
+                                selectedValue={formAddBudget.categoryTransaction}
+                                onValueChange={(itemValue: number, itemIndex: number) => {
+                                    setFormAddBudget({ ...formAddBudget, categoryTransaction: itemValue });
+                                }}
+                            >
+                                {categoryRedux.map((category, index) => {
+
+                                    return (
+                                        <Picker.Item key={'pickCategory-' + index} label={category.name} value={category.id} />
+                                    )
+                                })}
+                            </Picker>
+                        </View>
+
+                    </View>}
+
+                <BtnNextStage
+                    curentStage={curentEtape}
+                    setCurentStage={setCurentEtape}
+                    handleSaveEditTransaction={handleSaveEditTransaction}
+                    handleSaveTransaction={() => handleSaveTransaction()}
+                    transaction={transaction}
+
+                />
+
             </View>
 
 
-        </Modal >
+
+        </CustomModal >
     );
 
 

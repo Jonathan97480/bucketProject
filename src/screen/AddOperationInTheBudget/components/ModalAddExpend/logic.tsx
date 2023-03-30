@@ -1,6 +1,7 @@
 import { CompteInterface, MonthInterface, SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase";
-import { fixedFloatNumber } from "../../../../utils/ExpendManipulation";
+import { generateAlert, TextCompare } from "../../../../utils/TextManipulation";
+
 
 
 export interface FormAddOperationInterface {
@@ -19,7 +20,7 @@ export interface FormAddOperationInterface {
 export function calculateTotalExpend(montant: number, quantity: number): number {
     let total = 0;
     total = montant * quantity;
-    return fixedFloatNumber(total);
+    return parseFloat(total.toFixed(2));
 
 }
 
@@ -121,6 +122,26 @@ export async function saveOperation({ compteCurrent, CurrentMonth, budget, newOp
 }) {
 
 
+    /* verification des doublons */
+    if (!oldOperation) {
+        if (budget.transaction) {
+            const AllOperations = budget.transaction[newOperation.type];
+            const doublon = AllOperations.find((operation) => {
+                return TextCompare(operation.name, newOperation.name);
+            });
+
+            if (doublon) {
+                return {
+                    compte: null,
+                    month: null,
+                    budget: null,
+                    alert: generateAlert({ message: "Une operation existe deja avec le meme nom", type: "error" })
+
+                }
+            }
+        }
+    }
+
 
     const request = prepareRequest({ compteCurrent, CurrentMonth, budget, newOperation, oldOperation });
 
@@ -139,7 +160,8 @@ export async function saveOperation({ compteCurrent, CurrentMonth, budget, newOp
         return {
             compte: newCompte,
             month: request.month,
-            budget: request.budget
+            budget: request.budget,
+            alert: null
         };
     } else {
         /*  une erreur est survenue pendant la preparation de la requête */
@@ -218,7 +240,7 @@ export function CalculBudget({ budget }: { budget: TransactionMonthInterface }) 
     budget.montant = budget.start_montant;
     budget.montant += total.income;
     budget.montant -= total.expense;
-    budget.montant = fixedFloatNumber(budget.montant);
+    budget.montant = parseFloat(budget.montant.toFixed(2));
 
 
 

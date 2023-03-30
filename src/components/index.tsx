@@ -3,3 +3,4 @@ export { default as CustomSafeAreaView } from "./CustomSafeAreaView/CustomSafeAr
 export { default as CustomActivityIndicator } from "./CustomActivityIndicator/CustomActivityIndicator";
 export { default as TabBardCustom } from "./TabBardCustom/TabBardCustom";
 export { default as IconsCategory } from "./IconsCategory/IconsCategory";
+export { CustomModal } from "./CustomModal/CustomModal";

@@ -1,13 +1,14 @@
 
 import { Button, CheckBox, Input } from '@rneui/base';
 import React, { useEffect, useState } from 'react';
-import { Modal, View, StyleSheet } from 'react-native';
+import { Modal, View, StyleSheet, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { addComptesArray, CompteInterface, updateCompte } from '../../../../redux/comptesSlice';
 import { createCompte, UpdateCompte } from './logic';
 import { styleSheet } from './styleSheet';
-import { CustomActivityIndicator } from '../../../../components';
+import { CustomActivityIndicator, CustomModal } from '../../../../components';
 import AllComptes from '../../AllComptes';
+import { getTrad } from '../../../../lang/internationalization';
 
 
 
@@ -49,22 +50,36 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
         setIsLoading(true);
 
         if (!curentCompte) {
-            const result = await createCompte(
+            const res = await createCompte(
                 {
                     _nameCompte: Compte.name,
                     _idUser: id_user,
                     _Overdrawn: Compte.Overdrawn,
-                    _isOverdrawn: Compte.isOverdrawn
+                    _isOverdrawn: Compte.isOverdrawn,
+                    _AllComptes: allComptes
+
                 }
             );
 
             setTimeout(() => {
 
                 setIsLoading(false);
-                if (result) {
+                if (!res.alert) {
                     setCompte(defaultFromState());
-                    dispatch(addComptesArray(result));
+                    dispatch(addComptesArray(res.compte));
                     setVisible(false);
+                } else {
+
+                    Alert.alert(res.alert.alert?.type || "", res.alert.alert?.message, [
+                        {
+                            text: getTrad("ok"),
+                            onPress: () => { }
+                        },
+                        {
+                            text: getTrad("cancel"),
+                            onPress: () => { }
+                        }
+                    ]);
                 }
 
             }, 500);
@@ -109,63 +124,60 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
     }
 
     return (
-        <Modal
+        <CustomModal
             visible={visible}
             animationType="slide"
             transparent={true}
-            onRequestClose={() => {
-                setVisible(false);
-            }}
+            setIsVisible={setVisible}
         >
-            <View style={styleSheet.container}>
-                <View
-                    style={styleSheet.formContainer}
-                >
 
-                    <Input
-                        placeholder={trad.AccountName}
-                        value={Compte.name}
-                        errorMessage={Compte.errorName}
-                        label={trad.AccountName}
-                        onChangeText={text => setCompte((prevState) => {
+            <View
+                style={styleSheet.formContainer}
+            >
+
+                <Input
+                    placeholder={trad.AccountName}
+                    value={Compte.name}
+                    errorMessage={Compte.errorName}
+                    label={trad.AccountName}
+                    onChangeText={text => setCompte((prevState) => {
+                        return {
+                            ...prevState,
+                            name: text,
+
+                        }
+                    })}
+
+                />
+                <Overdrawn
+
+                    onChange={(value: string, isOverdrawn: boolean) => {
+
+                        setCompte((prevState) => {
                             return {
                                 ...prevState,
-                                name: text,
+                                Overdrawn: value,
+                                isOverdrawn: isOverdrawn
 
                             }
-                        })}
-
-                    />
-                    <Overdrawn
-
-                        onChange={(value: string, isOverdrawn: boolean) => {
-
-                            setCompte((prevState) => {
-                                return {
-                                    ...prevState,
-                                    Overdrawn: value,
-                                    isOverdrawn: isOverdrawn
-
-                                }
-                            })
-                        }}
-                        isOverdrawn={Compte.isOverdrawn}
-                        overdrawn={Compte.Overdrawn}
-                        trad={trad}
-                    />
-                    <Button
-                        title={curentCompte ? trad.Save : trad.Add}
-                        disabled={Compte.name.length <= 0 || Compte.errorName.length > 0}
-                        onPress={onPress}
-                    />
-                </View>
+                        })
+                    }}
+                    isOverdrawn={Compte.isOverdrawn}
+                    overdrawn={Compte.Overdrawn}
+                    trad={trad}
+                />
+                <Button
+                    title={curentCompte ? trad.Save : trad.Add}
+                    disabled={Compte.name.length <= 0 || Compte.errorName.length > 0}
+                    onPress={onPress}
+                />
                 {
                     isLoading &&
                     <CustomActivityIndicator />
                 }
             </View>
 
-        </Modal>
+        </CustomModal>
     );
 
 }

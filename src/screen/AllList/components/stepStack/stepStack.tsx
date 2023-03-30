@@ -3,6 +3,7 @@ import React from "react";
 import { Alert, TouchableOpacity, View, Text } from "react-native";
 import { addList, listInterface, stepInterface } from "../../../../redux/listSlice";
 import { useDispatch } from "react-redux";
+import { getTrad } from "../../../../lang/internationalization";
 
 
 
@@ -23,12 +24,12 @@ export interface StepTaskProps {
     index: number;
     step: stepInterface;
     task: listInterface;
-    trad: any;
+
 
 }
 
 
-export const StepTask = ({ UpdateList, index, step, task, trad }: StepTaskProps) => {
+export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
 
     const dispatch = useDispatch();
     return (
@@ -36,15 +37,15 @@ export const StepTask = ({ UpdateList, index, step, task, trad }: StepTaskProps)
 
             onLongPress={() => {
                 Alert.alert(
-                    trad.delete,
-                    trad.DoYouWantDeleteThisTask,
+                    getTrad("delete"),
+                    getTrad("DoYouWantDeleteThisTask"),
                     [
                         {
-                            text: trad.cancel,
+                            text: getTrad("cancel"),
                             onPress: () => console.log("Cancel Pressed"),
                             style: "cancel"
                         },
-                        { text: trad.yes, onPress: () => deleteTask(index) }
+                        { text: getTrad("yes"), onPress: () => deleteTask(index) }
                     ],)
 
             }}
@@ -102,7 +103,7 @@ export const StepTask = ({ UpdateList, index, step, task, trad }: StepTaskProps)
                             color: "#fff",
                             textDecorationLine: step.isChecked ? "line-through" : "none",
                         }}
-                    >{step.quantity > 0 ? `${trad.Quantity} :${step.quantity}` : ""}</Text>
+                    >{step.quantity > 0 ? `${getTrad("Quantity")} :${step.quantity}` : ""}</Text>
                 </View>
 
             </View>

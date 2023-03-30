@@ -1,31 +1,58 @@
-import { Button } from "@rneui/base";
+import { Button, FAB, Icon } from "@rneui/base";
 import { Input } from "@rneui/themed";
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useReducer } from "react";
 import { View, Text, ScrollView, StatusBar, Alert, FlatList } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import globalStyle from "../../assets/styleSheet/globalStyle";
-import { CustomSafeAreaView } from "../../components";
+import { CustomModal, CustomSafeAreaView } from "../../components";
 import { Task } from "./components/Task/Task";
 import { addList, addListArray, listInterface } from "../../redux/listSlice";
 import DatabaseManager from "../../utils/DataBase";
 import ModalListTask from "./components/ModalListTask/ModalListTask";
 import { getLocales } from 'expo-localization';
-import { trad } from "../../lang/internationalization";
+import { trad, getTrad } from "../../lang/internationalization";
+import { AddList } from "./logic";
 
 
 
 
 export const AllList = () => {
-    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
     const dispatch = useDispatch();
     const list: listInterface[] = useSelector((state: any) => state.list.list);
-    const [modalIsVisible, setModalIsVisible] = React.useState(false);
+
+    const [modalVisible, dispatchModalVisible] = useReducer((state: any, action: {
+        type: "ModalListTask" | "ModalCreateList" | "close",
+        operation?: any
+    }) => {
+        switch (action.type) {
+            case "ModalListTask":
+                return action.type
+
+            case "ModalCreateList":
+                return action.type
+
+            case "close":
+                return action.type
+
+
+            default:
+                return state;
+        }
+    }, {
+        modalIsVisible: false,
+        currentIndexList: undefined,
+    });
+
+
+
+
     const [currentIndexList, setCurrentIndexList] = React.useState<number>();
-    const [newList, setNewList] = React.useState<string>("");
+
 
 
     function resetModal() {
-        setModalIsVisible(false);
+        dispatchModalVisible({ type: "close" });
         setCurrentIndexList(undefined);
     }
 
@@ -69,8 +96,8 @@ export const AllList = () => {
                                         index={index}
                                         task={item}
                                         setCurrentIndexList={setCurrentIndexList}
-                                        setModalIsVisible={setModalIsVisible}
-                                        trad={trad[local]}
+                                        setModalIsVisible={() => dispatchModalVisible({ type: "ModalListTask" })}
+
                                     />
                                 )
                             }}
@@ -80,7 +107,7 @@ export const AllList = () => {
                                 globalStyle.colorTextPrimary,
                                 globalStyle.textAlignCenter,
                                 globalStyle.textSizeXLarge,
-                            ]}>{trad[local].NoList}</Text>
+                            ]}>{getTrad("NoList")}</Text>
                         </View>
                 }
 
@@ -89,20 +116,61 @@ export const AllList = () => {
                 {
                     list.length > 0 && currentIndexList != undefined ?
                         <ModalListTask
-                            isVisible={modalIsVisible}
+                            isVisible={modalVisible === "ModalListTask"}
                             index_list={currentIndexList}
                             setModalIsVisible={resetModal}
-                            trad={trad[local]}
+
 
                         />
                         : null
                 }
+                <FAB
+                    icon={
+                        <Icon
+                            name="plus"
+                            type="font-awesome-5"
+                            color="#fff"
+                            size={20}
+                        />
+                    }
+                    onPress={() => {
+                        dispatchModalVisible({ type: "ModalCreateList" });
+                    }}
+                    placement="right"
+                />
+
+                <ModalCerateList
+                    isVisible={modalVisible === "ModalCreateList"}
+                    setModalIsVisible={resetModal}
+                />
+
+            </View>
+        </CustomSafeAreaView>
+
+    );
+
+
+}
+
+
+const ModalCerateList = React.memo(({ isVisible, setModalIsVisible }: { isVisible: boolean, setModalIsVisible: (value: boolean) => void }) => {
+    const [newList, setNewList] = React.useState<string>("");
+    const dispatch = useDispatch();
+    const allList: listInterface[] = useSelector((state: any) => state.list.list);
+    return (
+        <CustomModal
+            visible={isVisible}
+
+            setIsVisible={setModalIsVisible}
+            animationType="slide"
+            transparent={true} >
+            <View style={{ width: "100%" }}>
                 <View>
                     <Input
-                        placeholder={trad[local].NewListName}
+                        placeholder={getTrad("NewListName")}
                         value={newList}
                         style={{
-                            color: "#fff",
+                            color: "black",
                         }}
                         onChangeText={(text) => {
                             setNewList(text);
@@ -110,7 +178,7 @@ export const AllList = () => {
 
                     />
                     <Button
-                        title={trad[local].AddList}
+                        title={getTrad("AddList")}
                         radius={25}
                         buttonStyle={{
                             backgroundColor: "#9C68DD",
@@ -123,22 +191,44 @@ export const AllList = () => {
 
                         onPress={() => {
                             if (newList.length === 0) {
-                                Alert.alert("Erreur", trad[local].PleaseEnterNameForList);
+                                Alert.alert("Erreur", getTrad("PleaseEnterNameForList"));
                                 return;
                             }
 
-                            DatabaseManager.createList(newList).then((data: listInterface) => {
-                                dispatch(addListArray(data));
-                                setNewList("");
+
+
+                            AddList({
+                                nameList: newList,
+                                allList: allList,
+                            }).then((res) => {
+                                if (!res.alert) {
+                                    dispatch(addListArray(res.list));
+                                    setNewList("");
+                                    setModalIsVisible(false);
+                                } else {
+                                    Alert.alert(res.alert.alert?.type || "", res.alert.alert?.message,
+                                        [
+                                            {
+                                                text: getTrad("ok"),
+                                                onPress: () => { },
+                                            },
+                                            {
+                                                text: getTrad("cancel"),
+                                                onPress: () => { },
+                                                style: "cancel"
+                                            }
+
+
+
+                                        ]);
+                                }
+
                             });
                         }}
                     />
                 </View>
             </View>
-        </CustomSafeAreaView>
 
-    );
-
-
-}
-
+        </CustomModal>
+    )
+})

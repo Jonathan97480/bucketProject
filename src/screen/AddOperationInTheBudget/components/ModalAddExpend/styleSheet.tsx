@@ -8,10 +8,7 @@ export default StyleSheet.create({
         justifyContent: "center",
     },
     View: {
-        backgroundColor: "#fff",
-        padding: 20,
-
-        borderRadius: 20,
+        width: "100%",
     },
     TitleBlock: {
         flexDirection: "row",

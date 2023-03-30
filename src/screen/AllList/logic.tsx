@@ -1,6 +1,9 @@
+import { getTrad } from "../../lang/internationalization";
 import { listInterface } from "../../redux/listSlice";
 import DatabaseManager from "../../utils/DataBase";
-import { CreateDateCurentString } from "../../utils/TextManipulation";
+import { getDate } from "../../utils/DateManipulation";
+import { generateAlert, TextCompare } from "../../utils/TextManipulation";
+
 
 
 export async function addTask({ value, list }: { value: string, list: listInterface }) {
@@ -12,7 +15,7 @@ export async function addTask({ value, list }: { value: string, list: listInterf
         name: value,
         quantity: 0,
         isChecked: false,
-        date: CreateDateCurentString(),
+        date: getDate(),
         montant: 0,
         category: "autre",
         type: "achat",
@@ -59,7 +62,40 @@ export async function UpdateList({ isChecked, id, ItemArray, list }:
     else return [];
 }
 
+export async function AddList({ nameList, allList }: { nameList: string, allList: listInterface[] }) {
 
+    /* verification de doublon */
+    const doublon = allList.find((item) => TextCompare(item.name, nameList));
+    if (doublon) {
+        return {
+            list: null,
+            alert: generateAlert({
+                type: "error",
+                message: getTrad("listAlreadyExist"),
+            })
+        }
+    }
+
+    const result = await DatabaseManager.createList(nameList);
+
+    if (result) {
+
+        return {
+            list: result,
+            alert: null
+        }
+    }
+
+    return {
+        list: null,
+        alert: generateAlert({
+            type: getTrad("error"),
+            message: getTrad("errorAddList"),
+
+        }
+        )
+    }
+}
 
 
 

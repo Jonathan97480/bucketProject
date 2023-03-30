@@ -1,13 +1,28 @@
 import { CompteInterface, MonthInterface, TransactionInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase";
 import { getMonthByNumber } from "../../../../utils/DateManipulation";
+import { generateAlert, TextCompare } from "../../../../utils/TextManipulation";
+import { getTrad } from "../../../../lang/internationalization";
 
-export const createCompte = async ({ _idUser, _nameCompte, _Overdrawn, _isOverdrawn }: {
+export const createCompte = async ({ _idUser, _nameCompte, _Overdrawn, _isOverdrawn, _AllComptes }: {
     _idUser: number,
     _nameCompte: string,
     _Overdrawn: string,
     _isOverdrawn: boolean,
+    _AllComptes: CompteInterface[],
 }) => {
+
+
+    if (getIsCompteNameExist({
+        nameCompte: _nameCompte,
+        allCompte: _AllComptes
+    })) return {
+        compte: null,
+        alert: generateAlert({
+            type: "error",
+            message: getTrad("compteNameExist")
+        })
+    }
 
     const newCompte = await DatabaseManager.CreateCompte({
         _idUser,
@@ -15,35 +30,35 @@ export const createCompte = async ({ _idUser, _nameCompte, _Overdrawn, _isOverdr
         _discovered: _isOverdrawn,
         _discoveredMontant: _Overdrawn != "" ? parseInt(_Overdrawn) : 0,
     });
+    if (!newCompte) throw new Error("une erreur ces produite lors de la création du compte");
 
-    if (newCompte) {
 
-        newCompte.transactions = [];
+    newCompte.transactions = [];
 
-        newCompte.transactions.push(generatedTransactionDefault({
+    newCompte.transactions.push(generatedTransactionDefault({
 
-            _AccountBalanceBeginningMonth: newCompte.pay
+        _AccountBalanceBeginningMonth: newCompte.pay
 
-        }));
+    }));
 
-        newCompte.withdrawal = 0;
-        newCompte.deposit = 0;
-        newCompte.pay = 0;
+    newCompte.withdrawal = 0;
+    newCompte.deposit = 0;
+    newCompte.pay = 0;
 
-        const compteUpdate = await DatabaseManager.UpdateCompte(
-            newCompte.id,
-            newCompte.name,
-            newCompte.pay,
-            newCompte.withdrawal,
-            newCompte.deposit,
-            newCompte.transactions
-        );
+    const compteUpdate = await DatabaseManager.UpdateCompte(
+        newCompte.id,
+        newCompte.name,
+        newCompte.pay,
+        newCompte.withdrawal,
+        newCompte.deposit,
+        newCompte.transactions
+    );
 
-        return compteUpdate;
-
-    } else {
-        throw new Error("erreur lors de la création du compte");
+    return {
+        compte: compteUpdate,
+        alert: null
     }
+
 
 }
 
@@ -129,3 +144,13 @@ export async function UpdateCompte({
 
 
 }
+
+
+function getIsCompteNameExist({ nameCompte, allCompte }: { nameCompte: string, allCompte: CompteInterface[] }) {
+
+    const result = allCompte.find((compte) => TextCompare(compte.name, nameCompte));
+
+    return result ? true : false;
+
+}
+

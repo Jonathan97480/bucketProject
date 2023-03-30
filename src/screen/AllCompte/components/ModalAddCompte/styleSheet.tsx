@@ -9,14 +9,6 @@ export const styleSheet = StyleSheet.create({
 
     },
     formContainer: {
-        backgroundColor: "#fff",
         width: "100%",
-        padding: 20,
-        borderRadius: 10,
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
     }
 })

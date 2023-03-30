@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { addList, listInterface } from "../../../../redux/listSlice";
 import DatabaseManager from "../../../../utils/DataBase";
-import { textSizeFixe } from "../../../../utils/TextManipulation";
+import { getTrad } from "../../../../lang/internationalization";
 
 
 
@@ -14,11 +14,11 @@ export interface TaskProps {
     setModalIsVisible: (isVisible: boolean) => void;
     index: number;
     task: listInterface;
-    trad: any;
+
 }
 
 
-export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, trad }: TaskProps) => {
+export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, }: TaskProps) => {
 
     const dispatch = useDispatch();
 
@@ -37,16 +37,16 @@ export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, trad
             onLongPress={() => {
 
                 Alert.alert(
-                    trad.delete,
-                    trad.DoYouWantDeleteList,
+                    getTrad("delete"),
+                    getTrad("DoYouWantDeleteList"),
                     [
                         {
-                            text: trad.cancel,
+                            text: getTrad("cancel"),
                             onPress: () => console.log("Cancel Pressed"),
                             style: "cancel"
                         },
                         {
-                            text: trad.yes
+                            text: getTrad("yes")
                             , onPress: () => DeleteListe(task.id)
                         }
                     ],)
@@ -95,7 +95,7 @@ export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, trad
                                 globalStyle.textAlignLeft
                             ]
                         }
-                    >{textSizeFixe(task.name, 18)} {trad.TaskComplete} : {task.taskTerminer} / {task.task}</Text>
+                    >{task.name.substring(0, 18)} {getTrad("TaskComplete")} : {task.taskTerminer} / {task.task}</Text>
 
                 </View>
             </View>

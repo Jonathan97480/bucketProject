@@ -13,15 +13,7 @@ export default StyleSheet.create({
 
 
     },
-    backgroundRecipe: {
-        height: "50%",
-        backgroundColor: "white",
-        paddingBottom: 20,
-        width: "80%",
-        justifyContent: "space-between",
-        borderRadius: 25,
-        elevation: 5,
-    },
+    backgroundRecipe: { width: "100%" },
     titleTicket: {
         fontSize: 20,
         fontWeight: "bold",

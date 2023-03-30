@@ -4,6 +4,7 @@ import DatabaseManager from "../../../../utils/DataBase"
 import { CalculBudget } from "../../../AddOperationInTheBudget/components/ModalAddExpend/logic";
 import { getTrad } from "../../../../lang/internationalization";
 import { getMonthByNumber } from "../../../../utils/DateManipulation";
+import { TextCompare } from "../../../../utils/TextManipulation";
 
 export interface FormAddBudget {
     name: string,
@@ -82,7 +83,7 @@ interface SaveTransactionInterface {
 
 export const saveTransaction = async ({ currentCompte, currentMonth, newTransaction, useOverdraw, AllComptes }: SaveTransactionInterface) => {
 
-
+    /* Vérifie si l’utilisateur va utiliser sont découvert */
     const over = getOverdrawn(currentCompte, newTransaction, useOverdraw);
 
     if (over.overdrawn && !useOverdraw && newTransaction.typeOperation === 'expense') {
@@ -133,6 +134,18 @@ export const saveTransaction = async ({ currentCompte, currentMonth, newTransact
         return alert;
     }
 
+
+    /* Vérifie si le nom donnée a la transaction nes pas deja utiliser */
+    const isNameAlreadyUsed = checkIfNameIsAlreadyUsed(newTransaction, currentMonth);
+    if (isNameAlreadyUsed) {
+        const alert = generateAlert({
+            currentCompte: currentCompte,
+            currentMonth: currentMonth,
+            type: getTrad('error'),
+            message: getTrad("NameTransactionAlreadyUsed"),
+        });
+        return alert;
+    }
 
 
 
@@ -653,4 +666,14 @@ async function Transfer({ AllComptes, newTransaction, oldTransaction,
 
     return newAllCOmptes;
 
+}
+
+
+function checkIfNameIsAlreadyUsed(transaction: TransactionMonthInterface, currentMonth: MonthInterface) {
+
+    const result = currentMonth.transactions[transaction.typeOperation].find((_transaction: TransactionMonthInterface) => {
+        return TextCompare(_transaction.name, transaction.name);
+    })
+
+    return result ? true : false;
 }
