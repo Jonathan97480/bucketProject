@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "buket",
+    "name": "SpendTracker",
     "slug": "buket",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -27,7 +27,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.jon.dev.buket"
+      "package": "com.jon.dev.spendTracker"
     },
     "web": {
       "favicon": "./assets/favicon.png"

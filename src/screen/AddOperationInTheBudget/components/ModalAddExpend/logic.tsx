@@ -1,3 +1,4 @@
+import { getTrad } from "../../../../lang/internationalization";
 import { CompteInterface, MonthInterface, SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import DatabaseManager from "../../../../utils/DataBase";
 import { generateAlert, TextCompare } from "../../../../utils/TextManipulation";
@@ -77,17 +78,17 @@ export function checkForm({ form, setFormOperation }: {
 
 
     if (form.title === "") {
-        form.errorTitle = "Le champ est vide";
+        form.errorTitle = getTrad("TheFieldEmpty");
     } else {
         form.errorTitle = "";
     }
     if (form.montant === "") {
-        form.errorMontant = "Le champ est vide";
+        form.errorMontant = getTrad("TheFieldEmpty");
     } else {
         form.errorMontant = "";
     }
     if (form.quantity === "") {
-        form.errorQuantity = "Le champ est vide";
+        form.errorQuantity = getTrad("TheFieldEmpty");
     } else {
         form.errorQuantity = "";
     }
@@ -135,7 +136,7 @@ export async function saveOperation({ compteCurrent, CurrentMonth, budget, newOp
                     compte: null,
                     month: null,
                     budget: null,
-                    alert: generateAlert({ message: "Une operation existe deja avec le meme nom", type: "error" })
+                    alert: generateAlert({ message: getTrad("AnOperationAlreadyExistsName"), type: getTrad("error") })
 
                 }
             }

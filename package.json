@@ -1,5 +1,5 @@
 {
-  "name": "buket",
+  "name": "spendtracker",
   "version": "1.0.0",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
@@ -35,7 +35,8 @@
     "react-native-web": "~0.18.9",
     "react-redux": "^8.0.5",
     "redux": "^4.2.0",
-    "expo-localization": "~14.0.0"
+    "expo-localization": "~14.0.0",
+    "expo-dev-client": "~2.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

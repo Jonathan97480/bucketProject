@@ -1,8 +1,8 @@
 import React from "react";
-import { View, Text, BackHandler } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, Text } from "react-native";
+
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
-import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth } from "../../../../redux/comptesSlice";
+import { CompteInterface } from "../../../../redux/comptesSlice";
 import styleSheet from "./styleSheet";
 import { getTrad } from "../../../../lang/internationalization";
 import { useDispatch } from "react-redux";
@@ -14,38 +14,6 @@ interface InfoCompteProps {
 
 export default function InfoCompte({ compte, }: InfoCompteProps) {
 
-
-
-    const dispatch = useDispatch();
-    const navigation = useNavigation();
-    React.useEffect(() => {
-
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            () => {
-                handleBackAllCompte();
-                return true;    // return true to prevent default behavior (exit app)
-            }
-        );
-        return () => backHandler.remove();
-    }, []);
-
-    const handleBackAllCompte = () => {
-
-        switch (navigation.getState().routeNames[navigation.getState().index]) {
-            case "Compte":
-
-                dispatch(setCurentMonth(null));
-                dispatch(setCurentBudget(null));
-                navigation.navigate("AllComptes");
-                break
-
-            default:
-                navigation.navigate(navigation.getState().routeNames[navigation.getState().index]);
-                break
-
-        }
-    }
 
     return (
         <View style={styleSheet.blockCurentMonth} >

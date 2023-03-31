@@ -3,10 +3,10 @@ import { Button, Icon, ListItem } from '@rneui/base';
 import React from 'react';
 import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { CompteInterface, setCurentCompte } from '../../../../redux/comptesSlice';
+import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth } from '../../../../redux/comptesSlice';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
-import { getLocales } from 'expo-localization';
-import { trad } from '../../../../lang/internationalization';
+
+import { getTrad } from '../../../../lang/internationalization';
 
 interface ComptesItemProps {
     item: CompteInterface;
@@ -19,12 +19,14 @@ interface ComptesItemProps {
 export const ComptesItem = ({ item, navigation = undefined, editCallBack, deleteCallBack }: ComptesItemProps) => {
 
     const dispatch = useDispatch();
-    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
 
 
     function onPress() {
         if (navigation !== undefined) {
             dispatch(setCurentCompte(item))
+            dispatch(setCurentMonth(null))
+            dispatch(setCurentBudget(null))
             navigation.navigate("Tab");
         }
     }
@@ -85,10 +87,10 @@ export const ComptesItem = ({ item, navigation = undefined, editCallBack, delete
                         globalStyle.textBold,
                         globalStyle.textAlignLeft
                     ]}>{item.name}</ListItem.Title>
-                    <ListItem.Subtitle style={globalStyle.textSizeSmall}>{trad[local].pay} : {item.pay.toFixed(2)}€</ListItem.Subtitle>
+                    <ListItem.Subtitle style={globalStyle.textSizeSmall}>{getTrad("pay")} : {item.pay.toFixed(2)}€</ListItem.Subtitle>
 
-                    {item.discovered ? <ListItem.Subtitle style={globalStyle.textSizeSmall}>{trad[local].Overdraft} : {item.discoveredMontant.toFixed(2)}€</ListItem.Subtitle> :
-                        <ListItem.Subtitle style={globalStyle.textSizeSmall}>{trad[local].UnauthorizedOverdraft}</ListItem.Subtitle>
+                    {item.discovered ? <ListItem.Subtitle style={globalStyle.textSizeSmall}>{getTrad("Overdraft")} : {item.discoveredMontant.toFixed(2)}€</ListItem.Subtitle> :
+                        <ListItem.Subtitle style={globalStyle.textSizeSmall}>{getTrad("UnauthorizedOverdraft")}</ListItem.Subtitle>
                     }
 
                 </ListItem.Content>
