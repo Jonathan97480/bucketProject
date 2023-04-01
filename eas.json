@@ -15,6 +15,11 @@
             "developmentClient": true
         },
         "production": {
+            "android": {
+                "applicationArchivePath": "android/app/build/outputs/**/*.aab"
+            }
+        },
+        "development": {
             "developmentClient": true,
             "distribution": "internal"
         }

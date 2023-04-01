@@ -29,11 +29,14 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
         <ListItem.Swipeable
             style={
                 {
-                    minWidth: 310,
-                    maxWidth: 400,
+                    overflow: 'hidden',
+                    width: '100%',
+
                 }
             }
-            containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20, }]}
+
+
+            containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20 }]}
             onPress={() => {
                 if (transaction.transactionType === "Budget") {
 

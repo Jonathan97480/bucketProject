@@ -1,5 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
+
+const { width, height } = Dimensions.get('window');
 export default StyleSheet.create({
 
     backgroundPrimaryColor: {
@@ -69,12 +71,10 @@ export default StyleSheet.create({
     },
     btnStyle: {
 
-        backgroundColor: "#9C68DD",
+        backgroundColor: "#17a2b8",
+        height: height * 0.06,
         width: "100%",
-        height: 50,
-        justifyContent: "center",
-        alignItems: "center",
-        marginTop: 10,
+
 
     },
     textBold: {
@@ -91,7 +91,7 @@ export default StyleSheet.create({
         marginTop: 8,
     },
     checkBoxText: {
-        fontSize: 14,
+        fontSize: width * 0.04,
         fontWeight: 'bold',
         color: '#fff',
     },

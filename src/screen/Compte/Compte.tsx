@@ -9,6 +9,7 @@ import { CompteInterface, MonthInterface, setCurentCompte, setCurentMonth, Trans
 import { getMonthByNumber } from "../../utils/DateManipulation";
 import { FixeIsYearAndMonthExist } from "./logic";
 import DatabaseManager from "../../utils/DataBase";
+import { BannerAd } from "react-native-google-mobile-ads";
 export default function Compte() {
 
 
@@ -73,7 +74,7 @@ export default function Compte() {
 
             <View style={styleSheet.container}>
 
-
+                <BannerAd unitId={"ca-app-pub-2398424925470703/2494426460"} size="300x200" />
                 <ScrollView style={[styleSheet.scrollview,]}>
 
                     <View style={[globalStyle.containerCenter, { alignItems: "center" }]}>

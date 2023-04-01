@@ -40,5 +40,9 @@
     "runtimeVersion": {
       "policy": "sdkVersion"
     }
+  },
+  "react-native-google-mobile-ads": {
+    "android_app_id": "ca-app-pub-2398424925470703~9437989206",
+    "user_tracking_usage_description": "This identifier will be used to deliver personalized ads to you."
   }
 }

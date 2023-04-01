@@ -1,6 +1,6 @@
 import { Button, CheckBox, FAB, Icon, Input } from "@rneui/base";
 import React, { useCallback, useEffect } from "react";
-import { Alert, TouchableOpacity, View, Text, Modal, ScrollView, FlatList } from "react-native";
+import { Alert, TouchableOpacity, View, Text, Modal, ScrollView, FlatList, Dimensions } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { StepTask } from "../stepStack/stepStack";
 import { addList, listInterface, stepInterface } from "../../../../redux/listSlice";
@@ -8,6 +8,7 @@ import { ListAlphabetizeOrder } from "../../../../utils/TextManipulation";
 import { addTask, UpdateList } from "../../logic";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { getTrad } from "../../../../lang/internationalization";
+import { CustomModal } from "../../../../components";
 
 
 interface ModalListTaskProps {
@@ -20,7 +21,7 @@ interface ModalListTaskProps {
 
 export default function ModalListTask({ isVisible, setModalIsVisible, index_list }: ModalListTaskProps) {
 
-    const dispatch = useDispatch();
+    const width = Dimensions.get("window").width;
 
     const allList: listInterface[] = useSelector((state: any) => state.list.list);
 
@@ -49,57 +50,39 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
 
 
     return (
-        <Modal
+        <CustomModal
 
             visible={isVisible}
             animationType="slide"
             transparent={true}
-            onRequestClose={() => {
+            setIsVisible={() => {
                 setModalIsVisible(false);
             }}
-
+            disableCenterPosition={true}
+            title={allList[index_list].name.substring(0, 1).toUpperCase() + allList[index_list].name.substring(1)}
 
         >
-            <View style={[
-                {
-                    flex: 1,
-                    justifyContent: "space-between",
-                    padding: 15,
-                    paddingTop: 20,
-                    maxHeight: "100%",
-                    borderTopLeftRadius: 20,
-                    borderTopRightRadius: 20,
-                },
-                globalStyle.backgroundTrinaryColor,
 
-            ]}>
 
-                <Text
-                    style={[
-                        globalStyle.textAlignCenter,
-                        globalStyle.textSizeXLarge,
-                        globalStyle.colorTextPrimary,
+            <View
+                style={{
+                    width: "100%",
+                    height: "95%",
+                }}
+            >
 
-                        {
-                            marginBottom: 20,
-                        }
-                    ]}
-
-                >{allList[index_list].name}</Text>
 
                 <Input
-                    label={getTrad("ToResearch")}
+
                     placeholder={getTrad("SearchForItemInList")}
                     keyboardType="default"
-                    style={globalStyle.colorTextPrimary}
-                    labelStyle={{
-                        color: "#fff",
-                    }}
+                    style={[globalStyle.colorTextPrimary, globalStyle.marginVertical]}
+
                     rightIcon={
                         <Icon
                             name="search"
-                            size={30}
-                            color="#fff"
+                            size={width * 0.05}
+                            color="#000"
 
                         />
                     }
@@ -135,44 +118,47 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                         )
                     }}
                 />
-                <FAB
-                    style={{}}
-                    placement="right"
-                    color="#9c68dd"
-                    icon={
-                        <Icon
-                            name="plus"
-                            type="font-awesome-5"
-                            size={20}
-                            color="#fff"
-                        />
-                    }
-                    onPress={() => {
-                        setModalAddIsVisible(true);
+
+
+
+
+                <ModalAddTaskList
+                    isVisible={modalAddIsVisible}
+                    setModalIsVisible={() => {
+                        setModalAddIsVisible(false);
                     }}
+                    index_list={index_list}
+                    allList={allList}
+
+
                 />
 
             </View>
-
-            <ModalAddTaskList
-                isVisible={modalAddIsVisible}
-                setModalIsVisible={() => {
-                    setModalAddIsVisible(false);
+            <FAB
+                style={{}}
+                placement="right"
+                color="#9c68dd"
+                icon={
+                    <Icon
+                        name="plus"
+                        type="font-awesome-5"
+                        size={20}
+                        color="#fff"
+                    />
+                }
+                onPress={() => {
+                    setModalAddIsVisible(true);
                 }}
-                index_list={index_list}
-                allList={allList}
-
-
             />
-
-
-        </Modal >
+        </CustomModal >
     )
 
 }
 
 
 const Filters = React.memo(function ({ filter, setFilter }: { filter: string, setFilter: (value: "checked" | "unchecked") => void }) {
+
+    const width = Dimensions.get("window").width;
 
     return (
         <View style={[
@@ -181,11 +167,12 @@ const Filters = React.memo(function ({ filter, setFilter }: { filter: string, se
         ]}>
             <CheckBox
 
-                textStyle={globalStyle.checkBoxText}
+                textStyle={[globalStyle.checkBoxText, filter === "unchecked" ? { color: "#007bff" } : { color: "#6c757d" }]}
                 containerStyle={globalStyle.checkBox}
                 disabledStyle={globalStyle.checkBoxDisabled}
 
                 title={getTrad("UnfinishedTask")}
+
                 checked={filter === "unchecked"}
                 onPress={() => {
                     setFilter("unchecked");
@@ -195,7 +182,7 @@ const Filters = React.memo(function ({ filter, setFilter }: { filter: string, se
 
             <CheckBox
 
-                textStyle={globalStyle.checkBoxText}
+                textStyle={[globalStyle.checkBoxText, filter === "checked" ? { color: "#007bff" } : { color: "#6c757d" }]}
                 containerStyle={globalStyle.checkBox}
                 disabledStyle={globalStyle.checkBoxDisabled}
                 title={getTrad("TaskComplete")}
@@ -247,6 +234,8 @@ const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list,
     const dispatch = useDispatch();
     const [newItem, setNewItem] = React.useState("");
 
+    const width = Dimensions.get("window").width;
+
     const addListCallBack = useCallback((_data: listInterface[]) => {
 
         dispatch(addList(_data));
@@ -255,84 +244,75 @@ const ModalAddTaskList = React.memo(({ isVisible, setModalIsVisible, index_list,
 
     }, []);
     return (
-        <Modal
+        <CustomModal
             visible={isVisible}
             animationType="slide"
             transparent={true}
-            onRequestClose={() => {
+            setIsVisible={() => {
                 setModalIsVisible(false);
             }}
+            title={getTrad("AddTaskToList")}
         >
 
-            <View style={
+            <View style={[
                 {
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: "rgba(0,0,0,0.5)",
+                    backgroundColor: "#fff",
+                    padding: 15,
+                    borderRadius: 10,
+                    width: "90%",
+                },
+            ]}>
 
-                }
-            }>
+                <Input
+                    placeholder={getTrad("NewTaskName")}
+                    keyboardType="default"
+                    inputStyle={{ color: "#000", fontSize: width * 0.04 }}
+                    multiline={true}
+                    value={newItem}
+                    onChange={(e) => {
 
-                <View style={[
-                    {
-                        backgroundColor: "#fff",
-                        padding: 15,
-                        borderRadius: 10,
-                        width: "90%",
-                    },
-                ]}>
-                    <Text
-                        style={[
-                            globalStyle.textAlignLeft,
-                            globalStyle.textSizeMedium,
-                            globalStyle.colorTextPrimary,
-                        ]}
-                    >{getTrad("AddTaskToList")}</Text>
-                    <Input
-                        placeholder={getTrad("NewTaskName")}
-                        keyboardType="default"
-                        style={{ color: "#000" }}
-                        value={newItem}
-                        onChange={(e) => {
-
-                            setNewItem(e.nativeEvent.text);
-                        }}
-
-                    />
-                    <Button
-                        disabled={newItem.length === 0}
-                        radius={25}
-                        buttonStyle={{
-                            backgroundColor: "#9C68DD",
-                            width: "100%",
-                            height: 50,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            marginTop: 10,
-                        }}
-                        disabledStyle={{
-                            backgroundColor: "rgba(156, 104, 221, 0.42)",
-                        }}
-                        title={getTrad("AddTask")}
-                        onPress={async () => {
-                            if (newItem.length > 0) {
-                                const AllList = await addTask({
-                                    value: newItem,
-                                    list: allList[index_list]
-                                });
-
-                                addListCallBack(AllList);
+                        setNewItem(e.nativeEvent.text);
+                    }}
 
 
-                            }
-                        }}
-                    />
-                </View>
+                />
+                <Button
+                    disabled={newItem.length === 0}
+                    radius={25}
+                    buttonStyle={{
+                        backgroundColor: "#007bff",
+                        width: "100%",
+                        height: width * 0.10,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginTop: 10,
+                    }}
+                    titleStyle={{
+                        color: "#fff",
+                        fontSize: width * 0.04,
+                    }}
+                    disabledStyle={{
+                        backgroundColor: "#6c757d",
+                    }}
+                    title={getTrad("AddTask")}
+                    onPress={async () => {
+                        if (newItem.length > 0) {
+                            const AllList = await addTask({
+                                value: newItem,
+                                list: allList[index_list]
+                            });
+
+                            addListCallBack(AllList);
+
+
+                        }
+                    }}
+                />
             </View>
 
 
-        </Modal>)
+
+        </CustomModal>)
 
 });
 

@@ -1,10 +1,10 @@
 import { Button, FAB, Icon } from "@rneui/base";
 import { Input } from "@rneui/themed";
 import React, { useEffect, useCallback, useReducer } from "react";
-import { View, Text, ScrollView, StatusBar, Alert, FlatList } from "react-native";
+import { View, Text, ScrollView, StatusBar, Alert, FlatList, Dimensions } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import globalStyle from "../../assets/styleSheet/globalStyle";
-import { CustomModal, CustomSafeAreaView } from "../../components";
+import { BannerAds, CustomModal, CustomSafeAreaView } from "../../components";
 import { Task } from "./components/Task/Task";
 import { addList, addListArray, listInterface } from "../../redux/listSlice";
 import DatabaseManager from "../../utils/DataBase";
@@ -74,11 +74,11 @@ export const AllList = () => {
 
         <CustomSafeAreaView>
 
-
+            <BannerAds />
             <View style={{
 
-                maxHeight: "100%",
-                minHeight: "100%",
+                flex: 1,
+
 
             }}>
 
@@ -125,6 +125,7 @@ export const AllList = () => {
                         : null
                 }
                 <FAB
+                    color="#17a2b8"
                     icon={
                         <Icon
                             name="plus"
@@ -157,75 +158,87 @@ const ModalCerateList = React.memo(({ isVisible, setModalIsVisible }: { isVisibl
     const [newList, setNewList] = React.useState<string>("");
     const dispatch = useDispatch();
     const allList: listInterface[] = useSelector((state: any) => state.list.list);
+    const width = Dimensions.get("window").width;
     return (
         <CustomModal
             visible={isVisible}
 
             setIsVisible={setModalIsVisible}
             animationType="slide"
-            transparent={true} >
+            transparent={true}
+            title={getTrad("AddList")}
+        >
             <View style={{ width: "100%" }}>
                 <View>
                     <Input
                         placeholder={getTrad("NewListName")}
                         value={newList}
+                        inputStyle={{
+                            color: "black",
+                            fontSize: width * 0.04,
+                        }}
                         style={{
                             color: "black",
+                            marginVertical: 10,
                         }}
                         onChangeText={(text) => {
                             setNewList(text);
                         }}
 
                     />
-                    <Button
-                        title={getTrad("AddList")}
-                        radius={25}
-                        buttonStyle={{
-                            backgroundColor: "#9C68DD",
+                    <View
+                        style={{
                             width: "100%",
-                            height: 50,
-                            justifyContent: "center",
                             alignItems: "center",
-                            marginTop: 10,
+                            marginVertical: 10,
                         }}
+                    >
+                        <Button
+                            title={getTrad("AddList")}
+                            radius={25}
+                            buttonStyle={globalStyle.btnStyle}
+                            titleStyle={{
+                                color: "white",
+                                fontSize: width * 0.04,
+                                width: "100%",
+                                textAlign: "center",
 
-                        onPress={() => {
-                            if (newList.length === 0) {
-                                Alert.alert("Erreur", getTrad("PleaseEnterNameForList"));
-                                return;
-                            }
-
-
-
-                            AddList({
-                                nameList: newList,
-                                allList: allList,
-                            }).then((res) => {
-                                if (!res.alert) {
-                                    dispatch(addListArray(res.list));
-                                    setNewList("");
-                                    setModalIsVisible(false);
-                                } else {
-                                    Alert.alert(res.alert.alert?.type || "", res.alert.alert?.message,
-                                        [
-                                            {
-                                                text: getTrad("ok"),
-                                                onPress: () => { },
-                                            },
-                                            {
-                                                text: getTrad("cancel"),
-                                                onPress: () => { },
-                                                style: "cancel"
-                                            }
-
-
-
-                                        ]);
+                            }}
+                            onPress={() => {
+                                if (newList.length === 0) {
+                                    Alert.alert("Erreur", getTrad("PleaseEnterNameForList"));
+                                    return;
                                 }
 
-                            });
-                        }}
-                    />
+
+
+                                AddList({
+                                    nameList: newList,
+                                    allList: allList,
+                                }).then((res) => {
+                                    if (!res.alert) {
+                                        dispatch(addListArray(res.list));
+                                        setNewList("");
+                                        setModalIsVisible(false);
+                                    } else {
+                                        Alert.alert(res.alert.alert?.type || "", res.alert.alert?.message,
+                                            [
+                                                {
+                                                    text: getTrad("ok"),
+                                                    onPress: () => { },
+                                                },
+                                                {
+                                                    text: getTrad("cancel"),
+                                                    onPress: () => { },
+                                                    style: "cancel"
+                                                }
+                                            ]);
+                                    }
+
+                                });
+                            }}
+                        />
+                    </View>
                 </View>
             </View>
 

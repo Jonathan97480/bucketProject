@@ -1,6 +1,7 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 import { colorList } from "../../../../utils/ColorCollection";
 
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
 
@@ -8,12 +9,7 @@ export default StyleSheet.create({
         elevation: 5,
 
     },
-    titleModal: {
 
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
-    },
     modalContainer: {
 
         height: '100%',
@@ -25,15 +21,17 @@ export default StyleSheet.create({
 
         width: '100%',
         minHeight: 340,
+        alignItems: 'center',
 
     },
     stageContainer: {
         minHeight: 180,
         justifyContent: 'space-between',
         paddingVertical: 10,
+        width: '100%',
     },
     modalInputLabel: {
-        fontSize: 15,
+        fontSize: width * 0.04,
         fontWeight: 'bold',
 
     },

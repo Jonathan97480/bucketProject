@@ -10,9 +10,12 @@ import { ModalAddBudget } from "./components/ModalAddTransaction/ModalAddTransac
 import TransactionSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
 import { MonthInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
-import { CustomSafeAreaView } from "../../components";
+import { BannerAds, CustomSafeAreaView } from "../../components";
 import { getLocales } from 'expo-localization';
 import { trad } from "../../lang/internationalization";
+
+
+
 
 
 
@@ -47,21 +50,23 @@ export const Transaction = () => {
     if (curentMonth === null) {
         return (
             <CustomSafeAreaView >
-                <View style={styleSheet.container}>
-                    <EmptyTransaction
 
-                        setIsViewModalAddBudget={setIsViewModalAddBudget}
-                        trad={trad[local]}
-
-                    />
-                </View>
+                <BannerAds />
             </CustomSafeAreaView>
         )
     }
 
     return (
         <CustomSafeAreaView >
+            <View
+                style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
+                <BannerAds />
 
+            </View>
             <View style={styleSheet.container}>
 
                 {

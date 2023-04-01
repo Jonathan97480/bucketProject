@@ -1,6 +1,6 @@
 import { CheckBox } from "@rneui/themed";
 import React from "react";
-import { Alert, TouchableOpacity, View, Text } from "react-native";
+import { Alert, TouchableOpacity, View, Text, Dimensions } from "react-native";
 import { useDispatch } from "react-redux";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { addList, listInterface } from "../../../../redux/listSlice";
@@ -21,7 +21,7 @@ export interface TaskProps {
 export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, }: TaskProps) => {
 
     const dispatch = useDispatch();
-
+    const width = Dimensions.get("window").width;
 
 
     return (
@@ -57,20 +57,19 @@ export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, }: T
                 style={{
 
                     backgroundColor: "#373737",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
                     borderRadius: 50,
-
-
+                    overflow: "hidden",
+                    padding: 10,
                 }}
             >
                 <View
                     style={{
                         flexDirection: "row",
                         alignItems: "center",
-                        justifyContent: "flex-start",
-                        padding: 10,
+                        justifyContent: "space-between",
+                        width: "100%",
+
+
 
                     }}
                 >
@@ -91,11 +90,30 @@ export const Task = ({ setCurrentIndexList, setModalIsVisible, index, task, }: T
                             [
                                 { textDecorationLine: checkTaskComplete() ? "line-through" : "none" },
                                 globalStyle.colorTextPrimary,
-                                globalStyle.textSizeSmall,
+                                {
+                                    fontSize: width * 0.035,
+
+                                },
                                 globalStyle.textAlignLeft
                             ]
                         }
-                    >{task.name.substring(0, 18)} {getTrad("TaskComplete")} : {task.taskTerminer} / {task.task}</Text>
+                    >{task.name.substring(0, width * 0.5)}</Text>
+                    <Text
+                        style={
+                            [
+                                { textDecorationLine: checkTaskComplete() ? "line-through" : "none" },
+                                globalStyle.colorTextPrimary,
+                                {
+                                    fontSize: width * 0.035,
+
+                                },
+                                globalStyle.textAlignLeft
+                            ]
+                        }
+
+                    >
+                        {task.taskTerminer === task.task && task.task !== 0 ? "🎉" : task.taskTerminer + "/" + task.task * 100}
+                    </Text>
 
                 </View>
             </View>

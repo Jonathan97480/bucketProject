@@ -9,7 +9,7 @@ export default StyleSheet.create({
     container: {
         flex: 1,
         maxHeight: '100%',
-        justifyContent: 'center',
+
         height: '100%',
     },
 

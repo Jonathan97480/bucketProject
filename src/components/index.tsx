@@ -4,3 +4,4 @@ export { default as CustomActivityIndicator } from "./CustomActivityIndicator/Cu
 export { default as TabBardCustom } from "./TabBardCustom/TabBardCustom";
 export { default as IconsCategory } from "./IconsCategory/IconsCategory";
 export { CustomModal } from "./CustomModal/CustomModal";
+export { default as BannerAds } from "./BannerAds/BannerAds";
