@@ -1,9 +1,9 @@
-import { TouchableOpacity, View, Text, Image } from "react-native";
+import { TouchableOpacity, View, Text, Image, Dimensions } from "react-native";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
 import { getTrad } from "../../lang/internationalization";
 export default function TabBardCustom({ state, descriptors, navigation }: { state: any, descriptors: any, navigation: any }) {
-
+    const width = Dimensions.get('window').width;
 
     return (
         <View
@@ -56,7 +56,8 @@ export default function TabBardCustom({ state, descriptors, navigation }: { stat
                         <Text
                             style={[{
                                 color: isFocused ? '#9747FF' : '#fff',
-                            }, globalStyle.textSizeSmall]}>
+                                fontSize: width * 0.03,
+                            }]}>
                             {getTrad(label)}
                         </Text>
                     </TouchableOpacity>

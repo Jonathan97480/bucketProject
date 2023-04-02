@@ -7,7 +7,7 @@ import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { IconsCategory } from "../../../../components";
 import { deleteTransaction } from "./logic";
 import { useSelector, useDispatch } from "react-redux";
-import { View } from "react-native";
+import { View, Dimensions } from "react-native";
 
 interface BudgetSwipeableProps {
     transaction: TransactionMonthInterface;
@@ -24,6 +24,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
     const curentMonth = useSelector((state: any) => state.compte.currentMonth);
     const comptes = useSelector((state: any) => state.compte.comptes);
     const dispatch = useDispatch();
+    const { width, height } = Dimensions.get('window');
 
     return (
         <ListItem.Swipeable
@@ -94,29 +95,30 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                 name={transaction.transactionType === "Spent" ? "swap-horizontal-bold" : "wallet"}
                 type='material-community'
                 color={colorList.primary}
+                size={width * 0.08}
             />
             <ListItem.Content
 
             >
                 <ListItem.Title
-                    style={{ color: colorList.primary, fontWeight: 'bold' }}
+                    style={{ color: colorList.primary, fontWeight: 'bold', fontSize: width * 0.04 }}
                 >{transaction.name.slice(0, 30)}</ListItem.Title>
                 {
                     transaction.transactionType === "Budget" ?
                         <>
                             <ListItem.Subtitle
-                                style={{ color: colorList.primary, fontSize: 12 }}
+                                style={{ color: colorList.primary, fontSize: width * 0.03 }}
                             >{trad.AmountStart} : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
 
                             <ListItem.Subtitle
-                                style={{ color: colorList.primary, fontSize: 12 }}
+                                style={{ color: colorList.primary, fontSize: width * 0.03 }}
                             >{trad.RemainingBudget} : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
                         </>
                         :
                         <>
 
                             <ListItem.Subtitle
-                                style={{ color: colorList.primary, fontSize: 12 }}
+                                style={{ color: colorList.primary, fontSize: width * 0.03 }}
                             >{trad.Amount} : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
                         </>
                 }
@@ -137,6 +139,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         name="lock"
                         type='material-community'
                         color={colorList.primary}
+                        size={width * 0.08}
                     />}
             </View>
         </ListItem.Swipeable>

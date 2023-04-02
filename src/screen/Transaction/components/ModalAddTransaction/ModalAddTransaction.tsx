@@ -257,8 +257,11 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                     curentEtape === 'Etape1' &&
                     <View style={styleSheet.stageContainer}>
                         <View>
-                            <Text style={styleSheet.modalInputLabel}>{getTrad("name")} :</Text>
+
                             <Input placeholder={getTrad("NameYourTransaction")}
+                                label={getTrad("name")}
+                                labelStyle={[styleSheet.modalInputLabel, { color: 'black' }]}
+                                inputStyle={styleSheet.modalInputLabel}
                                 errorMessage={formAddBudget.errorName}
                                 value={formAddBudget.name}
                                 onChangeText={(value) => {
@@ -267,10 +270,13 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                             />
                         </View>
                         <View>
-                            <Text style={styleSheet.modalInputLabel}>{getTrad("Amount")} :</Text>
+
                             <Input placeholder={getTrad("AmountYourTransaction")}
                                 keyboardType="numeric"
+                                label={getTrad("Amount")}
                                 errorMessage={formAddBudget.errorMontant}
+                                labelStyle={[styleSheet.modalInputLabel, { color: 'black' }]}
+                                inputStyle={styleSheet.modalInputLabel}
                                 value={formAddBudget.montant}
                                 onChangeText={(value) => {
                                     setFormAddBudget({ ...formAddBudget, montant: value });

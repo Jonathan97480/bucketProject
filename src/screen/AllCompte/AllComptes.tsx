@@ -1,5 +1,5 @@
 import React, { useEffect, useReducer, useState } from "react";
-import { View, StyleSheet, ScrollView, TouchableOpacity, Alert, FlatList } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Alert, FlatList, Dimensions } from "react-native";
 import { Button, Icon } from "@rneui/base";
 import { useSelector, useDispatch } from "react-redux";
 import { CustomActivityIndicator } from "../../components";
@@ -20,6 +20,8 @@ import { trad, getTrad } from "../../lang/internationalization";
 export default function AllComptes({ navigation }: any) {
 
     const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
+    const { width } = Dimensions.get('window');
 
     const [curentCompte, setCurentCompte] = useState<CompteInterface | null>(null);
     function ModalAddCompteReducer(state: any, action: { type: string, payload?: CompteInterface }) {
@@ -162,7 +164,7 @@ export default function AllComptes({ navigation }: any) {
                 </TouchableOpacity>
             </View>
 
-            <View style={globalStyle.containerCenter} >
+            <View style={[globalStyle.containerCenter, {}]} >
                 {comptes.length <= 0 ? <NoCompte
                     trad={trad[local]}
                 /> :
@@ -191,19 +193,26 @@ export default function AllComptes({ navigation }: any) {
 
 
                 }
-                <Button
-                    title={getTrad("AddAnAccount")}
-                    onPress={onPress}
-                    buttonStyle={globalStyle.btnStyle}
-                    radius={25}
-                    icon={{
-                        name: "wallet",
-                        size: 20,
-                        color: "white",
-                        type: "material-community"
-                    }}
+                <View style={
+                    {
+                        alignItems: "center",
+                    }
+                }>
+                    <Button
+                        title={getTrad("AddAnAccount")}
+                        titleStyle={{ color: "white", fontSize: width * 0.04 }}
+                        onPress={onPress}
+                        buttonStyle={[globalStyle.btnStyle, { padding: 10, maxWidth: width > 400 ? width * 0.5 : width * 0.8 }]}
+                        radius={25}
+                        icon={{
+                            name: "wallet",
+                            size: width * 0.07,
+                            color: "white",
+                            type: "material-community"
+                        }}
 
-                />
+                    />
+                </View>
             </View>
             <ModalAddCompte
                 visible={isCompteModalVisible.isCompteModalVisible}

@@ -1,7 +1,7 @@
 
 import { Button, CheckBox, Input } from '@rneui/base';
 import React, { useEffect, useState } from 'react';
-import { Modal, View, StyleSheet, Alert } from 'react-native';
+import { View, Dimensions, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { addComptesArray, CompteInterface, updateCompte } from '../../../../redux/comptesSlice';
 import { createCompte, UpdateCompte } from './logic';
@@ -24,6 +24,8 @@ interface ModalAddCompteProps {
 export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, allComptes, trad }: ModalAddCompteProps) => {
 
     const dispatch = useDispatch();
+
+    const { width } = Dimensions.get('window');
 
     const [Compte, setCompte] = useState(defaultFromState());
     const [isLoading, setIsLoading] = useState(false);
@@ -140,6 +142,8 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                     value={Compte.name}
                     errorMessage={Compte.errorName}
                     label={trad.AccountName}
+                    labelStyle={{ color: "black", fontSize: width * 0.05, fontWeight: "bold" }}
+                    inputStyle={{ color: "black", fontSize: width * 0.04 }}
                     onChangeText={text => setCompte((prevState) => {
                         return {
                             ...prevState,
@@ -168,6 +172,8 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                 />
                 <Button
                     title={curentCompte ? trad.Save : trad.Add}
+                    titleStyle={{ color: "white", fontSize: width * 0.05 }}
+                    radius={25}
                     disabled={Compte.name.length <= 0 || Compte.errorName.length > 0}
                     onPress={onPress}
                 />
@@ -197,6 +203,7 @@ const Overdrawn = ({
 
     const [checked, setChecked] = useState(isOverdrawn);
     const [value, setValue] = useState(overdrawn);
+    const { width } = Dimensions.get('window');
 
     useEffect(() => {
         setChecked(isOverdrawn);
@@ -209,6 +216,7 @@ const Overdrawn = ({
             <CheckBox
                 title={trad.AuthorizeOverdraft}
                 checked={checked}
+                size={width * 0.06}
                 onPress={() => {
                     onChange(value, !checked);
                     setChecked(!checked);
@@ -221,6 +229,8 @@ const Overdrawn = ({
                 checked &&
                 <Input
                     placeholder={trad.OverdraftAmount}
+                    labelStyle={{ color: "black", fontSize: width * 0.05, fontWeight: "bold" }}
+                    inputStyle={{ color: "black", fontSize: width * 0.04 }}
                     value={value}
                     label={trad.OverdraftAmount}
                     keyboardType="numeric"

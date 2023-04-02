@@ -1,6 +1,6 @@
 import { CheckBox } from "@rneui/base";
 import React from "react";
-import { Alert, TouchableOpacity, View, Text } from "react-native";
+import { Alert, TouchableOpacity, View, Text, Dimensions } from "react-native";
 import { addList, listInterface, stepInterface } from "../../../../redux/listSlice";
 import { useDispatch } from "react-redux";
 import { getTrad } from "../../../../lang/internationalization";
@@ -32,6 +32,7 @@ export interface StepTaskProps {
 export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
 
     const dispatch = useDispatch();
+    const { width } = Dimensions.get("window");
     return (
         <TouchableOpacity
 
@@ -96,12 +97,13 @@ export const StepTask = ({ UpdateList, index, step, task }: StepTaskProps) => {
                         style={{
                             color: "#fff",
                             textDecorationLine: step.isChecked ? "line-through" : "none",
+                            fontSize: width * 0.04,
                         }}
                     >{step.name}</Text>
                     <Text
                         style={{
                             color: "#fff",
-                            textDecorationLine: step.isChecked ? "line-through" : "none",
+                            textDecorationLine: step.isChecked ? "line-through" : "none", fontSize: width * 0.04,
                         }}
                     >{step.quantity > 0 ? `${getTrad("Quantity")} :${step.quantity}` : ""}</Text>
                 </View>

@@ -1,7 +1,7 @@
 
 import { Button, Icon, ListItem } from '@rneui/base';
 import React from 'react';
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth } from '../../../../redux/comptesSlice';
 import globalStyle from '../../../../assets/styleSheet/globalStyle';
@@ -20,7 +20,7 @@ export const ComptesItem = ({ item, navigation = undefined, editCallBack, delete
 
     const dispatch = useDispatch();
 
-
+    const { width } = Dimensions.get('window');
 
     function onPress() {
         if (navigation !== undefined) {
@@ -77,20 +77,20 @@ export const ComptesItem = ({ item, navigation = undefined, editCallBack, delete
 
                 <Icon
                     name="account-balance-wallet"
-                    size={54}
+                    size={width * 0.13}
                     color="#817FE5"
 
                 />
                 <ListItem.Content>
                     <ListItem.Title style={[
-                        globalStyle.textSizeXLarge,
+                        { fontSize: width * 0.05 },
                         globalStyle.textBold,
                         globalStyle.textAlignLeft
                     ]}>{item.name}</ListItem.Title>
-                    <ListItem.Subtitle style={globalStyle.textSizeSmall}>{getTrad("pay")} : {item.pay.toFixed(2)}€</ListItem.Subtitle>
+                    <ListItem.Subtitle style={{ fontSize: width * 0.031 }}>{getTrad("pay")} : {item.pay.toFixed(2)}€</ListItem.Subtitle>
 
-                    {item.discovered ? <ListItem.Subtitle style={globalStyle.textSizeSmall}>{getTrad("Overdraft")} : {item.discoveredMontant.toFixed(2)}€</ListItem.Subtitle> :
-                        <ListItem.Subtitle style={globalStyle.textSizeSmall}>{getTrad("UnauthorizedOverdraft")}</ListItem.Subtitle>
+                    {item.discovered ? <ListItem.Subtitle style={{ fontSize: width * 0.031 }}>{getTrad("Overdraft")} : {item.discoveredMontant.toFixed(2)}€</ListItem.Subtitle> :
+                        <ListItem.Subtitle style={{ fontSize: width * 0.031 }}>{getTrad("UnauthorizedOverdraft")}</ListItem.Subtitle>
                     }
 
                 </ListItem.Content>

@@ -76,10 +76,10 @@ export const Transaction = () => {
                             <View
                                 style={styleSheet.scrollViewContainer}
                             >
-                                <Text style={[styleSheet.title, globalStyle.colorTextPrimary]} >
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.textAlignCenter]} >
                                     {trad[local].TransactionList}
                                 </Text>
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]} >{trad[local].DepositToAccount}</Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]} >{trad[local].DepositToAccount}</Text>
                                 {
                                     curentMonth.transactions.income.length > 0 ?
                                         curentMonth.transactions.income.map((item, indexBudget) => {
@@ -108,7 +108,7 @@ export const Transaction = () => {
                                         : null
 
                                 }
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.marginVertical]}>{trad[local].WithdrawalAccount}</Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]}>{trad[local].WithdrawalAccount}</Text>
                                 {
                                     curentMonth.transactions.expense.length > 0 ?
                                         curentMonth.transactions.expense.map((item, indexBudget) => {

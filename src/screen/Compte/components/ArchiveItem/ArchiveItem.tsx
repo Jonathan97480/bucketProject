@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Dimensions } from "react-native";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { MonthInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import styleSheet from "./styleSheet";
@@ -15,6 +15,7 @@ interface ArchiveItemProps {
 
 export default function ArchiveItem({ months, year }: ArchiveItemProps) {
 
+    const { width } = Dimensions.get('window');
 
     if (months === null) {
         return <>
@@ -36,8 +37,8 @@ export default function ArchiveItem({ months, year }: ArchiveItemProps) {
                         key={'archive-' + index}
                     >
 
-                        <Text style={[styleSheet.blockCurentMonthText, globalStyle.colorTextPrimary]}>{getTradNameMonth(month.nameMonth)} {year}</Text>
-                        <Text style={[globalStyle.textSizeSmall, globalStyle.colorTextPrimary]} >{numberTransaction} {getTrad("transactions")}</Text>
+                        <Text style={[styleSheet.blockCurentMonthText, globalStyle.colorTextPrimary, { fontSize: width * 0.04 }]}>{getTradNameMonth(month.nameMonth)} {year}</Text>
+                        <Text style={[{ fontSize: width * 0.031 }, globalStyle.colorTextPrimary]} >{numberTransaction} {getTrad("transactions")}</Text>
                     </View>
                     )
                 })

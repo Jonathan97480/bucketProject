@@ -75,8 +75,14 @@ export default function ModalListTask({ isVisible, setModalIsVisible, index_list
                 <Input
 
                     placeholder={getTrad("SearchForItemInList")}
+                    inputStyle={{
+                        color: "#000",
+                        fontSize: width * 0.04,
+                        fontWeight: "bold",
+
+                    }}
                     keyboardType="default"
-                    style={[globalStyle.colorTextPrimary, globalStyle.marginVertical]}
+
 
                     rightIcon={
                         <Icon

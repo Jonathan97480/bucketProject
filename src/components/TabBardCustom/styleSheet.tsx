@@ -1,6 +1,11 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+
+
+const { width, height } = Dimensions.get("window");
 
 export default StyleSheet.create({
+
+
 
     tabBar: {
         flexDirection: 'row',
@@ -14,8 +19,8 @@ export default StyleSheet.create({
         elevation: 10,
     },
     icon: {
-        width: 24,
-        height: 24,
+        width: width * 0.04,
+        height: height * 0.04,
 
     },
 

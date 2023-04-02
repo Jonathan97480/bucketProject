@@ -1,4 +1,4 @@
-import { Image, StyleSheet } from "react-native";
+import { Image, StyleSheet, Dimensions } from "react-native";
 
 const IconAutres_image = require(`./icons/Autres.png`);
 const IconAlimentation_image = require(`./icons/Alimentation.png`);
@@ -8,6 +8,9 @@ const Voiture_image = require(`./icons/Voiture.png`);
 const IconVetement_image = require(`./icons/Vêtements.png`);
 const IconLogement_image = require(`./icons/Logement.png`);
 const IconBudgetEmpty_image = require(`./icons/BudgetEmpty.png`);
+
+const { width, height } = Dimensions.get("window");
+
 export const IconBudgetAdd_image = require(`./icons/BudgetAdd.png`);
 
 
@@ -17,7 +20,8 @@ export const IconAutres = () => {
 }
 
 export const IconAlimentation = () => {
-    return <Image source={IconAlimentation_image} style={styles.icon}
+    return <Image source={IconAlimentation_image} style={[{ width: width * 0.05, height: height * 0.05, }]}
+
     />
 }
 

@@ -13,7 +13,7 @@ export default StyleSheet.create({
     },
     blockCurentMonthText: {
         textAlign: 'center',
-        fontSize: 20,
+
         fontWeight: 'bold',
     },
 });

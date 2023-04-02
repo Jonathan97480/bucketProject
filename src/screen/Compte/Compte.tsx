@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, ScrollView, Text } from "react-native";
+import { View, ScrollView, Text, Dimensions } from "react-native";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
 import ArchiveItem from "./components/ArchiveItem/ArchiveItem";
@@ -16,6 +16,7 @@ export default function Compte() {
 
     const dispatch = useDispatch();
 
+    const { width } = Dimensions.get('window');
     const currentCompte: CompteInterface = useSelector((state: any) => state.compte.currentCompte);
     const currentMonth: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
 
@@ -51,9 +52,6 @@ export default function Compte() {
                         }
                     })
                 }
-
-
-
             })
 
         }
@@ -74,7 +72,6 @@ export default function Compte() {
 
             <View style={styleSheet.container}>
 
-                <BannerAd unitId={"ca-app-pub-2398424925470703/2494426460"} size="300x200" />
                 <ScrollView style={[styleSheet.scrollview,]}>
 
                     <View style={[globalStyle.containerCenter, { alignItems: "center" }]}>
@@ -83,7 +80,12 @@ export default function Compte() {
                             currentCompte.transactions.map((YearTransaction, index) => {
                                 return (
                                     <View key={`list-index-${index}`}>
-                                        <Text style={[globalStyle.textSizeLarge, globalStyle.colorTextPrimary, globalStyle.textAlignCenter, globalStyle.marginVertical]} >{YearTransaction.year} </Text>
+                                        <Text style={[
+                                            { fontSize: width * 0.05 },
+                                            globalStyle.colorTextPrimary,
+                                            globalStyle.textAlignCenter,
+                                            globalStyle.marginVertical
+                                        ]} >{YearTransaction.year} </Text>
                                         <ArchiveItem
                                             months={YearTransaction.month}
                                             year={YearTransaction.year}
