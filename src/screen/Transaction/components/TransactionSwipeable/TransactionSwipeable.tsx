@@ -7,18 +7,18 @@ import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { IconsCategory } from "../../../../components";
 import { deleteTransaction } from "./logic";
 import { useSelector, useDispatch } from "react-redux";
-import { View, Dimensions } from "react-native";
+import { View, Dimensions, Alert } from "react-native";
+import { getTrad } from "../../../../lang/internationalization";
 
 interface BudgetSwipeableProps {
     transaction: TransactionMonthInterface;
     indexBudget: number;
-    trad: any;
     setModalEdit: (value: boolean, transaction: TransactionMonthInterface) => void;
     navigation: any;
 }
 
 
-export default function TransactionSwipeable({ transaction, indexBudget, setModalEdit, navigation, trad }: BudgetSwipeableProps) {
+export default function TransactionSwipeable({ transaction, indexBudget, setModalEdit, navigation }: BudgetSwipeableProps) {
 
     const curentCompte = useSelector((state: any) => state.compte.currentCompte);
     const curentMonth = useSelector((state: any) => state.compte.currentMonth);
@@ -51,7 +51,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             leftContent={(reset) => (
                 <Button
                     containerStyle={{ borderRadius: 20, }}
-                    title={trad.Edit + ` ${transaction.transactionType === "Spent" ? trad.Transaction : trad.Budget} `}
+                    title={getTrad("Edit") + ` ${transaction.transactionType === "Spent" ? getTrad("Transaction") : getTrad("Budget")} `}
                     onPress={() => {
 
                         setModalEdit(true, transaction);
@@ -64,25 +64,31 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             rightContent={(reset) => (
                 <Button
                     containerStyle={{ borderRadius: 20, }}
-                    title={trad.delete + ` ${transaction.transactionType === "Spent" ? "Transaction" : "Budget"} `}
+                    title={getTrad("delete") + ` ${transaction.transactionType === "Spent" ? "Transaction" : "Budget"} `}
                     onPress={() => {
 
-                        deleteTransaction({
-                            _transaction: transaction,
-                            _compte: curentCompte,
-                            _curentMonth: curentMonth,
-                            _AllComptes: comptes
-                        }).then((res) => {
-
-                            dispatch(setCurentCompte(res.compte));
-                            dispatch(setCurentMonth(res.curentMonth));
-                            if (res.allComptes.length > 0) {
-                                dispatch(addComptes(res.allComptes));
-                            }
+                        if (transaction.transactionType === "Budget") {
+                            Alert.alert(
+                                getTrad("DeleteBudget"),
+                                getTrad("DeleteBudgetMessage"),
+                                [
+                                    {
+                                        text: getTrad("cancel"),
+                                        onPress: () => console.log("Cancel Pressed"),
+                                        style: "cancel"
+                                    },
+                                    {
+                                        text: getTrad("Delete"),
+                                        onPress: () => {
+                                            deleteBudget()
+                                            reset()
+                                        }
+                                    }
+                                ],)
+                        } else {
+                            deleteBudget()
                             reset()
-                        })
-                        reset()
-
+                        }
                     }
                     }
 
@@ -108,18 +114,18 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         <>
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: width * 0.03 }}
-                            >{trad.AmountStart} : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
+                            >{getTrad("AmountStart")} : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: width * 0.03 }}
-                            >{trad.RemainingBudget} : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
+                            >{getTrad("RemainingBudget")} : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
                         </>
                         :
                         <>
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: width * 0.03 }}
-                            >{trad.Amount} : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
+                            >{getTrad("Amount")} : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
                         </>
                 }
             </ListItem.Content>
@@ -144,5 +150,23 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             </View>
         </ListItem.Swipeable>
     )
+
+    function deleteBudget() {
+        deleteTransaction({
+            _transaction: transaction,
+            _compte: curentCompte,
+            _curentMonth: curentMonth,
+            _AllComptes: comptes
+        }).then((res) => {
+
+            dispatch(setCurentCompte(res.compte));
+            dispatch(setCurentMonth(res.curentMonth));
+            if (res.allComptes.length > 0) {
+                dispatch(addComptes(res.allComptes));
+            }
+
+        })
+
+    }
 
 }

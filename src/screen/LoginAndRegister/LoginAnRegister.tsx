@@ -10,11 +10,11 @@ import { setUser, userInterface } from "../../redux/userSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
 import { getLocales } from 'expo-localization';
-import { trad } from "../../lang/internationalization";
+import { getTrad } from "../../lang/internationalization";
 
 export default function LoginAndRegister({ navigation }: any) {
 
-    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
 
     const dispatch = useDispatch()
 
@@ -72,7 +72,7 @@ export default function LoginAndRegister({ navigation }: any) {
     return (
         <CustomSafeAreaView>
 
-            <Title title={isAsUser ? trad[local].ToLogIn : trad[local].CreateAccount} />
+            <Title title={isAsUser ? getTrad("ToLogIn") : getTrad("CreateAccount")} />
 
             <View style={globalStyle.containerCenter} >
                 {
@@ -92,8 +92,8 @@ export default function LoginAndRegister({ navigation }: any) {
                     <Input
                         style={globalStyle.marginVertical}
                         inputStyle={globalStyle.inputStyle}
-                        placeholder={trad[local].YourUsername}
-                        label={trad[local].Username}
+                        placeholder={getTrad("YourUsername")}
+                        label={getTrad("Username")}
                         errorMessage={form.identifiantError}
                         value={form.identifiant}
                         onChangeText={(text) => setForm({ ...form, identifiant: text })}
@@ -103,8 +103,8 @@ export default function LoginAndRegister({ navigation }: any) {
                     <Input
                         style={globalStyle.marginVertical}
                         inputStyle={globalStyle.inputStyle}
-                        placeholder={trad[local].YourPassword}
-                        label={trad[local].Password}
+                        placeholder={getTrad("YourPassword")}
+                        label={getTrad("Password")}
                         errorMessage={form.passwordError}
                         value={form.password}
                         secureTextEntry={true}
@@ -116,7 +116,7 @@ export default function LoginAndRegister({ navigation }: any) {
                         style={globalStyle.marginVertical}
                         radius={25}
                         buttonStyle={globalStyle.btnStyle}
-                        title={isAsUser ? trad[local].ToLogIn : trad[local].CreateAccount}
+                        title={isAsUser ? getTrad("ToLogIn") : getTrad("CreateAccount")}
                         onPress={() => {
                             setIsLoading(true)
                             const formError = FormValidate({
@@ -161,7 +161,7 @@ export default function LoginAndRegister({ navigation }: any) {
                                             setIsError(false)
                                             setForm({
                                                 ...form,
-                                                errorGlobal: trad[local].logInOk
+                                                errorGlobal: getTrad("logInOk")
                                             })
                                             setTimeout(() => {
                                                 setIsLoading(false)
@@ -217,7 +217,7 @@ export default function LoginAndRegister({ navigation }: any) {
                                             setIsError(false)
                                             setForm({
                                                 ...form,
-                                                errorGlobal: trad[local].registerOk
+                                                errorGlobal: getTrad("registerOk")
                                             })
                                             setTimeout(() => {
                                                 setIsLoading(false)

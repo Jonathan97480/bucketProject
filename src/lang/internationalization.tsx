@@ -9,6 +9,9 @@ export const trad = {
         cancel: "Annuler",
         yes: "Oui",
         no: "Non",
+        Delete: "Supprimer",
+        DeleteBudget: "Supprimer le budget",
+        DeleteBudgetMessage: "Voulez vous vraiment supprimer ce budget ?",
         listAlreadyExist: "Cette liste existe déjà avec ce nom",
         ok: "Ok",
         Information: "Information",
@@ -149,6 +152,9 @@ export const trad = {
         yes: "Yes",
         no: "No",
         ok: "Ok",
+        Delete: "Delete",
+        DeleteBudget: "Delete budget",
+        DeleteBudgetMessage: "Do you really want to delete this budget?",
         Transactionnelle: "You are making a deposit or a withdrawal?",
         listAlreadyExist: "This list already exist please choose another name",
         List: "List",
@@ -281,6 +287,6 @@ export const trad = {
 }
 
 export function getTrad(key: keyof typeof trad["FR"]) {
-    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+    const local: "FR" | "EN" = "FR"/*  getLocales()[0].languageCode === "fr" ? "FR" : "EN"; */
     return trad[local][key] ? trad[local][key] : key;
 }

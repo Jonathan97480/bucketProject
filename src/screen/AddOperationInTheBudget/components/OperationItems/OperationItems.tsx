@@ -3,6 +3,7 @@ import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native'
 import styleSheet from './styleSheet'
 import { SimpleTransactionInterface } from '../../../../redux/comptesSlice'
 import globalStyle from '../../../../assets/styleSheet/globalStyle'
+import { getTrad } from '../../../../lang/internationalization'
 
 
 
@@ -12,12 +13,12 @@ interface OperationItemsProps {
 
     deleteCallBack: (operation: SimpleTransactionInterface) => void
     infoPanelOpen: (operation: SimpleTransactionInterface) => void
-    trad: any
+
 
 }
 
 
-export default function OperationItems({ listeExpend, deleteCallBack, infoPanelOpen, trad }: OperationItemsProps) {
+export default function OperationItems({ listeExpend, deleteCallBack, infoPanelOpen }: OperationItemsProps) {
 
     const [NewListeExpend, setNewListeExpend] = React.useState<SimpleTransactionInterface[]>(listeExpend);
 
@@ -41,18 +42,14 @@ export default function OperationItems({ listeExpend, deleteCallBack, infoPanelO
                             index={index}
                             deleteCallBack={deleteCallBack}
                             infoPanelOpen={infoPanelOpen}
-                            trad={trad}
+
                         />
 
                         }
                         keyExtractor={(item, index) => index.toString() + item.id.toString() + -"operation"}
 
                     />
-                    : <EmptyList
-
-                        trad={trad}
-
-                    />
+                    : <EmptyList />
 
             }
 
@@ -70,18 +67,18 @@ const EmptyList = React.memo((props: any) => {
             globalStyle.colorTextPrimary,
             globalStyle.textAlignCenter,
             globalStyle.textSizeSmall
-        ]}>{props.trad.YouDontHaveOperationsThisSection}</Text>
+        ]}>{getTrad("YouDontHaveOperationsThisSection")}</Text>
     )
 
 
 })
 
-const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen, trad }: {
+const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen }: {
     operation: SimpleTransactionInterface
     index: number
     deleteCallBack: (operation: SimpleTransactionInterface) => void
     infoPanelOpen: (operation: SimpleTransactionInterface) => void
-    trad: any
+
 }) => {
 
     const operationMemo = React.useMemo(() => {
@@ -92,16 +89,16 @@ const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen, 
 
     const handleLongPress = () => {
         Alert.alert(
-            trad.delete,
-            trad.DoYouWantDeleteOperation,
+            getTrad("delete"),
+            getTrad("DoYouWantDeleteOperation"),
             [
                 {
-                    text: trad.cancel,
+                    text: getTrad("cancel"),
                     onPress: () => console.log("Cancel Pressed"),
                     style: "cancel"
                 },
                 {
-                    text: trad.yes,
+                    text: getTrad("yes"),
                     onPress: () => {
                         deleteCallBack(operation);
                     }
@@ -128,7 +125,7 @@ const ItemList = React.memo(({ operation, index, deleteCallBack, infoPanelOpen, 
                 <Text style={[globalStyle.colorTextPrimary]} >{operationMemo.total_real !== 0 ? operationMemo.total_real.toFixed(2) : operationMemo.total.toFixed(2)}€</Text>
 
                 <View style={[{ backgroundColor: operationMemo.type === "income" ? "#203EAA" : "#E1424B", }, styleSheet.pastille]}>
-                    <Text style={{ color: "#fff" }} >{operationMemo.type === "income" ? trad.Deposit : trad.Withdrawal}</Text>
+                    <Text style={{ color: "#fff" }} >{operationMemo.type === "income" ? getTrad("Deposit") : getTrad("Withdrawal")}</Text>
                 </View>
 
 

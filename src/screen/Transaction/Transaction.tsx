@@ -11,17 +11,11 @@ import TransactionSwipeable from "./components/TransactionSwipeable/TransactionS
 import { MonthInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { BannerAds, CustomSafeAreaView } from "../../components";
-import { getLocales } from 'expo-localization';
-import { trad } from "../../lang/internationalization";
-
-
-
-
-
+import { getTrad } from "../../lang/internationalization";
 
 
 export const Transaction = () => {
-    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
     const navigation = useNavigation();
 
     const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
@@ -77,12 +71,12 @@ export const Transaction = () => {
                                 style={styleSheet.scrollViewContainer}
                             >
                                 <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.textAlignCenter]} >
-                                    {trad[local].TransactionList}
+                                    {getTrad("TransactionList")}
                                 </Text>
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]} >{trad[local].DepositToAccount}</Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]} >{getTrad("DepositToAccount")}</Text>
                                 {
                                     curentMonth.transactions.income.length > 0 ?
-                                        curentMonth.transactions.income.map((item, indexBudget) => {
+                                        curentMonth.transactions.income.slice(0).reverse().map((item, indexBudget) => {
                                             return (
 
 
@@ -98,7 +92,7 @@ export const Transaction = () => {
                                                         indexBudget={indexBudget}
                                                         setModalEdit={editTransactionCallBack}
                                                         navigation={navigation}
-                                                        trad={trad[local]}
+
                                                     />
                                                 </View>
 
@@ -108,10 +102,10 @@ export const Transaction = () => {
                                         : null
 
                                 }
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]}>{trad[local].WithdrawalAccount}</Text>
+                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]}>{getTrad("WithdrawalAccount")}</Text>
                                 {
                                     curentMonth.transactions.expense.length > 0 ?
-                                        curentMonth.transactions.expense.map((item, indexBudget) => {
+                                        curentMonth.transactions.expense.slice(0).reverse().map((item, indexBudget) => {
                                             return (
 
 
@@ -126,7 +120,7 @@ export const Transaction = () => {
                                                         indexBudget={indexBudget}
                                                         setModalEdit={editTransactionCallBack}
                                                         navigation={navigation}
-                                                        trad={trad[local]}
+
                                                     />
                                                 </View>
 
@@ -142,7 +136,7 @@ export const Transaction = () => {
                         </ScrollView>
 
                         : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget}
-                            trad={trad[local]}
+
                         />
 
                 }

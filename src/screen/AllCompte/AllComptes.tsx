@@ -13,13 +13,12 @@ import NoCompte from "./components/NoCompte/NoCompte";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { RemoveUser } from "../LoginAndRegister/logic";
 import { deleteCompte } from "./components/ComptesItem/logic";
-import { getLocales } from 'expo-localization';
-import { trad, getTrad } from "../../lang/internationalization";
+import { getTrad } from "../../lang/internationalization";
 
 
 export default function AllComptes({ navigation }: any) {
 
-    const local: "FR" | "EN" = getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
 
     const { width } = Dimensions.get('window');
 
@@ -87,16 +86,16 @@ export default function AllComptes({ navigation }: any) {
 
 
         Alert.alert(
-            trad[local].deleteCompte,
-            trad[local].deleteCompteMessage,
+            getTrad("deleteCompte"),
+            getTrad("deleteCompteMessage"),
             [
                 {
-                    text: trad[local].cancel,
+                    text: getTrad("cancel"),
                     onPress: () => console.log("Cancel Pressed"),
                     style: "cancel"
                 },
                 {
-                    text: trad[local].yes,
+                    text: getTrad("yes"),
                     onPress: async () => {
                         {
                             setIsLoading(true);
@@ -130,14 +129,14 @@ export default function AllComptes({ navigation }: any) {
             }>
 
                 <TouchableOpacity onPress={async () => {
-                    Alert.alert(trad[local].logout,
-                        trad[local].logoutUser, [
+                    Alert.alert(getTrad("logout"),
+                        getTrad("logoutUser"), [
                         {
-                            text: trad[local].cancel,
+                            text: getTrad("cancel"),
                             style: "cancel"
                         },
                         {
-                            text: trad[local].yes,
+                            text: getTrad("yes"),
                             onPress: async () => {
 
                                 await RemoveUser()
@@ -166,7 +165,7 @@ export default function AllComptes({ navigation }: any) {
 
             <View style={[globalStyle.containerCenter, {}]} >
                 {comptes.length <= 0 ? <NoCompte
-                    trad={trad[local]}
+
                 /> :
                     <FlatList
                         data={comptes}
@@ -223,7 +222,7 @@ export default function AllComptes({ navigation }: any) {
                 id_user={user.user?.id || 1}
                 allComptes={comptes}
                 curentCompte={curentCompte}
-                trad={trad[local]}
+
             />
             {isLoading &&
                 <CustomActivityIndicator />}

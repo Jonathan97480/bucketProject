@@ -30,7 +30,7 @@ export default function ArchiveItem({ months, year }: ArchiveItemProps) {
     return (
         <>
             {
-                months.map((month: MonthInterface, index: number) => {
+                months.slice(0).reverse().map((month: MonthInterface, index: number) => {
 
                     const numberTransaction = month.transactions.expense.length + month.transactions.income.length
                     return (<View style={[styleSheet.blockMonthSelect, globalStyle.backgroundSecondaryColor]}

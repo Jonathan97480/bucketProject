@@ -1,7 +1,7 @@
 import { Button, FAB, Icon } from "@rneui/base";
 import { Input } from "@rneui/themed";
-import React, { useEffect, useCallback, useReducer } from "react";
-import { View, Text, ScrollView, StatusBar, Alert, FlatList, Dimensions } from "react-native";
+import React, { useEffect, useReducer } from "react";
+import { View, Text, Alert, FlatList, Dimensions } from "react-native";
 import { useSelector, useDispatch } from 'react-redux';
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { BannerAds, CustomModal, CustomSafeAreaView } from "../../components";
@@ -9,8 +9,7 @@ import { Task } from "./components/Task/Task";
 import { addList, addListArray, listInterface } from "../../redux/listSlice";
 import DatabaseManager from "../../utils/DataBase";
 import ModalListTask from "./components/ModalListTask/ModalListTask";
-import { getLocales } from 'expo-localization';
-import { trad, getTrad } from "../../lang/internationalization";
+import { getTrad } from "../../lang/internationalization";
 import { AddList } from "./logic";
 
 

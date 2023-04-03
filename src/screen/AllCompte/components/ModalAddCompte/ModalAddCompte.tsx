@@ -7,7 +7,6 @@ import { addComptesArray, CompteInterface, updateCompte } from '../../../../redu
 import { createCompte, UpdateCompte } from './logic';
 import { styleSheet } from './styleSheet';
 import { CustomActivityIndicator, CustomModal } from '../../../../components';
-import AllComptes from '../../AllComptes';
 import { getTrad } from '../../../../lang/internationalization';
 
 
@@ -18,10 +17,10 @@ interface ModalAddCompteProps {
     setVisible: (visible: boolean) => void;
     curentCompte?: CompteInterface | null;
     allComptes: CompteInterface[];
-    trad: any;
+
 }
 
-export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, allComptes, trad }: ModalAddCompteProps) => {
+export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, allComptes }: ModalAddCompteProps) => {
 
     const dispatch = useDispatch();
 
@@ -138,10 +137,10 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
             >
 
                 <Input
-                    placeholder={trad.AccountName}
+                    placeholder={getTrad("AccountName")}
                     value={Compte.name}
                     errorMessage={Compte.errorName}
-                    label={trad.AccountName}
+                    label={getTrad("AccountName")}
                     labelStyle={{ color: "black", fontSize: width * 0.05, fontWeight: "bold" }}
                     inputStyle={{ color: "black", fontSize: width * 0.04 }}
                     onChangeText={text => setCompte((prevState) => {
@@ -168,10 +167,10 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                     }}
                     isOverdrawn={Compte.isOverdrawn}
                     overdrawn={Compte.Overdrawn}
-                    trad={trad}
+
                 />
                 <Button
-                    title={curentCompte ? trad.Save : trad.Add}
+                    title={curentCompte ? getTrad("Save") : getTrad("Add")}
                     titleStyle={{ color: "white", fontSize: width * 0.05 }}
                     radius={25}
                     disabled={Compte.name.length <= 0 || Compte.errorName.length > 0}
@@ -193,12 +192,12 @@ const Overdrawn = ({
     onChange,
     isOverdrawn,
     overdrawn,
-    trad
+
 }: {
     onChange: (text: string, isOverdrawn: boolean) => void;
     isOverdrawn: boolean;
     overdrawn: string;
-    trad: any;
+
 }) => {
 
     const [checked, setChecked] = useState(isOverdrawn);
@@ -214,7 +213,7 @@ const Overdrawn = ({
         <View >
 
             <CheckBox
-                title={trad.AuthorizeOverdraft}
+                title={getTrad("AuthorizeOverdraft")}
                 checked={checked}
                 size={width * 0.06}
                 onPress={() => {
@@ -228,11 +227,11 @@ const Overdrawn = ({
             {
                 checked &&
                 <Input
-                    placeholder={trad.OverdraftAmount}
+                    placeholder={getTrad("OverdraftAmount")}
                     labelStyle={{ color: "black", fontSize: width * 0.05, fontWeight: "bold" }}
                     inputStyle={{ color: "black", fontSize: width * 0.04 }}
                     value={value}
-                    label={trad.OverdraftAmount}
+                    label={getTrad("OverdraftAmount")}
                     keyboardType="numeric"
                     onChangeText={text => {
                         onChange(text, checked)

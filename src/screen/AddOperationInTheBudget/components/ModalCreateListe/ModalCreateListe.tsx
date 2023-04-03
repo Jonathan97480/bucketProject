@@ -7,18 +7,19 @@ import { CreateListe } from "./logic";
 import { useDispatch } from "react-redux";
 import { addListArray } from "../../../../redux/listSlice";
 import { CustomModal } from "../../../../components";
+import { getTrad } from "../../../../lang/internationalization";
 
 
 interface ModalCreateListeProps {
     budget: TransactionMonthInterface;
     isVisible: boolean;
     setIsVisible: (value: boolean) => void;
-    trad: any
+
 }
 
 
 
-export default function ModalCreateListe({ budget, isVisible, setIsVisible, trad }: ModalCreateListeProps) {
+export default function ModalCreateListe({ budget, isVisible, setIsVisible }: ModalCreateListeProps) {
 
     const [selectorElements, setSelectorElements] = useState<'All' | 'Income' | 'Expense'>('All');
     const dispatch = useDispatch();
@@ -42,31 +43,31 @@ export default function ModalCreateListe({ budget, isVisible, setIsVisible, trad
                         globalStyle.textSizeLarge,
                         globalStyle.marginVertical
                     ]}
-                >{trad.CreateListOnBudget}</Text>
+                >{getTrad("CreateListOnBudget")}</Text>
 
                 <CheckBox
-                    title={trad.AllOperations}
+                    title={getTrad("AllOperations")}
                     checked={selectorElements === 'All' ? true : false}
                     onPress={() => setSelectorElements('All')}
 
 
                 />
                 <CheckBox
-                    title={trad.ThatTheOutputs}
+                    title={getTrad("ThatTheOutputs")}
                     checked={selectorElements === 'Expense' ? true : false}
                     onPress={() => setSelectorElements('Expense')}
 
 
                 />
                 <CheckBox
-                    title={trad.ThatTheEntries}
+                    title={getTrad("ThatTheEntries")}
                     checked={selectorElements === 'Income' ? true : false}
                     onPress={() => setSelectorElements('Income')}
 
                 />
 
                 <Button
-                    title={trad.CreateList}
+                    title={getTrad("CreateList")}
                     radius={25}
                     buttonStyle={{
                         backgroundColor: "#9C68DD",

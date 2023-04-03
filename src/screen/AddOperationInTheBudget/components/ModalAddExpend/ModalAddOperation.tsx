@@ -8,6 +8,7 @@ import { CompteInterface, setCurentBudget, setCurentCompte, setCurentMonth, Simp
 import { checkForm, createNewOperation, FormAddOperationInterface, resetForm, returnDefaultValueForm, saveOperation } from "./logic";
 import { CategoryInterface } from "../../../../redux/categorySlice";
 import { CustomModal } from "../../../../components";
+import { getTrad } from "../../../../lang/internationalization";
 
 
 
@@ -16,12 +17,12 @@ interface ModalAddExpendProps {
     budget: TransactionMonthInterface,
     setIsVisible: (value: boolean) => void,
     CurrentOperation?: SimpleTransactionInterface | null | undefined,
-    trad: any
+
 }
 
 
 
-export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperation, trad }: ModalAddExpendProps) => {
+export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperation }: ModalAddExpendProps) => {
 
 
     const [actionType, setActionType] = useState<"income" | "expense">("expense");
@@ -80,7 +81,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
 
 
                         }}
-                    >{trad.Output}</Text>
+                    >{getTrad("Output")}</Text>
                     <Text style={actionType === "expense" ? styleSheet.title : styleSheet.titleActive}
                         onPress={() => {
                             setActionType("income");
@@ -89,12 +90,12 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                                 setFormOperation: setFormOperation,
                             })
                         }}
-                    >{trad.Entrance}</Text>
+                    >{getTrad("Entrance")}</Text>
 
                 </View>
 
                 <Input
-                    placeholder={trad.NameOf + ` ${actionType === "income" ? trad.TheEntrance : trad.TheOutput}`}
+                    placeholder={getTrad("NameOf") + ` ${actionType === "income" ? getTrad("TheEntrance") : getTrad("TheOutput")}`}
                     value={formOperation.title}
                     onChangeText={(value) => {
                         checkForm({
@@ -108,7 +109,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                 />
                 <Input
                     keyboardType="numeric"
-                    placeholder={trad.AmountOf + ` ${actionType === "income" ? trad.TheEntrance : trad.TheOutput
+                    placeholder={getTrad("AmountOf") + ` ${actionType === "income" ? getTrad("TheEntrance") : getTrad("TheOutput")
                         }`}
                     value={formOperation.montant}
                     onChangeText={(value) => {
@@ -148,7 +149,7 @@ export const ModalAddExpend = ({ isVisible, budget, setIsVisible, CurrentOperati
                         marginTop: 10,
                     }}
                     disabled={formOperation.btnEnabled}
-                    title={CurrentOperation ? trad.SaveChanges : trad.AddOperation}
+                    title={CurrentOperation ? getTrad("SaveChanges") : getTrad("AddOperation")}
                     onPress={() => {
 
                         /* Add operation */

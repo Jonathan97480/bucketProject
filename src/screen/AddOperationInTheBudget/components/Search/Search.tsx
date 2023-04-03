@@ -4,6 +4,7 @@ import { Icon, Input } from "@rneui/base";
 import { SimpleTransactionInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { OperationArrayAlphabetizeOrder, rechercheExpendByName } from "./logic";
+import { getTrad } from "../../../../lang/internationalization";
 
 
 interface SearchProps {
@@ -11,18 +12,18 @@ interface SearchProps {
     budget: TransactionMonthInterface;
 
     onSearch: (value: { income: SimpleTransactionInterface[], expense: SimpleTransactionInterface[] }) => void;
-    trad: any;
+
 }
 
 
-export const Search = ({ budget, onSearch, trad }: SearchProps) => {
+export const Search = ({ budget, onSearch }: SearchProps) => {
 
     return <View>
         <Input
             style={[
                 globalStyle.colorTextPrimary,
             ]}
-            placeholder={trad.ToResearch}
+            placeholder={getTrad("ToResearch")}
             onChangeText={(text) => {
                 if (text.length >= 3 && budget.transaction) {
 
