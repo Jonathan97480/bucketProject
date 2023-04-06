@@ -18,12 +18,14 @@ interface SearchProps {
 
 export const Search = ({ budget, onSearch }: SearchProps) => {
 
-    return <View>
+    return (
         <Input
-            style={[
-                globalStyle.colorTextPrimary,
-            ]}
+
+            labelStyle={globalStyle.labelStyle}
+            inputStyle={[globalStyle.inputStyle, { borderBottomRightRadius: 0, borderTopRightRadius: 0 }]}
+            inputContainerStyle={globalStyle.inputContainerStyle}
             placeholder={getTrad("ToResearch")}
+
             onChangeText={(text) => {
                 if (text.length >= 3 && budget.transaction) {
 
@@ -53,12 +55,14 @@ export const Search = ({ budget, onSearch }: SearchProps) => {
                     name="search"
                     size={27}
                     color="#ffffff"
+                    backgroundColor={globalStyle.inputStyle.backgroundColor}
+                    style={[globalStyle.inputStyle, { borderBottomLeftRadius: 0, borderTopLeftRadius: 0 }]}
 
                 />
             }
 
-        />
-    </View>
+        />)
+
 
 
 

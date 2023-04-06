@@ -1,27 +1,19 @@
 import { Button, Input } from "@rneui/base";
 import React, { useState, useEffect } from "react";
-import { Text } from "react-native";
-import { FormValidate, GetUser, LoginUser, RegisterUser, SaveUser } from "./logic";
+import { FormValidate, GetIsAsUser, LoginUser, RegisterUser, SaveUser } from "./logic";
 import { View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { Title, CustomSafeAreaView, CustomActivityIndicator } from "../../components";
-import DatabaseManager from "../../utils/DataBase";
-import { setUser, userInterface } from "../../redux/userSlice";
+import { useDispatch } from "react-redux";
+import { Title, CustomSafeAreaView, CustomActivityIndicator, NotificationForm } from "../../components";
+import { setUser } from "../../redux/userSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
-import styleSheet from "./styleSheet";
-import { getLocales } from 'expo-localization';
 import { getTrad } from "../../lang/internationalization";
 
 export default function LoginAndRegister({ navigation }: any) {
 
-
-
     const dispatch = useDispatch()
-
     const [isAsUser, setIsAsUser] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
     const [isError, setIsError] = useState(false)
-
     const [form, setForm] = useState({
         identifiant: "",
         identifiantError: "",
@@ -30,43 +22,29 @@ export default function LoginAndRegister({ navigation }: any) {
         errorGlobal: ""
     })
 
-
     useEffect(() => {
-
-        DatabaseManager.GetIsAsUser().then((isAsUser) => {
-
-            if (isAsUser) {
-
-                GetUser().then((user) => {
-
-                    if (typeof user !== "boolean") {
-
-
-
-                        dispatch(setUser(user))
-                        navigation.replace("AllComptes")
-
-                    } else {
-                        setIsAsUser(isAsUser)
-                    }
-
-                }).catch((error) => {
-
-                    console.error(error)
-                })
-            }
-            setIsAsUser(isAsUser)
-
-
-        }).catch((error) => {
-            console.error(error)
-        })
-
-
-
+        GetIsAsUserCallBack();
     }, [])
 
+    const GetIsAsUserCallBack = React.useCallback(async () => {
+        const result = await GetIsAsUser()
 
+        if (result.isUserRegister) {
+            setIsAsUser(true)
+        }
+
+        if (result.userAutoLogin && result.user !== null) {
+
+            const user = result.user;
+
+            if (typeof user === "object") {
+
+                dispatch(setUser(user));
+                navigation.replace("AllComptes");
+
+            }
+        }
+    }, [])
 
 
     return (
@@ -75,37 +53,33 @@ export default function LoginAndRegister({ navigation }: any) {
             <Title title={isAsUser ? getTrad("ToLogIn") : getTrad("CreateAccount")} />
 
             <View style={globalStyle.containerCenter} >
-                {
-                    form.errorGlobal !== "" && form.errorGlobal.length > 0 ?
-                        <View
-                            style={[isError ? globalStyle.backgroundErrorColor : globalStyle.backgroundSuccessColor, styleSheet.containerMessageForm]}
-                        >
-                            <Text
-                                style={[globalStyle.colorTextPrimary, globalStyle.textSizeSmall, globalStyle.textAlignCenter]}
-                            >{form.errorGlobal}</Text>
-                        </View> : null}
-                <View>
+                <NotificationForm message={form.errorGlobal} type={isError ? "error" : "success"} messageDefault={isAsUser ? getTrad("pleaseConnectYour") : getTrad("EmptyUserCreateYourCount")} />
+                <View style={
+                    globalStyle.containerForm
+                }>
                     {
                         isLoading &&
                         <CustomActivityIndicator />
                     }
                     <Input
-                        style={globalStyle.marginVertical}
+
                         inputStyle={globalStyle.inputStyle}
                         placeholder={getTrad("YourUsername")}
+                        labelStyle={globalStyle.labelStyle}
                         label={getTrad("Username")}
                         errorMessage={form.identifiantError}
                         value={form.identifiant}
                         onChangeText={(text) => setForm({ ...form, identifiant: text })}
-
+                        inputContainerStyle={globalStyle.inputContainerStyle}
                     />
 
                     <Input
-                        style={globalStyle.marginVertical}
+                        labelStyle={globalStyle.labelStyle}
                         inputStyle={globalStyle.inputStyle}
                         placeholder={getTrad("YourPassword")}
                         label={getTrad("Password")}
                         errorMessage={form.passwordError}
+                        inputContainerStyle={globalStyle.inputContainerStyle}
                         value={form.password}
                         secureTextEntry={true}
                         onChangeText={(text) => setForm({ ...form, password: text })}
@@ -117,6 +91,7 @@ export default function LoginAndRegister({ navigation }: any) {
                         radius={25}
                         buttonStyle={globalStyle.btnStyle}
                         title={isAsUser ? getTrad("ToLogIn") : getTrad("CreateAccount")}
+                        titleStyle={globalStyle.btnTitleStyle}
                         onPress={() => {
                             setIsLoading(true)
                             const formError = FormValidate({

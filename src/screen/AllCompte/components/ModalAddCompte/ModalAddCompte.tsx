@@ -1,5 +1,5 @@
 
-import { Button, CheckBox, Input } from '@rneui/base';
+import { Button, CheckBox, Icon, Input } from '@rneui/base';
 import React, { useEffect, useState } from 'react';
 import { View, Dimensions, Alert } from 'react-native';
 import { useDispatch } from 'react-redux';
@@ -8,6 +8,7 @@ import { createCompte, UpdateCompte } from './logic';
 import { styleSheet } from './styleSheet';
 import { CustomActivityIndicator, CustomModal } from '../../../../components';
 import { getTrad } from '../../../../lang/internationalization';
+import globalStyle from '../../../../assets/styleSheet/globalStyle';
 
 
 
@@ -130,10 +131,15 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
             animationType="slide"
             transparent={true}
             setIsVisible={setVisible}
+            title={curentCompte ? getTrad("EditAccount") : getTrad("AddAccount")}
+            backgroundColor='#282525'
+            titleStyle={globalStyle.titleStyle}
+            containerStyle={globalStyle.modalContainerStyleForm}
+
         >
 
             <View
-                style={styleSheet.formContainer}
+                style={globalStyle.containerForm}
             >
 
                 <Input
@@ -141,8 +147,10 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                     value={Compte.name}
                     errorMessage={Compte.errorName}
                     label={getTrad("AccountName")}
-                    labelStyle={{ color: "black", fontSize: width * 0.05, fontWeight: "bold" }}
-                    inputStyle={{ color: "black", fontSize: width * 0.04 }}
+                    labelStyle={globalStyle.labelStyle}
+                    inputStyle={globalStyle.inputStyle}
+                    inputContainerStyle={globalStyle.inputContainerStyle}
+
                     onChangeText={text => setCompte((prevState) => {
                         return {
                             ...prevState,
@@ -171,10 +179,22 @@ export const ModalAddCompte = ({ visible, setVisible, id_user, curentCompte, all
                 />
                 <Button
                     title={curentCompte ? getTrad("Save") : getTrad("Add")}
-                    titleStyle={{ color: "white", fontSize: width * 0.05 }}
+                    titleStyle={globalStyle.btnTitleStyle}
+                    containerStyle={globalStyle.btnContainerStyle}
+                    buttonStyle={globalStyle.btnStyle}
                     radius={25}
-                    disabled={Compte.name.length <= 0 || Compte.errorName.length > 0}
                     onPress={onPress}
+                    iconPosition='right'
+                    icon={
+                        <Icon
+                            name="check"
+                            type="font-awesome"
+                            size={20}
+                            color="#fff"
+                            style={{ marginLeft: 10 }}
+                        />
+
+                    }
                 />
                 {
                     isLoading &&
@@ -210,11 +230,16 @@ const Overdrawn = ({
     }, [isOverdrawn, overdrawn]);
 
     return (
-        <View >
+        < >
 
             <CheckBox
                 title={getTrad("AuthorizeOverdraft")}
+                textStyle={globalStyle.titleStyleCheckBox}
+                containerStyle={globalStyle.containerCheckBoxStyle}
                 checked={checked}
+                style={globalStyle.checkBoxStyle}
+
+                checkedColor={globalStyle.checkedColorCheckBox.color}
                 size={width * 0.06}
                 onPress={() => {
                     onChange(value, !checked);
@@ -228,8 +253,9 @@ const Overdrawn = ({
                 checked &&
                 <Input
                     placeholder={getTrad("OverdraftAmount")}
-                    labelStyle={{ color: "black", fontSize: width * 0.05, fontWeight: "bold" }}
-                    inputStyle={{ color: "black", fontSize: width * 0.04 }}
+                    labelStyle={globalStyle.labelStyle}
+                    inputStyle={globalStyle.inputStyle}
+                    inputContainerStyle={globalStyle.inputContainerStyle}
                     value={value}
                     label={getTrad("OverdraftAmount")}
                     keyboardType="numeric"
@@ -241,7 +267,7 @@ const Overdrawn = ({
                     }
                 />
             }
-        </View>
+        </>
     );
 
 };

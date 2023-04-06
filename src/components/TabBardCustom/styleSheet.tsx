@@ -17,10 +17,11 @@ export default StyleSheet.create({
         marginHorizontal: 12,
         backgroundColor: '#312ECB',
         elevation: 10,
+        width: width > 500 ? 500 : 320,
     },
     icon: {
-        width: width * 0.04,
-        height: height * 0.04,
+        width: width > 500 ? 30 : 20,
+        height: width > 500 ? 30 : 20,
 
     },
 

@@ -12,6 +12,9 @@ interface CustomModalProps {
     children: React.ReactNode,
     title?: string,
     disableCenterPosition?: boolean,
+    backgroundColor?: string,
+    titleStyle?: any,
+    containerStyle?: any,
 }
 
 export const CustomModal = React.memo((props: CustomModalProps) => {
@@ -47,6 +50,8 @@ export const CustomModal = React.memo((props: CustomModalProps) => {
                 <View
                     style={[{
                         width: "100%",
+                        justifyContent: "center",
+                        alignItems: "center",
                     },
                     props.disableCenterPosition ? {
                         flex: 1
@@ -56,9 +61,9 @@ export const CustomModal = React.memo((props: CustomModalProps) => {
                     ]}
                 >
                     <View
-                        style={{
+                        style={props.containerStyle ? props.containerStyle : {
                             width: "100%",
-                            backgroundColor: "#fff",
+                            backgroundColor: props.backgroundColor ? props.backgroundColor : "#fff",
                             justifyContent: "center",
                             alignItems: "center",
                             borderRadius: 10,
@@ -79,7 +84,7 @@ export const CustomModal = React.memo((props: CustomModalProps) => {
                         >
                             <View></View>
                             <Text
-                                style={{
+                                style={props.titleStyle ? props.titleStyle : {
 
                                     fontSize: width * 0.05,
                                     fontWeight: 'bold',
@@ -88,10 +93,10 @@ export const CustomModal = React.memo((props: CustomModalProps) => {
                                 }}
                             >{props.title}</Text>
                             <Icon
-
-
                                 name="close"
-                                size={30}
+                                size={width > 600 ? 40 : 30}
+                                color="#ffff"
+
                                 onPress={() => {
                                     props.setIsVisible(false);
                                 }}

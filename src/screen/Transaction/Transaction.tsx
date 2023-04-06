@@ -1,7 +1,7 @@
 
 import { FAB } from "@rneui/base";
 import React, { useEffect, useCallback } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, Dimensions } from "react-native";
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import styleSheet from "./styleSheet";
@@ -10,13 +10,14 @@ import { ModalAddBudget } from "./components/ModalAddTransaction/ModalAddTransac
 import TransactionSwipeable from "./components/TransactionSwipeable/TransactionSwipeable";
 import { MonthInterface, TransactionMonthInterface } from "../../redux/comptesSlice";
 import globalStyle from "../../assets/styleSheet/globalStyle";
-import { BannerAds, CustomSafeAreaView } from "../../components";
+import { BannerAds, CustomSafeAreaView, Title } from "../../components";
 import { getTrad } from "../../lang/internationalization";
 
 
 export const Transaction = () => {
 
     const navigation = useNavigation();
+    const { width, height } = Dimensions.get('window');
 
     const currentMonthRedux: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
 
@@ -56,107 +57,120 @@ export const Transaction = () => {
                 style={{
                     alignItems: "center",
                     justifyContent: "center",
+                    margin: 0
                 }}
             >
                 <BannerAds />
 
             </View>
-            <View style={styleSheet.container}>
-
-                {
-
-                    curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
-                        <ScrollView contentContainerStyle={styleSheet.scrollView}>
-                            <View
-                                style={styleSheet.scrollViewContainer}
-                            >
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeXLarge, globalStyle.textAlignCenter]} >
-                                    {getTrad("TransactionList")}
-                                </Text>
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]} >{getTrad("DepositToAccount")}</Text>
-                                {
-                                    curentMonth.transactions.income.length > 0 ?
-                                        curentMonth.transactions.income.slice(0).reverse().map((item, indexBudget) => {
-                                            return (
 
 
-                                                <View style={{
-                                                    marginVertical: 5,
-                                                    height: "auto",
+            {
 
-                                                }} key={item.id}
-                                                >
+                curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
+                    <ScrollView contentContainerStyle={styleSheet.scrollView}>
+                        <View
+                            style={{
+                                justifyContent: "flex-start",
+                                width: "100%",
+                                flex: 1,
+                                alignItems: "center",
 
-                                                    <TransactionSwipeable
-                                                        transaction={item}
-                                                        indexBudget={indexBudget}
-                                                        setModalEdit={editTransactionCallBack}
-                                                        navigation={navigation}
+                            }}
+                        >
+                            <Title title={getTrad("TransactionList")} />
 
-                                                    />
-                                                </View>
-
-                                            )
-
-                                        })
-                                        : null
-
-                                }
-                                <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]}>{getTrad("WithdrawalAccount")}</Text>
-                                {
-                                    curentMonth.transactions.expense.length > 0 ?
-                                        curentMonth.transactions.expense.slice(0).reverse().map((item, indexBudget) => {
-                                            return (
+                            <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]} >{getTrad("DepositToAccount")}</Text>
+                            {
+                                curentMonth.transactions.income.length > 0 ?
+                                    curentMonth.transactions.income.slice(0).reverse().map((item, indexBudget) => {
+                                        return (
 
 
-                                                <View style={{
-                                                    marginVertical: 5,
-                                                    height: "auto",
-
-                                                }} key={item.id}
-                                                >
-                                                    <TransactionSwipeable
-                                                        transaction={item}
-                                                        indexBudget={indexBudget}
-                                                        setModalEdit={editTransactionCallBack}
-                                                        navigation={navigation}
-
-                                                    />
-                                                </View>
-
-                                            )
-
-                                        }) : null
-                                }
+                                            <View style={{
+                                                marginVertical: 5,
+                                                height: "auto",
+                                                alignItems: "center",
+                                                width: width > 500 ? 500 : width * 0.8,
+                                                maxWidth: width > 500 ? 500 : "100%",
 
 
+                                            }} key={item.id}
+                                            >
 
-                            </View>
+                                                <TransactionSwipeable
+                                                    transaction={item}
+                                                    indexBudget={indexBudget}
+                                                    setModalEdit={editTransactionCallBack}
+                                                    navigation={navigation}
 
-                        </ScrollView>
+                                                />
+                                            </View>
 
-                        : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget}
+                                        )
 
-                        />
+                                    })
+                                    : null
 
-                }
+                            }
+                            <Text style={[globalStyle.colorTextPrimary, globalStyle.textSizeLarge, globalStyle.marginVertical]}>{getTrad("WithdrawalAccount")}</Text>
+                            {
+                                curentMonth.transactions.expense.length > 0 ?
+                                    curentMonth.transactions.expense.slice(0).reverse().map((item, indexBudget) => {
+                                        return (
 
 
-                <ModalAddBudget
-                    isViewModalAddBudget={isViewModalAddBudget}
-                    setIsViewModalAddBudget={editTransactionCallBack}
-                    transaction={curentTransaction}
+                                            <View style={{
+                                                marginVertical: 5,
+                                                height: "auto",
+                                                width: width > 500 ? 500 : width * 0.8,
+                                                maxWidth: width > 500 ? 500 : "100%",
 
-                />
-                {curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
-                    <FAB
-                        visible={true}
-                        icon={{ name: 'add', color: 'white' }}
-                        placement="right"
-                        color="#4F94BB"
-                        onPress={() => setIsViewModalAddBudget(true)}
-                    /> : null}
-            </View>
+
+                                            }} key={item.id}
+                                            >
+                                                <TransactionSwipeable
+                                                    transaction={item}
+                                                    indexBudget={indexBudget}
+                                                    setModalEdit={editTransactionCallBack}
+                                                    navigation={navigation}
+
+                                                />
+                                            </View>
+
+                                        )
+
+                                    }) : null
+                            }
+
+
+
+                        </View>
+
+                    </ScrollView>
+
+                    : <EmptyTransaction setIsViewModalAddBudget={setIsViewModalAddBudget}
+
+                    />
+
+            }
+
+
+            <ModalAddBudget
+                isViewModalAddBudget={isViewModalAddBudget}
+                setIsViewModalAddBudget={editTransactionCallBack}
+                transaction={curentTransaction}
+
+            />
+            {curentMonth.transactions.expense.length > 0 || curentMonth.transactions.income.length > 0 ?
+                <FAB
+                    visible={true}
+                    icon={{ name: 'add', color: 'white' }}
+                    placement="right"
+                    color="#4F94BB"
+                    onPress={() => setIsViewModalAddBudget(true)}
+                /> : null}
+
 
 
         </CustomSafeAreaView>

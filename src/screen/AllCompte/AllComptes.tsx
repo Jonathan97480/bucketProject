@@ -125,7 +125,7 @@ export default function AllComptes({ navigation }: any) {
     return (
         <CustomSafeAreaView>
             <View style={
-                [{ flexDirection: "row", justifyContent: "flex-end" }, globalStyle.marginVertical]
+                [{ flexDirection: "row", justifyContent: "flex-end" }]
             }>
 
                 <TouchableOpacity onPress={async () => {
@@ -145,12 +145,7 @@ export default function AllComptes({ navigation }: any) {
                         }
                     ]);
                 }}
-                    style={{
-                        backgroundColor: "#8280E5",
-                        padding: 8,
-                        borderRadius: 50,
 
-                    }}
                 >
 
                     <Icon
@@ -163,7 +158,7 @@ export default function AllComptes({ navigation }: any) {
                 </TouchableOpacity>
             </View>
 
-            <View style={[globalStyle.containerCenter, {}]} >
+            <View style={globalStyle.containerCenter} >
                 {comptes.length <= 0 ? <NoCompte
 
                 /> :
@@ -199,9 +194,10 @@ export default function AllComptes({ navigation }: any) {
                 }>
                     <Button
                         title={getTrad("AddAnAccount")}
-                        titleStyle={{ color: "white", fontSize: width * 0.04 }}
+                        titleStyle={globalStyle.btnTitleStyle}
                         onPress={onPress}
-                        buttonStyle={[globalStyle.btnStyle, { padding: 10, maxWidth: width > 400 ? width * 0.5 : width * 0.8 }]}
+                        buttonStyle={globalStyle.btnStyle}
+                        containerStyle={globalStyle.btnContainerStyle}
                         radius={25}
                         icon={{
                             name: "wallet",

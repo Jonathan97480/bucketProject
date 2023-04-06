@@ -107,3 +107,32 @@ export const RemoveUser = async () => {
 
 }
 
+export const GetIsAsUser = async () => {
+
+    const result: boolean = await DatabaseManager.GetIsAsUser();
+
+    if (result) {
+
+        const user = await GetUser();
+
+        if (typeof user === "object") {
+            return {
+                isUserRegister: true,
+                userAutoLogin: true,
+                user: user
+            }
+        }
+        return {
+            isUserRegister: true,
+            userAutoLogin: false,
+            user: null
+        }
+    }
+
+    return {
+        isUserRegister: false,
+        userAutoLogin: false,
+        user: null
+    }
+
+}

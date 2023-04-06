@@ -7,62 +7,70 @@ export default function TabBardCustom({ state, descriptors, navigation }: { stat
 
     return (
         <View
-            style={styleSheet.tabBar}>
-            {state.routes.map((route: any, index: any) => {
-                const { options } = descriptors[route.key];
-                const label =
-                    options.tabBarLabel !== undefined
-                        ? options.tabBarLabel
-                        : options.title !== undefined
-                            ? options.title
-                            : route.name;
-                const isFocused = state.index === index;
+            style={{
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+            }}
+        >
+            <View
+                style={styleSheet.tabBar}>
+                {state.routes.map((route: any, index: any) => {
+                    const { options } = descriptors[route.key];
+                    const label =
+                        options.tabBarLabel !== undefined
+                            ? options.tabBarLabel
+                            : options.title !== undefined
+                                ? options.title
+                                : route.name;
+                    const isFocused = state.index === index;
 
-                const myIcon: any = getIconByRouteName(route.name, isFocused);
+                    const myIcon: any = getIconByRouteName(route.name, isFocused);
 
 
-                const onPress = () => {
-                    const event = navigation.emit({
-                        type: 'tabPress',
-                        target: route.key,
-                    });
+                    const onPress = () => {
+                        const event = navigation.emit({
+                            type: 'tabPress',
+                            target: route.key,
+                        });
 
-                    if (!isFocused && !event.defaultPrevented) {
-                        navigation.navigate(route.name);
-                    }
-                };
+                        if (!isFocused && !event.defaultPrevented) {
+                            navigation.navigate(route.name);
+                        }
+                    };
 
-                const onLongPress = () => {
-                    navigation.emit({
-                        type: 'tabLongPress',
-                        target: route.key,
-                    });
-                };
+                    const onLongPress = () => {
+                        navigation.emit({
+                            type: 'tabLongPress',
+                            target: route.key,
+                        });
+                    };
 
-                return (
-                    <TouchableOpacity
-                        key={index + "-bottom-tab"}
-                        accessibilityRole="button"
-                        accessibilityLabel={options.tabBarAccessibilityLabel}
-                        testID={options.tabBarTestID}
-                        onPress={onPress}
-                        onLongPress={onLongPress}
-                        style={{
-                            flex: 1,
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                        }}>
-                        {myIcon}
-                        <Text
-                            style={[{
-                                color: isFocused ? '#9747FF' : '#fff',
-                                fontSize: width * 0.03,
-                            }]}>
-                            {getTrad(label)}
-                        </Text>
-                    </TouchableOpacity>
-                );
-            })}
+                    return (
+                        <TouchableOpacity
+                            key={index + "-bottom-tab"}
+                            accessibilityRole="button"
+                            accessibilityLabel={options.tabBarAccessibilityLabel}
+                            testID={options.tabBarTestID}
+                            onPress={onPress}
+                            onLongPress={onLongPress}
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                            }}>
+                            {myIcon}
+                            <Text
+                                style={[{
+                                    color: isFocused ? '#9747FF' : '#fff',
+                                    fontSize: width > 400 ? 16 : 12,
+                                }]}>
+                                {getTrad(label)}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
         </View>
     );
 }

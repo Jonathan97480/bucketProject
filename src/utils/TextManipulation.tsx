@@ -2,7 +2,7 @@ import { getTrad } from "../lang/internationalization";
 import { SimpleTransactionInterface } from "../redux/comptesSlice";
 import { listeExpendInterface, PoleExpend } from "../redux/expendSlice";
 import { listInterface, stepInterface } from "../redux/listSlice";
-
+import { Dimensions } from 'react-native';
 
 export function TextArrayAlphabetizeOrder(a: []) {
     return a.sort(function (x: string, y: string) {
@@ -60,4 +60,27 @@ export function generateAlert({ type, message, }: GenerateAlertInterface) {
         } : null
 
     };
+}
+
+
+/**
+ *  renvoi une font size en fonction de la taille de l'écran et de la taille de la police de base 
+ * avec une taille de police minimum et maximum
+ * @param fontSize 
+ * @param minFontSize 
+ * @param maxFontSize 
+ * @returns  number
+ * @example clampFontSizeWithScreenWidth(16, 12, 20) => 16
+ * @example clampFontSizeWithScreenWidth(16, 12, 14) => 14
+ * @example clampFontSizeWithScreenWidth(16, 18, 20) => 18
+ */
+export function clampFontSizeWithScreenWidth(fontSize: number, minFontSize: number, maxFontSize: number) {
+    const screenWidth = Dimensions.get('window').width;
+    const clampedFontSize = clamp(fontSize * (screenWidth / 375), minFontSize, maxFontSize); // 375 est la largeur de l'iPhone 6/7/8, qui est souvent utilisée comme référence pour les tailles de police.
+
+    return clampedFontSize;
+}
+
+function clamp(value: number, min: number, max: number) {
+    return Math.min(Math.max(value, min), max);
 }

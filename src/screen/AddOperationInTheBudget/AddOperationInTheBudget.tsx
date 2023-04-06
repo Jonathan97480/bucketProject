@@ -7,7 +7,7 @@ import { setCurentCompte, setCurentMonth, SimpleTransactionInterface, Transactio
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import { getColorBudget } from "../../utils/ColorCollection";
 import { ModalAddExpend } from "./components/ModalAddExpend/ModalAddOperation";
-import { CustomModal, CustomSafeAreaView } from "../../components";
+import { BannerAds, CustomModal, CustomSafeAreaView } from "../../components";
 import { OperationArrayAlphabetizeOrder } from "./components/Search/logic";
 import { Search } from "./components/Search/Search";
 import { Filters } from "./components/Filters/Filters";
@@ -121,26 +121,30 @@ export const AddOperationInTheBudget = () => {
     return (
 
         <CustomSafeAreaView>
-
+            <BannerAds />
             <Header
                 localCurentBudget={budget}
                 dispatchModalVisible={dispatchModalVisible}
 
             />
-            <Search
-                budget={budget}
-                onSearch={({ income, expense }) => {
-                    setCurentOperations({ income, expense });
-                }}
-            />
-            <Filters
-                onChanges={(value) => {
-                    setFilters(value);
-                }}
-            />
+
 
             {budget.transaction &&
-                <>
+                <View style={{
+                    flex: 1,
+
+                }}>
+                    <Search
+                        budget={budget}
+                        onSearch={({ income, expense }) => {
+                            setCurentOperations({ income, expense });
+                        }}
+                    />
+                    <Filters
+                        onChanges={(value) => {
+                            setFilters(value);
+                        }}
+                    />
                     {
                         filters == "Expense" ?
                             <View>
@@ -174,7 +178,7 @@ export const AddOperationInTheBudget = () => {
 
                                 />
                             </View> : null}
-                </>
+                </View>
 
             }
 
@@ -242,7 +246,7 @@ export const AddOperationInTheBudget = () => {
 
 
             <FAB
-
+                color={globalStyle.btnStyle.backgroundColor}
                 disabled={budget.isClosed}
                 icon={
                     <Icon
@@ -278,69 +282,91 @@ const Header = React.memo(({ localCurentBudget, dispatchModalVisible }: {
 
     const isNullTransaction: boolean = localCurentBudget.transaction?.expense?.length! > 0 || localCurentBudget.transaction?.income.length! > 0;
     return (
-        <View style={
-            [
-                styleSheet.centenaire,
+        <>
+            <View style={
                 {
-                    backgroundColor: getColorBudget(localCurentBudget.montant, localCurentBudget.start_montant)
+                    backgroundColor: getColorBudget(localCurentBudget.montant, localCurentBudget.start_montant),
+                    padding: 10,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                    width: "40%",
+                    borderRadius: 10,
+                    alignSelf: "center",
+                    borderBottomLeftRadius: 0,
+                    borderBottomRightRadius: 0,
+                    marginTop: 10,
                 }
-            ]
-        }
-        >
-            <Text
-                style={styleSheet.title}
-            >
-                {localCurentBudget.montant.toFixed(2)}€
-            </Text>
-            <Text style={styleSheet.title}>{localCurentBudget.name.substring(0, textSize)}</Text>
-            <View
-                style={styleSheet.containerIcon}
-            >
-                <Icon
-                    disabled={localCurentBudget.isClosed || !isNullTransaction}
+            } >
+                <Text
 
-                    name="check"
-                    type="font-awesome"
-                    style={{
-                        backgroundColor: localCurentBudget.isClosed || !isNullTransaction ? '#d1d5d8' : "#4F94BB",
-                        padding: 8,
-                        borderRadius: 25,
-                        width: 30,
-                        height: 30,
-                    }}
-                    size={15}
-                    color="#fff"
-                    onPress={() => {
+                    style={[styleSheet.title, globalStyle.textAlignCenter]}
+                >
 
-                        dispatchModalVisible({ type: "closeBudget" });
-                    }}
-
-
-
-                />
-                <Icon
-                    disabled={localCurentBudget.isClosed || !isNullTransaction}
-                    name="list"
-                    type="font-awesome"
-                    style={{
-                        backgroundColor: localCurentBudget.isClosed || !isNullTransaction ? '#d1d5d8' : "#4F94BB",
-                        padding: 8,
-                        borderRadius: 25,
-                        width: 30,
-                        height: 30,
-                    }}
-                    size={25}
-                    color="#fff"
-                    onPress={() => {
-                        dispatchModalVisible({ type: "createListe" });
-                    }}
-                />
+                    {localCurentBudget.montant.toFixed(2)}€
+                </Text>
             </View>
+            <View style={
+                [{
+                    backgroundColor: getColorBudget(localCurentBudget.montant, localCurentBudget.start_montant),
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    padding: 8,
+                    borderRadius: 10,
+                    marginBottom: 10,
+                }]
+            }
+            >
+
+                <Text style={styleSheet.title}>{localCurentBudget.name.substring(0, textSize)}</Text>
+                <View
+                    style={styleSheet.containerIcon}
+                >
+                    <Icon
+                        disabled={localCurentBudget.isClosed || !isNullTransaction}
+
+                        name="check"
+                        type="font-awesome"
+                        style={{
+                            backgroundColor: localCurentBudget.isClosed || !isNullTransaction ? '#d1d5d8' : "#4F94BB",
+                            padding: 8,
+                            borderRadius: 25,
+                            width: 30,
+                            height: 30,
+                        }}
+                        size={15}
+                        color="#fff"
+                        onPress={() => {
+
+                            dispatchModalVisible({ type: "closeBudget" });
+                        }}
+
+
+
+                    />
+                    <Icon
+                        disabled={localCurentBudget.isClosed || !isNullTransaction}
+                        name="list"
+                        type="font-awesome"
+                        style={{
+                            backgroundColor: localCurentBudget.isClosed || !isNullTransaction ? '#d1d5d8' : "#4F94BB",
+                            padding: 8,
+                            borderRadius: 25,
+                            width: 30,
+                            height: 30,
+                        }}
+                        size={25}
+                        color="#fff"
+                        onPress={() => {
+                            dispatchModalVisible({ type: "createListe" });
+                        }}
+                    />
+                </View>
 
 
 
 
-        </View>
+            </View>
+        </>
     )
 
 

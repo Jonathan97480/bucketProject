@@ -9,7 +9,6 @@ export default StyleSheet.create({
     container: {
         flex: 1,
         maxHeight: '100%',
-
         height: '100%',
     },
 
@@ -33,7 +32,6 @@ export default StyleSheet.create({
         textAlign: 'center',
     },
     buttonAddBudget: {
-
         flex: 1,
         borderRadius: 50,
         backgroundColor: '#596cab',

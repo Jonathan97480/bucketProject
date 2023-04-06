@@ -13,21 +13,31 @@ export const Filters = ({ onChanges }: FiltersProps) => {
 
     const [checked, setChecked] = useState<"Income" | "Expense">("Expense");
 
-    return <View style={styleSheet.container}>
+    return < >
         <Text style={[
-            globalStyle.colorTextPrimary,
-            globalStyle.textAlignLeft,
-            globalStyle.textSizeMedium,
+            globalStyle.labelStyle,
+            { margin: 0, padding: 0 }
         ]}>Filtres </Text>
-        <View style={globalStyle.containerCheckBox}>
+        <View style={
+            {
+                flexDirection: "row",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                margin: 0,
+                padding: 0,
+                height: 55,
+
+            }
+        }>
 
             <CheckBox
 
                 title="Sortie"
                 checkedIcon="dot-circle-o"
                 uncheckedIcon="circle-o"
-                containerStyle={globalStyle.checkBox}
-                textStyle={checked === "Expense" ? globalStyle.checkBoxText : null}
+                containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                textStyle={globalStyle.titleStyleCheckBox}
+                checkedColor={globalStyle.checkedColorCheckBox.color}
                 checked={checked === "Expense" ? true : false}
                 onPress={() => {
                     setChecked("Expense");
@@ -39,8 +49,9 @@ export const Filters = ({ onChanges }: FiltersProps) => {
                 title="Entrée"
                 checkedIcon="dot-circle-o"
                 uncheckedIcon="circle-o"
-                textStyle={checked === "Income" ? globalStyle.checkBoxText : null}
-                containerStyle={globalStyle.checkBox}
+                containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                textStyle={globalStyle.titleStyleCheckBox}
+                checkedColor={globalStyle.checkedColorCheckBox.color}
                 checked={checked === "Income" ? true : false}
                 onPress={() => {
                     setChecked("Income");
@@ -49,7 +60,7 @@ export const Filters = ({ onChanges }: FiltersProps) => {
 
             />
         </View>
-    </View>
+    </>
 
 
 }

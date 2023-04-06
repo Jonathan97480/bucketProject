@@ -1,7 +1,10 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
+const { width, height } = Dimensions.get('window');
 
 export default StyleSheet.create({
+
+
 
     container: {
         flex: 1,
@@ -11,16 +14,9 @@ export default StyleSheet.create({
         width: "100%",
 
     }, image: {
-        width: 200,
-        height: 200
+        width: width > 500 ? 300 : 200,
+        height: width > 500 ? 300 : 200,
 
-    }, title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 20
-    },
-    button: {
-        borderRadius: 10
     }
 
 

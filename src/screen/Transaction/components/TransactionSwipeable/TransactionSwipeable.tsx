@@ -30,11 +30,14 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
         <ListItem.Swipeable
             style={
                 {
+                    borderRadius: 20,
                     overflow: 'hidden',
-                    width: '100%',
+                    width: width > 500 ? 500 : width * 0.8,
+                    maxWidth: width > 500 ? 500 : "100%",
 
                 }
             }
+
 
 
             containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20 }]}
@@ -50,7 +53,10 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
             leftContent={(reset) => (
                 <Button
-                    containerStyle={{ borderRadius: 20, }}
+                    containerStyle={globalStyle.btnContainerStyle}
+                    buttonStyle={{ minHeight: '100%' }}
+                    titleStyle={globalStyle.btnTitleStyle}
+                    radius={25}
                     title={getTrad("Edit") + ` ${transaction.transactionType === "Spent" ? getTrad("Transaction") : getTrad("Budget")} `}
                     onPress={() => {
 
@@ -58,12 +64,15 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         reset()
                     }}
 
-                    buttonStyle={{ minHeight: '100%' }}
+
                 />
             )}
             rightContent={(reset) => (
                 <Button
-                    containerStyle={{ borderRadius: 20, }}
+                    containerStyle={globalStyle.btnContainerStyle}
+                    buttonStyle={[{ minHeight: '100%', backgroundColor: 'red' }]}
+                    titleStyle={globalStyle.btnTitleStyle}
+                    radius={25}
                     title={getTrad("delete") + ` ${transaction.transactionType === "Spent" ? "Transaction" : "Budget"} `}
                     onPress={() => {
 
@@ -92,8 +101,8 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                     }
                     }
 
-                    buttonStyle={[{ minHeight: '100%', backgroundColor: 'red' }]}
-                    color="#ffffff"
+
+
                 />
             )}
         >
@@ -104,27 +113,36 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                 size={width * 0.08}
             />
             <ListItem.Content
+                style={{
 
+                    width: width > 500 ? 700 : 400,
+                    maxWidth: width > 500 ? 500 : 400,
+                }}
             >
                 <ListItem.Title
-                    style={{ color: colorList.primary, fontWeight: 'bold', fontSize: width * 0.04 }}
+                    style={[
+                        { fontSize: width > 500 ? 30 : width * 0.05, color: "#fff" },
+                        globalStyle.textBold,
+                        globalStyle.textAlignLeft
+
+                    ]}
                 >{transaction.name.slice(0, 30)}</ListItem.Title>
                 {
                     transaction.transactionType === "Budget" ?
                         <>
                             <ListItem.Subtitle
-                                style={{ color: colorList.primary, fontSize: width * 0.03 }}
+                                style={{ color: colorList.primary, fontSize: width > 500 ? 20 : width * 0.03, width: "100%" }}
                             >{getTrad("AmountStart")} : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
 
                             <ListItem.Subtitle
-                                style={{ color: colorList.primary, fontSize: width * 0.03 }}
+                                style={{ color: colorList.primary, fontSize: width > 500 ? 20 : width * 0.03, width: "100%" }}
                             >{getTrad("RemainingBudget")} : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
                         </>
                         :
                         <>
 
                             <ListItem.Subtitle
-                                style={{ color: colorList.primary, fontSize: width * 0.03 }}
+                                style={{ color: colorList.primary, fontSize: width > 500 ? 20 : width * 0.03, width: "100%" }}
                             >{getTrad("Amount")} : {transaction.montant_real === 0 ? transaction.montant.toFixed(2) : transaction.montant_real.toFixed(2)}€</ListItem.Subtitle>
                         </>
                 }
@@ -134,6 +152,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                 style={{
                     flexDirection: "row",
                     alignItems: "center",
+
 
                 }}
             >

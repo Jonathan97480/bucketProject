@@ -22,12 +22,12 @@ export const EmptyTransaction = ({ setIsViewModalAddBudget }: EmptyBudgetProps) 
                     source={IconBudgetAdd_image}
                     style={styleSheet.image}
                 />
-                <Text style={[styleSheet.title, globalStyle.colorTextPrimary, globalStyle.textAlignCenter]}>{getTrad("YouDoNotTransactionMonth")} {getMonthByNumber(new Date().getMonth() + 1)}</Text>
+                <Text style={[globalStyle.titleStyle, globalStyle.textAlignCenter, { lineHeight: 30, marginBottom: 20 }]}>{getTrad("YouDoNotTransactionMonth")} {getMonthByNumber(new Date().getMonth() + 1)}</Text>
                 <Button
-
-                    color='#817FE5'
                     radius={5}
                     title={getTrad("AddTransaction")}
+                    titleStyle={globalStyle.btnTitleStyle}
+                    containerStyle={globalStyle.btnContainerStyle}
                     onPress={() => {
                         setIsViewModalAddBudget(true);
                     }} />

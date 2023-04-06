@@ -1,7 +1,7 @@
 
 
 import React, { useEffect, useState } from 'react'
-import { View, Text, TouchableOpacity, Alert, Dimensions } from 'react-native'
+import { View, Text, TouchableOpacity, Alert, Dimensions, ScrollView } from 'react-native'
 import { Input, Icon, Button, CheckBox, } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import styleSheet from './styleSheet';
@@ -223,9 +223,12 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
             }}
             title={getTrad("AddTransaction")}
+            backgroundColor='#282525'
+            titleStyle={globalStyle.titleStyle}
+            containerStyle={globalStyle.modalContainerStyleForm}
 
         >
-            <View style={styleSheet.modalBody}>
+            <View style={globalStyle.containerForm}>
                 {/*  <Text style={styleSheet.titleModal}>{getTrad("AddTransaction")}</Text> */}
                 <View style={[
                     globalStyle.flexRow,
@@ -260,9 +263,9 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
 
                             <Input placeholder={getTrad("NameYourTransaction")}
                                 label={getTrad("name")}
-                                labelStyle={[styleSheet.modalInputLabel, { color: 'black' }]}
-                                inputStyle={styleSheet.modalInputLabel}
-                                errorMessage={formAddBudget.errorName}
+                                labelStyle={globalStyle.labelStyle}
+                                inputStyle={globalStyle.inputStyle}
+                                inputContainerStyle={globalStyle.inputContainerStyle}
                                 value={formAddBudget.name}
                                 onChangeText={(value) => {
                                     setFormAddBudget({ ...formAddBudget, name: value });
@@ -275,8 +278,9 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                 keyboardType="numeric"
                                 label={getTrad("Amount")}
                                 errorMessage={formAddBudget.errorMontant}
-                                labelStyle={[styleSheet.modalInputLabel, { color: 'black' }]}
-                                inputStyle={styleSheet.modalInputLabel}
+                                labelStyle={globalStyle.labelStyle}
+                                inputStyle={globalStyle.inputStyle}
+                                inputContainerStyle={globalStyle.inputContainerStyle}
                                 value={formAddBudget.montant}
                                 onChangeText={(value) => {
                                     setFormAddBudget({ ...formAddBudget, montant: value });
@@ -286,114 +290,118 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                     </View>}
                 {
                     curentEtape === 'Etape2' &&
-                    <View style={styleSheet.stageContainer}>
-                        <View>
-                            <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionType")}</Text>
-                            <View style={[globalStyle.flexRow]}>
-                                <CheckBox
-                                    onPress={() => {
-                                        setFormAddBudget({ ...formAddBudget, typeTransaction: 'Spent' });
-                                    }}
-                                    textStyle={{
-
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
-                                    title={getTrad("Operation")}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                    checked={formAddBudget.typeTransaction === 'Spent' ? true : false}
-                                />
-                                <CheckBox
-                                    onPress={() => {
-                                        setFormAddBudget({ ...formAddBudget, typeTransaction: 'Budget' });
-                                    }}
-                                    textStyle={{
-
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
-                                    title={getTrad("Budget")}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                    checked={formAddBudget.typeTransaction === 'Budget' ? true : false}
-                                />
-                                <CheckBox
-                                    onPress={() => {
-                                        setFormAddBudget({
-                                            ...formAddBudget, typeTransaction: 'BankTransfers',
-                                            typeOperation: 'expense'
-                                        });
-                                    }}
-                                    textStyle={{
-
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
-                                    title={getTrad("BankTransfers")}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                    checked={formAddBudget.typeTransaction === 'BankTransfers' ? true : false}
-                                />
-                            </View>
+                    <ScrollView
+                        style={{
+                            maxHeight: width / 100 * 90
+                        }}
+                    >
+                        <View style={styleSheet.stageContainer}>
                             <View>
+                                <Text style={globalStyle.labelStyle}>{getTrad("TransactionType")}</Text>
+                                <View style={[globalStyle.flexRow]}>
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({ ...formAddBudget, typeTransaction: 'Spent' });
+                                        }}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={globalStyle.containerCheckBoxStyle}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
+                                        title={getTrad("Operation")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.typeTransaction === 'Spent' ? true : false}
+                                    />
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({ ...formAddBudget, typeTransaction: 'Budget' });
+                                        }}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={globalStyle.containerCheckBoxStyle}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
+                                        title={getTrad("Budget")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.typeTransaction === 'Budget' ? true : false}
+                                    />
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({
+                                                ...formAddBudget, typeTransaction: 'BankTransfers',
+                                                typeOperation: 'expense'
+                                            });
+                                        }}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={globalStyle.containerCheckBoxStyle}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
+                                        title={getTrad("BankTransfers")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.typeTransaction === 'BankTransfers' ? true : false}
+                                    />
+                                </View>
+                                <View>
 
-                                <ComptePIcker formAddBudget={formAddBudget} setFormAddBudget={setFormAddBudget} />
+                                    <ComptePIcker formAddBudget={formAddBudget} setFormAddBudget={setFormAddBudget} />
 
-                            </View>
+                                </View>
 
-                        </View >
-                        {formAddBudget.typeTransaction != "BankTransfers" && < View >
-                            <Text style={styleSheet.modalInputLabel}>{getTrad("Transactionnelle")}</Text>
-                            <View style={[globalStyle.flexRow]}>
-                                <CheckBox
-                                    onPress={() => {
-                                        setFormAddBudget({ ...formAddBudget, typeOperation: 'income' });
-                                    }}
-                                    title={getTrad("Deposit")}
-                                    textStyle={{
-                                        color: '#1ba344',
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                    checked={formAddBudget.typeOperation === 'income' ? true : false}
-                                />
-                                <CheckBox
-                                    onPress={() => {
-                                        setFormAddBudget({ ...formAddBudget, typeOperation: 'expense' });
-                                    }}
-                                    textStyle={{
-                                        color: '#de3e44',
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
-                                    title={getTrad("Withdrawal")}
-                                    checkedIcon='dot-circle-o'
-                                    uncheckedIcon='circle-o'
-                                    checked={formAddBudget.typeOperation === 'expense' ? true : false}
-                                />
-                            </View>
+                            </View >
+                            {formAddBudget.typeTransaction != "BankTransfers" && < View >
+                                <Text style={globalStyle.labelStyle}>{getTrad("Transactionnelle")}</Text>
+                                <View style={[globalStyle.flexRow]}>
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({ ...formAddBudget, typeOperation: 'income' });
+                                        }}
+                                        title={getTrad("Deposit")}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.typeOperation === 'income' ? true : false}
+                                    />
+                                    <CheckBox
+                                        onPress={() => {
+                                            setFormAddBudget({ ...formAddBudget, typeOperation: 'expense' });
+                                        }}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
+                                        title={getTrad("Withdrawal")}
+                                        checkedIcon='dot-circle-o'
+                                        uncheckedIcon='circle-o'
+                                        checked={formAddBudget.typeOperation === 'expense' ? true : false}
+                                    />
+                                </View>
 
 
-                        </View>}
-                    </View>}
+                            </View>}
+
+                        </View>
+                    </ScrollView>
+                }
+
+
                 {
                     curentEtape === 'Etape3' &&
                     <View style={styleSheet.stageContainer}>
                         <View>
-                            <Text style={styleSheet.modalInputLabel}>{getTrad("IsOperationUnique")}</Text>
+                            <Text style={globalStyle.labelStyle}>{getTrad("IsOperationUnique")}</Text>
                             <View style={[globalStyle.flexRow]}>
                                 <CheckBox
                                     onPress={() => {
                                         setFormAddBudget({ ...formAddBudget, isUnique: true });
                                     }}
-                                    textStyle={{
-
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
+                                    textStyle={globalStyle.titleStyleCheckBox}
+                                    containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                                    style={globalStyle.checkBoxStyle}
+                                    checkedColor={globalStyle.checkedColorCheckBox.color}
                                     title={getTrad("yes")}
                                     checkedIcon='dot-circle-o'
                                     uncheckedIcon='circle-o'
@@ -403,11 +411,10 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                     onPress={() => {
                                         setFormAddBudget({ ...formAddBudget, isUnique: false });
                                     }}
-                                    textStyle={{
-
-                                        fontWeight: 'bold',
-                                        fontSize: width * 0.04
-                                    }}
+                                    textStyle={globalStyle.titleStyleCheckBox}
+                                    containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                                    style={globalStyle.checkBoxStyle}
+                                    checkedColor={globalStyle.checkedColorCheckBox.color}
                                     title={getTrad("no")}
                                     checkedIcon='dot-circle-o'
                                     uncheckedIcon='circle-o'
@@ -419,18 +426,17 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                         {
                             !formAddBudget.isUnique &&
                             <View>
-                                <Text style={styleSheet.modalInputLabel}>{getTrad("theOperationRepeatedEvery")}</Text>
+                                <Text style={globalStyle.labelStyle}>{getTrad("theOperationRepeatedEvery")}</Text>
                                 <View style={[globalStyle.flexRow]}>
 
                                     <CheckBox
                                         onPress={() => {
                                             setFormAddBudget({ ...formAddBudget, period: 'month' });
                                         }}
-                                        textStyle={{
-
-                                            fontWeight: 'bold',
-                                            fontSize: width * 0.04
-                                        }}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
                                         title={getTrad("months")}
                                         checkedIcon='dot-circle-o'
                                         uncheckedIcon='circle-o'
@@ -440,11 +446,10 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                                         onPress={() => {
                                             setFormAddBudget({ ...formAddBudget, period: 'year' });
                                         }}
-                                        textStyle={{
-
-                                            fontWeight: 'bold',
-                                            fontSize: width * 0.04
-                                        }}
+                                        textStyle={globalStyle.titleStyleCheckBox}
+                                        containerStyle={[globalStyle.containerCheckBoxStyle, { width: "40%" }]}
+                                        style={globalStyle.checkBoxStyle}
+                                        checkedColor={globalStyle.checkedColorCheckBox.color}
                                         title={getTrad("years")}
                                         checkedIcon='dot-circle-o'
                                         uncheckedIcon='circle-o'
@@ -455,12 +460,12 @@ export const ModalAddBudget = ({ isViewModalAddBudget, setIsViewModalAddBudget, 
                         }
 
 
-                        <View>
-                            <Text style={styleSheet.modalInputLabel}>{getTrad("TransactionCategory")}</Text>
+                        <View >
+                            <Text style={globalStyle.labelStyle}>{getTrad("TransactionCategory")}</Text>
                             <Picker
                                 selectedValue={formAddBudget.categoryTransaction}
-                                style={{ height: 50, width: width * 0.8, color: '#000' }}
-
+                                style={globalStyle.pickerInputStyle}
+                                dropdownIconColor={"#fff"}
                                 onValueChange={(itemValue: number, itemIndex: number) => {
                                     setFormAddBudget({ ...formAddBudget, categoryTransaction: itemValue });
                                 }}
@@ -544,8 +549,10 @@ const BtnNextStage = React.memo(({ curentStage, setCurentStage, handleSaveEditTr
                 curentStage !== 'Etape3' ?
                     <Button
                         title={getTrad("Next")}
-                        titleStyle={{ color: "#fff", fontSize: width * 0.04 }}
+
                         radius={25}
+                        titleStyle={globalStyle.btnTitleStyle}
+                        containerStyle={globalStyle.btnContainerStyle}
                         buttonStyle={globalStyle.btnStyle}
                         onPress={() => {
                             switch (curentStage) {
@@ -594,11 +601,10 @@ const BtnSaveTransaction = React.memo(({ handleSaveTransaction, handleSaveEditTr
         <Button
             color={"#817FE5"}
             radius={25}
-            disabledStyle={{ backgroundColor: "rgba(129, 127, 229, 0.26)" }}
+            titleStyle={globalStyle.btnTitleStyle}
+            containerStyle={globalStyle.btnContainerStyle}
             buttonStyle={globalStyle.btnStyle}
-            style={globalStyle.btnStyle}
             title={transaction ? getTrad("Save") : getTrad("Add")}
-            titleStyle={{ color: "#fff", fontSize: width * 0.04 }}
             onPress={() => {
 
                 if (!transaction) {
