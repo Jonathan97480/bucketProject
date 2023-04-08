@@ -17,6 +17,8 @@ export const trad = {
         listAlreadyExist: "Cette liste existe déjà avec ce nom",
         EditAccount: "Modifier le compte",
         AddAccount: "Ajouter un compte",
+        errorConnection: "Une erreur est survenue lors de la connexion",
+        AnErrorOccurredRegisteringNewUser: "Une erreur est survenue lors de l’enregistrement du nouvel utilisateur",
         ok: "Ok",
         Information: "Information",
         logout: "Déconnexion",
@@ -146,18 +148,42 @@ export const trad = {
         NameTransactionAlreadyUsed: "Ce nom de transaction est déjà utilisé",
         AnOperationAlreadyExistsName: "Une opération existe déjà avec ce nom",
         TheFieldEmpty: "Le champ est vide veuillez le remplir",
+        TheUserDoesNotExist: "L'utilisateur n'existe pas",
+        TheUserRegisteredSuccessfully: "L'utilisateur a été enregistré avec succès",
+        UserCouldNotSaved: "L'utilisateur n'a pas pu être enregistré",
+        errorRegister: "Une erreur est survenue lors de l'enregistrement d'un nouvel utilisateur",
+        SelectUser: "Sélectionnez un utilisateur",
+        NoUser: "Aucun utilisateur est enregistré  dans l'application pour le moment veuillez en créer un en cliquant sur le bouton ci-dessous",
+        TheUserHasBeenDeleted: "L'utilisateur a été supprimé",
+        AnErrorOccurredDeletingTheUser: "Une erreur est survenue lors de la suppression de l'utilisateur",
+        DeleteUser: "Supprimer l'utilisateur",
+        Info: "Information",
+        AreYouSureYouWantToDeleteThisUser: "Êtes-vous sûr de vouloir supprimer cet utilisateur ?",
+        Settings: "Paramètres",
     },
     EN: {
+        TheUserHasBeenDeleted: "The user has been deleted",
+        Settings: "Settings",
+        AreYouSureYouWantToDeleteThisUser: "Are you sure you want to delete this user?",
+        DeleteUser: "Delete user",
+        AnErrorOccurredDeletingTheUser: "An error occurred while deleting the user",
         deleteCompte: "Delete account",
+        TheUserRegisteredSuccessfully: "The user has been registered successfully",
+        UserCouldNotSaved: "The user could not be saved",
         deleteCompteMessage: "Do you really want to delete this account?",
         TheFieldEmpty: "The field is empty please fill it",
+        SelectUser: "Select a user",
         cancel: "Cancel",
         Account: "Account",
+        Info: "Information",
+        NoUser: "No user is registered in the application for the moment please create one by clicking on the button below",
         yes: "Yes",
         no: "No",
         ok: "Ok",
         EditAccount: "Edit account",
         AddAccount: "Add account",
+        AnErrorOccurredRegisteringNewUser: "An error occurred while registering a new user",
+        TheUserDoesNotExist: "The user does not exist",
         pleaseConnectYour: "Please connect your",
         EmptyUserCreateYourCount: "Empty user create your count",
         Delete: "Delete",
@@ -262,6 +288,7 @@ export const trad = {
         DoYouWantDeleteList: "Are you sure you want to delete this list?",
         TaskComplete: "Task completed",
         ToResearch: "To research",
+        errorConnection: "An error occurred while connecting to the server",
         SearchForItemInList: "Find an item in the list",
         UnfinishedTask: "Current task",
         DoYouWantDeleteThisTask: "Are you sure you want to delete this task?",
@@ -295,6 +322,10 @@ export const trad = {
 }
 
 export function getTrad(key: keyof typeof trad["FR"]) {
-    const local: "FR" | "EN" = "FR"/*  getLocales()[0].languageCode === "fr" ? "FR" : "EN"; */
-    return trad[local][key] ? trad[local][key] : key;
+
+    const local: "FR" | "EN" = __DEV__ ? "FR" : getLocales()[0].languageCode === "fr" ? "FR" : "EN";
+
+    if (!trad[local][key]) return key;
+
+    return trad[local][key] as string;
 }

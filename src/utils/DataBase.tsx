@@ -2,6 +2,7 @@
 import * as SQLite from 'expo-sqlite';
 import { CompteInterface, TransactionInterface } from '../redux/comptesSlice';
 import { listInterface, stepInterface } from '../redux/listSlice';
+import { user, userInterface } from '../redux/userSlice';
 
 const db = SQLite.openDatabase("database.db");
 
@@ -580,6 +581,32 @@ export default class DatabaseManager {
 
     }
 
+
+    static async GetAllUsers(): Promise<user[]> {
+
+        return new Promise((resolve, reject) => {
+
+            db.transaction(tx => {
+                tx.executeSql(
+                    "SELECT * FROM users",
+                    [],
+                    (_, { rows: { _array } }) => {
+                        resolve(_array);
+                    }
+                );
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + GET ALL USERS")
+                }
+            );
+        });
+
+
+    }
+
     static LoginUser = (identifiant: string, password: string): Promise<{
         id: number,
         identifiant: string,
@@ -614,6 +641,63 @@ export default class DatabaseManager {
                 }
             );
         });
+
+    }
+
+
+    static RemoveUser = async (id: number): Promise<boolean> => {
+
+        return new Promise((resolve, reject) => {
+            db.transaction(tx => {
+
+                /* get ALl compte user */
+                tx.executeSql(
+                    "SELECT * FROM compte_users WHERE user_id = ?",
+                    [id],
+                    (_, { rows: { _array } }) => {
+
+                        /* Remove all compte user */
+                        tx.executeSql(
+                            "DELETE FROM compte_users WHERE user_id = ?",
+                            [id],
+                            (_, { rows: { _array } }) => {
+
+                                /* Remove all compte */
+                                for (let i = 0; i < _array.length; i++) {
+                                    tx.executeSql(
+                                        "DELETE FROM compte WHERE id = ?",
+                                        [_array[i].compte_id],
+                                        (_, { rows: { _array } }) => {
+                                            resolve(true);
+                                        }
+                                    );
+                                }
+
+                                /* Remove user */
+                                tx.executeSql(
+                                    "DELETE FROM users WHERE id = ?",
+                                    [id],
+                                    (_, { rows: { _array } }) => {
+                                        resolve(true);
+                                    }
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+            }, (e) => {
+                console.error("ERREUR + " + e)
+                reject(e);
+            },
+                () => {
+                    console.info("OK + REMOVE USER")
+                }
+            );
+        });
+
 
     }
 

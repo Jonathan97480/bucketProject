@@ -14,7 +14,7 @@ import globalStyle from "../../assets/styleSheet/globalStyle";
 import { RemoveUser } from "../LoginAndRegister/logic";
 import { deleteCompte } from "./components/ComptesItem/logic";
 import { getTrad } from "../../lang/internationalization";
-
+import { useNavigation } from "@react-navigation/native";
 
 export default function AllComptes({ navigation }: any) {
 
@@ -140,7 +140,7 @@ export default function AllComptes({ navigation }: any) {
                             onPress: async () => {
 
                                 await RemoveUser()
-                                navigation.navigate("LoginAndRegister");
+                                navigation.replace("LoginAndRegister");
                             }
                         }
                     ]);

@@ -1,13 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+export interface user {
+    id: number,
+    identifiant: string,
+    password: string,
+}
+
 
 export interface userInterface {
 
-    user: {
-        id: number,
-        identifiant: string,
-        password: string,
-    } | undefined,
+    user: user | undefined,
     isConnected: boolean
 }
 

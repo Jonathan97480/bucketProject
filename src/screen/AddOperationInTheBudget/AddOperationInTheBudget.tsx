@@ -121,7 +121,9 @@ export const AddOperationInTheBudget = () => {
     return (
 
         <CustomSafeAreaView>
-            <BannerAds />
+            <BannerAds
+                key="ca-app-pub-2398424925470703/8995253614"
+            />
             <Header
                 localCurentBudget={budget}
                 dispatchModalVisible={dispatchModalVisible}

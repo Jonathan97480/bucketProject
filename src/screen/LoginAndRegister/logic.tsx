@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DatabaseManager from "../../utils/DataBase"
+import { getTrad } from '../../lang/internationalization';
 
 interface FormValidateParams {
     identifiant: string,
@@ -22,29 +23,46 @@ export const FormValidate = ({ identifiant, password }: FormValidateParams) => {
 
 }
 
+export const resetForm = () => {
+    return {
+        identifiant: "",
+        identifiantError: "",
+        password: "",
+        passwordError: "",
+        errorGlobal: ""
+    }
+}
+
 export const RegisterUser = async ({ identifiant, password }: FormValidateParams) => {
-
-
 
     const result = await DatabaseManager.RegisterUser(identifiant, password)
 
     if (result) {
-        const _result = await LoginUser({ identifiant, password })
-        if (typeof _result === "object")
-            return _result
-        else
-            throw new Error(_result)
+        const _result = await LoginUser({ identifiant, password });
+        if (typeof _result.user != null) return _result;
+
+        return {
+            user: null,
+            message: getTrad("AnErrorOccurredRegisteringNewUser")
+        }
 
     }
 
+    return {
+        user: null,
+        message: getTrad("AnErrorOccurredRegisteringNewUser")
+    }
 
 }
 
 
-export const LoginUser = async ({ identifiant, password }: FormValidateParams): Promise<"l'utilisateur n'existe pas" | {
-    id: number,
-    identifiant: string,
-    password: string,
+export const LoginUser = async ({ identifiant, password }: FormValidateParams): Promise<{
+    user: {
+        id: number,
+        identifiant: string,
+        password: string,
+    } | null,
+    message: string | null
 }> => {
 
 
@@ -52,9 +70,15 @@ export const LoginUser = async ({ identifiant, password }: FormValidateParams): 
 
 
     if (typeof result === "boolean")
-        return "l'utilisateur n'existe pas"
+        return {
+            user: null,
+            message: getTrad("TheUserDoesNotExist")
+        }
 
-    return result
+    return {
+        user: result,
+        message: null
+    }
 
 
 }
@@ -69,8 +93,17 @@ export const SaveUser = async (user: {
 
     try {
         await AsyncStorage.setItem("user", JSON.stringify(user))
+
+        return {
+            user: user,
+            message: getTrad("TheUserRegisteredSuccessfully")
+        }
+
     } catch (e) {
-        console.error(e)
+        return {
+            user: null,
+            message: getTrad("UserCouldNotSaved")
+        }
     }
 
 }
@@ -135,4 +168,34 @@ export const GetIsAsUser = async () => {
         user: null
     }
 
+}
+
+
+export const GetAllUser = async () => {
+    const result = await DatabaseManager.GetAllUsers();
+    return {
+        isUserRegister: false,
+        userAutoLogin: false,
+        users: result
+    };
+}
+
+
+export const RemoveUserInDatabase = async (id_user: number) => {
+
+    const result = await DatabaseManager.RemoveUser(id_user);
+
+    if (result) {
+        return {
+            isRemove: true,
+            message: getTrad("TheUserHasBeenDeleted")
+        }
+    }
+
+    return {
+        isRemove: false,
+        message: getTrad("AnErrorOccurredDeletingTheUser")
+
+
+    }
 }

@@ -1,21 +1,24 @@
-import { View, Text, Dimensions } from "react-native";
+import { View, Text, Dimensions, FlatList, TouchableOpacity } from "react-native";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { MonthInterface, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import styleSheet from "./styleSheet";
 import { getTrad } from "../../../../lang/internationalization";
+import { getMonthByNumber } from "../../../../utils/DateManipulation";
+import { useNavigation } from "@react-navigation/native";
 interface ArchiveItemProps {
 
     months: MonthInterface[] | null;
     year: number;
+    openStat: (month: MonthInterface) => void;
 
 
 }
 
 
 
-export default function ArchiveItem({ months, year }: ArchiveItemProps) {
+export default function ArchiveItem({ months, year, openStat }: ArchiveItemProps) {
 
-    const { width } = Dimensions.get('window');
+
 
     if (months === null) {
         return <>
@@ -26,29 +29,49 @@ export default function ArchiveItem({ months, year }: ArchiveItemProps) {
     }
 
 
+    const monthReverse = months.slice(0).reverse();
 
     return (
-        <>
-            {
-                months.slice(0).reverse().map((month: MonthInterface, index: number) => {
+        <FlatList
+            data={monthReverse}
+            keyExtractor={(item, index) => item.nameMonth + "-" + index.toString()}
+            renderItem={({ item }) => <ItemMonth month={item} year={year.toString()} openStat={openStat} />}
 
-                    const numberTransaction = month.transactions.expense.length + month.transactions.income.length
-                    return (<View style={[styleSheet.blockMonthSelect, globalStyle.backgroundSecondaryColor]}
-                        key={'archive-' + index}
-                    >
+        />
 
-                        <Text style={[styleSheet.blockCurentMonthText, globalStyle.colorTextPrimary, { fontSize: width * 0.04 }]}>{getTradNameMonth(month.nameMonth)} {year}</Text>
-                        <Text style={[{ fontSize: width * 0.031 }, globalStyle.colorTextPrimary]} >{numberTransaction} {getTrad("transactions")}</Text>
-                    </View>
-                    )
-                })
-            }
-
-
-        </>
     )
 }
 
+
+const ItemMonth = ({ month, year, openStat }: { month: MonthInterface, year: string, openStat: (month: MonthInterface) => void }) => {
+
+    const { width } = Dimensions.get('window');
+    const numberTransaction = month.transactions.expense.length + month.transactions.income.length
+    const navigation = useNavigation();
+
+    return (
+        <TouchableOpacity
+            onPress={() => {
+                if (month.nameMonth === getMonthByNumber(new Date().getMonth() + 1)) {
+                    navigation.navigate("transactions")
+
+                } else {
+                    openStat(month)
+                }
+            }}
+
+            style={[styleSheet.blockMonthSelect, globalStyle.backgroundSecondaryColor]}>
+            <Text
+                style={[styleSheet.blockCurentMonthText,
+                globalStyle.colorTextPrimary, { fontSize: width * 0.04 }]}>
+                {getTradNameMonth(month.nameMonth)} {year}
+            </Text>
+            <Text style={[{ fontSize: width * 0.031 }, globalStyle.colorTextPrimary]} >{numberTransaction} {getTrad("transactions")}</Text>
+        </TouchableOpacity>
+
+
+    );
+}
 
 
 function getTradNameMonth(month: string) {

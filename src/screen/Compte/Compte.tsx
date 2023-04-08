@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, ScrollView, Text, Dimensions, FlatList } from "react-native";
+import { View, Text, Dimensions } from "react-native";
 import globalStyle from "../../assets/styleSheet/globalStyle";
 import styleSheet from "./styleSheet";
 import ArchiveItem from "./components/ArchiveItem/ArchiveItem";
@@ -9,7 +9,9 @@ import { addComptes, CompteInterface, MonthInterface, setCurentCompte, setCurent
 import { getMonthByNumber } from "../../utils/DateManipulation";
 import { FixeIsYearAndMonthExist } from "./logic";
 import { userInterface } from "../../redux/userSlice";
-import { CustomActivityIndicator } from "../../components";
+import { CustomActivityIndicator, CustomModal } from "../../components";
+
+
 export default function Compte() {
 
 
@@ -21,6 +23,28 @@ export default function Compte() {
     const currentMonth: MonthInterface = useSelector((state: any) => state.compte.currentMonth);
     const user: userInterface = useSelector((state: any) => state.user);
     const [isLoading, setIsLoading] = React.useState(false);
+
+
+    const [Statistiques, setStatistiques] = React.useReducer((state: any, action: { type: string, payload?: any }) => {
+
+        switch (action.type) {
+            case 'open':
+                return {
+                    data: action.payload,
+                    isStatistiquesModalVisible: true
+                };
+            case 'close':
+                return {
+                    data: null,
+                    isStatistiquesModalVisible: false
+                };
+            default:
+                return state;
+        }
+
+
+    }, { isStatistiquesModalVisible: false })
+
 
     useEffect(() => {
         if (!isLoading) {
@@ -58,7 +82,7 @@ export default function Compte() {
     }, [currentCompte])
 
 
-
+    const transactionsListeReverse = currentCompte.transactions.slice(0).reverse();
 
 
 
@@ -75,40 +99,48 @@ export default function Compte() {
 
                         />
 
-                        <View style={styleSheet.container}>
+                        <View style={[styleSheet.container, { flex: 1, alignSelf: "center" }]}>
 
-                            <ScrollView style={[styleSheet.scrollview,]}>
+                            {
 
-                                <View style={[globalStyle.containerCenter, { alignItems: "center" }]}>
-                                    {
+                                transactionsListeReverse.map((YearTransaction, index) => {
+                                    return (
+                                        <View
+                                            key={`list-index-${index}`}>
+                                            <Text style={[
+                                                { fontSize: width * 0.05 },
+                                                globalStyle.colorTextPrimary,
+                                                globalStyle.textAlignCenter,
+                                                globalStyle.marginVertical
+                                            ]} >{YearTransaction.year} </Text>
 
-                                        currentCompte.transactions.slice(0).reverse().map((YearTransaction, index) => {
-                                            return (
-                                                <View key={`list-index-${index}`}>
-                                                    <Text style={[
-                                                        { fontSize: width * 0.05 },
-                                                        globalStyle.colorTextPrimary,
-                                                        globalStyle.textAlignCenter,
-                                                        globalStyle.marginVertical
-                                                    ]} >{YearTransaction.year} </Text>
+                                            <ArchiveItem
+                                                months={YearTransaction.month}
+                                                year={YearTransaction.year}
+                                                openStat={(value: MonthInterface) => {
+                                                    setStatistiques({ type: 'open', payload: value });
+                                                }}
 
-                                                    <ArchiveItem
-                                                        months={YearTransaction.month}
-                                                        year={YearTransaction.year}
+                                            />
+                                        </View>
 
-                                                    />
-                                                </View>
+                                    )
+                                })
 
-                                            )
-                                        })
+                            }
 
-                                    }
-                                </View>
-                            </ScrollView>
 
                         </View>
                     </>
             }
+            <ModalStatistics
+                visible={Statistiques.isStatistiquesModalVisible}
+                setIsVisible={() => {
+                    setStatistiques({ type: 'close' })
+                }}
+                data={Statistiques.data}
+
+            />
         </View>
 
     )
@@ -118,3 +150,30 @@ export default function Compte() {
 
 
 
+function ModalStatistics(props: { visible: boolean, setIsVisible: (value: boolean) => void, data: MonthInterface }) {
+
+    const [isLoading, setIsLoading] = React.useState(false);
+    const [data, setData] = React.useState<any>(null);
+
+    useEffect(() => {
+        if (props.data !== null) {
+
+            setData(props.data);
+        }
+    }, [props.data]);
+
+    return (
+        <CustomModal
+            visible={false}
+            title="Statistiques"
+            setIsVisible={() => { }}
+        >
+            <Text> WORK IN PROGRESSE </Text>
+
+        </CustomModal>
+    )
+
+
+
+
+}

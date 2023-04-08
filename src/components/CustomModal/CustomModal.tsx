@@ -7,8 +7,8 @@ import { Icon } from "@rneui/base";
 interface CustomModalProps {
     visible: boolean,
     setIsVisible: (isVisible: boolean) => void,
-    animationType: "slide" | "none" | "fade" | undefined,
-    transparent: boolean,
+    animationType?: "slide" | "none" | "fade" | undefined,
+    transparent?: boolean,
     children: React.ReactNode,
     title?: string,
     disableCenterPosition?: boolean,

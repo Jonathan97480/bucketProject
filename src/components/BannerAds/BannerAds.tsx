@@ -1,10 +1,11 @@
-const adUnitId = __DEV__ ? TestIds.BANNER : 'ca-app-pub-2398424925470703/2494426460';
+
 import { View } from 'react-native';
 import { TestIds, BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import React from 'react';
 
 
-export default function BannerAds() {
+export default function BannerAds(props: { key?: string }) {
+    const adUnitId = __DEV__ ? TestIds.BANNER : props.key ? props.key : 'ca-app-pub-2398424925470703/2494426460';
     return (<View
         style={{
             alignItems: "center",

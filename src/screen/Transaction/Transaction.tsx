@@ -46,7 +46,9 @@ export const Transaction = () => {
         return (
             <CustomSafeAreaView >
 
-                <BannerAds />
+                <BannerAds
+                    key="ca-app-pub-2398424925470703/9529057345"
+                />
             </CustomSafeAreaView>
         )
     }

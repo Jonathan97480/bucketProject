@@ -73,7 +73,10 @@ export const AllList = () => {
 
         <CustomSafeAreaView>
 
-            <BannerAds />
+            <BannerAds
+
+                key="ca-app-pub-2398424925470703/5056008601"
+            />
             <View style={{
 
                 flex: 1,

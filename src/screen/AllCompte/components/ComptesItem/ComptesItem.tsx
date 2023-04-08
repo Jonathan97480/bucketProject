@@ -40,8 +40,6 @@ export const ComptesItem = ({ item, navigation = undefined, editCallBack, delete
                 overflow: 'hidden',
                 width: width > 500 ? 500 : width * 0.8,
                 maxWidth: width > 500 ? 500 : "100%",
-
-
             }}
 
             leftContent={(reset) => {

@@ -15,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { TabBardCustom } from './src/components';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import 'expo-dev-client';
+import Settings from './src/screen/Settings/Settings';
 
 const Tab = createBottomTabNavigator();
 const stackBudget = createNativeStackNavigator();
@@ -65,11 +66,7 @@ export default function App() {
 
         <stackBudget.Navigator
           initialRouteName='LoginAndRegister'
-          screenOptions={{
-            headerShown: false,
-
-
-          }}
+          screenOptions={{ headerShown: false }}
         >
           <stackBudget.Screen name="LoginAndRegister" component={LoginAndRegister} />
           <stackBudget.Screen name="Tab" component={TabButton} />
@@ -101,6 +98,8 @@ export const TabButton = () => {
       <Tab.Screen name="Account" component={Compte} />
       <Tab.Screen name="transactions" component={Transaction} />
       <Tab.Screen name="List" component={AllList} />
+      <Tab.Screen name="Settings" component={Settings} />
+
     </Tab.Navigator>
   );
 }

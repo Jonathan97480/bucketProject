@@ -90,6 +90,10 @@ function getIconByRouteName(name: string, isFocused: boolean): React.ReactNode {
             return <Image source={require("../../assets/images/list.png")} style={[styleSheet.icon, {
                 tintColor: isFocused ? '#9747FF' : '#fff',
             }]} />;
+        case "Settings":
+            return <Image source={require("../../assets/images/settings.png")} style={[styleSheet.icon, {
+                tintColor: isFocused ? '#9747FF' : '#fff',
+            }]} />;
         default:
             return <Image source={require("../../assets/images/Wallet.png")} style={[styleSheet.icon, {
                 tintColor: isFocused ? '#9747FF' : '#fff',

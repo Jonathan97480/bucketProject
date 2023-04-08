@@ -24,6 +24,10 @@ export default StyleSheet.create({
         backgroundColor: "#00FF00",
     },
 
+    fabColor: {
+        backgroundColor: "#817FE5",
+    },
+
     colorTextPrimary: {
         color: "#fff",
 
