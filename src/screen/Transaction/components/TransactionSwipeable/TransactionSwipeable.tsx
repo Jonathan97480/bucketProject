@@ -5,7 +5,7 @@ import { Button, ListItem, Icon } from "@rneui/base";
 import { addComptes, setCurentBudget, setCurentCompte, setCurentMonth, TransactionMonthInterface } from "../../../../redux/comptesSlice";
 import globalStyle from "../../../../assets/styleSheet/globalStyle";
 import { IconsCategory } from "../../../../components";
-import { deleteTransaction } from "./logic";
+import { deleteTransaction, getColorBackGroundCard, getNameIconCard } from "./logic";
 import { useSelector, useDispatch } from "react-redux";
 import { View, Dimensions, Alert } from "react-native";
 import { getTrad } from "../../../../lang/internationalization";
@@ -25,7 +25,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
     const comptes = useSelector((state: any) => state.compte.comptes);
     const dispatch = useDispatch();
     const { width, height } = Dimensions.get('window');
-
+    const SIZE_TITLE = 13;
     return (
         <ListItem.Swipeable
             style={
@@ -40,7 +40,7 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
 
 
 
-            containerStyle={[{ backgroundColor: transaction.transactionType === "Spent" ? "#9C68DD" : "#4F94BB", borderRadius: 20 }]}
+            containerStyle={[{ backgroundColor: getColorBackGroundCard(transaction.transactionType), borderRadius: 20 }]}
             onPress={() => {
                 if (transaction.transactionType === "Budget") {
 
@@ -107,8 +107,8 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
             )}
         >
             <Icon
-                name={transaction.transactionType === "Spent" ? "swap-horizontal-bold" : "wallet"}
-                type='material-community'
+                name={getNameIconCard(transaction.transactionType, transaction.typeOperation)}
+                type='font-awesome-5'
                 color={colorList.primary}
                 size={width * 0.08}
             />
@@ -126,17 +126,19 @@ export default function TransactionSwipeable({ transaction, indexBudget, setModa
                         globalStyle.textAlignLeft
 
                     ]}
-                >{transaction.name.slice(0, 30)}</ListItem.Title>
+                >{
+                        transaction.name.length > SIZE_TITLE ?
+                            transaction.name.substring(0, SIZE_TITLE) + "..." : transaction.name}</ListItem.Title>
                 {
                     transaction.transactionType === "Budget" ?
                         <>
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: width > 500 ? 20 : width * 0.03, width: "100%" }}
-                            >{getTrad("AmountStart")} : {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
+                            >{getTrad("AmountStart")} :  {transaction.start_montant.toFixed(2)}€</ListItem.Subtitle>
 
                             <ListItem.Subtitle
                                 style={{ color: colorList.primary, fontSize: width > 500 ? 20 : width * 0.03, width: "100%" }}
-                            >{getTrad("RemainingBudget")} : {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
+                            >{getTrad("RemainingBudget")} :         {transaction.montant.toFixed(2)}€</ListItem.Subtitle>
                         </>
                         :
                         <>

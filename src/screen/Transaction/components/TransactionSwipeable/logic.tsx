@@ -138,3 +138,31 @@ async function deleteTransfer(transaction: TransactionMonthInterface, _AllCompte
 
 
 }
+
+export function getColorBackGroundCard(transactionType: "Spent" | "Budget" | "BankTransfers") {
+
+    switch (transactionType) {
+        case "Spent":
+            return "#9C68DD";
+        case "Budget":
+            return "#4F94BB";
+        case "BankTransfers":
+            return "#DDA868";
+        default:
+            return "#9C68DD";
+    }
+}
+
+export function getNameIconCard(transactionType: "Spent" | "Budget" | "BankTransfers", typeOperation: "income" | "expense") {
+
+    switch (transactionType) {
+        case "Spent":
+            return typeOperation === "income" ? "coins" : "credit-card";
+        case "Budget":
+            return "money-bill-wave";
+        case "BankTransfers":
+            return "exchange-alt";
+        default:
+            return "shopping-cart";
+    }
+}

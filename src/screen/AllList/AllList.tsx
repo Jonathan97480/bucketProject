@@ -164,25 +164,23 @@ const ModalCerateList = React.memo(({ isVisible, setModalIsVisible }: { isVisibl
     return (
         <CustomModal
             visible={isVisible}
-
+            backgroundColor='#282525'
             setIsVisible={setModalIsVisible}
             animationType="slide"
             transparent={true}
             title={getTrad("AddList")}
+            titleStyle={globalStyle.titleStyle}
+            containerStyle={globalStyle.modalContainerStyleForm}
         >
             <View style={{ width: "100%" }}>
-                <View>
+                <View style={{ padding: 15 }}>
                     <Input
                         placeholder={getTrad("NewListName")}
                         value={newList}
-                        inputStyle={{
-                            color: "black",
-                            fontSize: width * 0.04,
-                        }}
-                        style={{
-                            color: "black",
-                            marginVertical: 10,
-                        }}
+                        label={getTrad("NewListName")}
+                        labelStyle={globalStyle.labelStyle}
+                        inputStyle={globalStyle.inputStyle}
+                        inputContainerStyle={globalStyle.inputContainerStyle}
                         onChangeText={(text) => {
                             setNewList(text);
                         }}
@@ -198,14 +196,9 @@ const ModalCerateList = React.memo(({ isVisible, setModalIsVisible }: { isVisibl
                         <Button
                             title={getTrad("AddList")}
                             radius={25}
+                            titleStyle={globalStyle.btnTitleStyle}
+                            containerStyle={globalStyle.btnContainerStyle}
                             buttonStyle={globalStyle.btnStyle}
-                            titleStyle={{
-                                color: "white",
-                                fontSize: width * 0.04,
-                                width: "100%",
-                                textAlign: "center",
-
-                            }}
                             onPress={() => {
                                 if (newList.length === 0) {
                                     Alert.alert("Erreur", getTrad("PleaseEnterNameForList"));
