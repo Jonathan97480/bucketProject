@@ -6,3 +6,4 @@ export { default as IconsCategory } from "./IconsCategory/IconsCategory";
 export { CustomModal } from "./CustomModal/CustomModal";
 export { default as BannerAds } from "./BannerAds/BannerAds";
 export { default as NotificationForm } from "./ErrorForm/NotificationForm";
+export { default as CustomSection } from "./CustomSection/CustomSection";
